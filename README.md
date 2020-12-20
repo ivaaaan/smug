@@ -1,4 +1,4 @@
-# Smug - tmux session manager.
+# Smug - tmux session manager
 
 Inspired by [tmuxinator](https://github.com/tmuxinator/tmuxinator) and [tmuxp](https://github.com/tmux-python/tmuxp).
 
