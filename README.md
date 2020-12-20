@@ -1,6 +1,10 @@
 # Smug - tmux session manager.
 
-Inspired by [tmuxinator](https://github.com/tmuxinator/tmuxinator) and [tmuxp](https://github.com/tmux-python/tmuxp)
+Inspired by [tmuxinator](https://github.com/tmuxinator/tmuxinator) and [tmuxp](https://github.com/tmux-python/tmuxp).
+
+Smug automates your tmux workflow. You can create a single configuration file, and smug will create all required windows and panes for it.
+
+![gif](https://i.imgur.com/CfLgrz5.gif)
 
 ## Usage
 
