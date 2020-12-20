@@ -3,7 +3,6 @@ package main
 import (
 	"os"
 	"os/exec"
-	"strings"
 )
 
 const (
@@ -17,13 +16,7 @@ type Tmux struct {
 
 func (tmux Tmux) NewSession(name string) (string, error) {
 	cmd := exec.Command("tmux", "new", "-Pd", "-s", name)
-
-	session, err := tmux.commander.Exec(cmd)
-	if err != nil {
-		return "", &ShellError{strings.Join(cmd.Args, " "), err}
-	}
-
-	return session, nil
+	return tmux.commander.Exec(cmd)
 }
 
 func (tmux Tmux) SessionExists(name string) bool {
@@ -47,7 +40,10 @@ func (tmux Tmux) NewWindow(target string, name string, root string, commands []s
 	}
 
 	for _, c := range commands {
-		tmux.SendKeys(window, c)
+		err = tmux.SendKeys(window, c)
+		if err != nil {
+			return "", err
+		}
 	}
 
 	return window, nil
@@ -93,13 +89,16 @@ func (tmux Tmux) SplitWindow(target string, splitType string, root string, comma
 	}
 
 	for _, c := range commands {
-		tmux.SendKeys(pane, c)
+		err = tmux.SendKeys(pane, c)
+		if err != nil {
+			return "", err
+		}
 	}
 
 	return pane, nil
 }
 
 func (tmux Tmux) StopSession(target string) (string, error) {
-	cmd := exec.Command("tmux", "stop-session", "-t", target)
+	cmd := exec.Command("tmux", "kill-session", "-t", target)
 	return tmux.commander.Exec(cmd)
 }

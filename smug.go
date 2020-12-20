@@ -37,14 +37,13 @@ type Smug struct {
 
 func (smug Smug) execShellCommands(commands []string, path string) error {
 	for _, c := range commands {
-		args := strings.Split(c, " ")
 
-		cmd := exec.Command(args[0], args[1:]...)
+		cmd := exec.Command("/bin/sh", "-c", c)
 		cmd.Dir = path
 
 		_, err := smug.commander.Exec(cmd)
 		if err != nil {
-			return &ShellError{c, err}
+			return err
 		}
 	}
 	return nil

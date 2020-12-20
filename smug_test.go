@@ -20,8 +20,8 @@ var startSessionTestTable = []struct {
 		},
 		[]string{
 			"tmux has-session -t ses",
-			"command1",
-			"command2",
+			"/bin/sh -c command1",
+			"/bin/sh -c command2",
 			"tmux new -Pd -s ses",
 			"tmux kill-window -t ses:0",
 			"tmux move-window -r",

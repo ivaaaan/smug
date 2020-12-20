@@ -17,12 +17,16 @@ func (c DefaultCommander) Exec(cmd *exec.Cmd) (string, error) {
 	output, err := cmd.CombinedOutput()
 
 	if err != nil {
-		return "", err
+		return "", &ShellError{strings.Join(cmd.Args, " "), err}
 	}
 
 	return strings.TrimSuffix(string(output), "\n"), nil
 }
 
 func (c DefaultCommander) ExecSilently(cmd *exec.Cmd) error {
-	return cmd.Run()
+	err := cmd.Run()
+	if err != nil {
+		return &ShellError{strings.Join(cmd.Args, " "), err}
+	}
+	return nil
 }

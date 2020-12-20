@@ -4,7 +4,7 @@ Inspired by [tmuxinator](https://github.com/tmuxinator/tmuxinator) and [tmuxp](h
 
 ## Usage
 
-`tmux <command> <project>[:window name] [-w window name]`
+`tmux <command> <project>[:window name] [-w window name]`.
 
 ## Examples
 
@@ -14,7 +14,7 @@ To start/stop a project and all windows, run:
 
 `$ smug stop project`
 
-When you already have a started session, and you want to start only some windows from the configuration file, you can do something like this:
+When you already have a running session, and you want to create only some windows from the configuration file, you can do something like this:
 
 `$ smug start project:window1`
 
@@ -26,7 +26,7 @@ When you already have a started session, and you want to start only some windows
 
 ## Configuration
 
-Configuration files stored in the `~/.config/smug` directory in the `YAML` format, e.g `~/config/smug/your_project.yml`.
+Configuration files are stored in the `~/.config/smug` directory in the `YAML` format, e.g `~/.config/smug/your_project.yml`.
 
 Example:
 
