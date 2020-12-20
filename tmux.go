@@ -1,0 +1,105 @@
+package main
+
+import (
+	"os"
+	"os/exec"
+	"strings"
+)
+
+const (
+	VSplit = "vertical"
+	HSplit = "horizontal"
+)
+
+type Tmux struct {
+	commander Commander
+}
+
+func (tmux Tmux) NewSession(name string) (string, error) {
+	cmd := exec.Command("tmux", "new", "-Pd", "-s", name)
+
+	session, err := tmux.commander.Exec(cmd)
+	if err != nil {
+		return "", &ShellError{strings.Join(cmd.Args, " "), err}
+	}
+
+	return session, nil
+}
+
+func (tmux Tmux) SessionExists(name string) bool {
+	cmd := exec.Command("tmux", "has-session", "-t", name)
+	res, err := tmux.commander.Exec(cmd)
+	return res == "" && err == nil
+}
+
+func (tmux Tmux) KillWindow(target string) error {
+	cmd := exec.Command("tmux", "kill-window", "-t", target)
+	_, err := tmux.commander.Exec(cmd)
+	return err
+}
+
+func (tmux Tmux) NewWindow(target string, name string, root string, commands []string) (string, error) {
+	cmd := exec.Command("tmux", "neww", "-Pd", "-t", target, "-n", name, "-c", root)
+
+	window, err := tmux.commander.Exec(cmd)
+	if err != nil {
+		return "", err
+	}
+
+	for _, c := range commands {
+		tmux.SendKeys(window, c)
+	}
+
+	return window, nil
+}
+
+func (tmux Tmux) SendKeys(target string, command string) error {
+	cmd := exec.Command("tmux", "send-keys", "-t", target, command, "Enter")
+	_, err := tmux.commander.Exec(cmd)
+	return err
+}
+
+func (tmux Tmux) Attach(target string, stdin *os.File, stdout *os.File, stderr *os.File) error {
+	cmd := exec.Command("tmux", "attach", "-t", target)
+
+	cmd.Stdin = stdin
+	cmd.Stdout = stdout
+	cmd.Stderr = stderr
+
+	return tmux.commander.ExecSilently(cmd)
+}
+
+func (tmux Tmux) RenumberWindows() error {
+	cmd := exec.Command("tmux", "move-window", "-r")
+	_, err := tmux.commander.Exec(cmd)
+	return err
+}
+
+func (tmux Tmux) SplitWindow(target string, splitType string, root string, commands []string) (string, error) {
+	args := []string{"split-window", "-Pd", "-t", target, "-c", root}
+
+	switch splitType {
+	case VSplit:
+		args = append(args, "-v")
+	case HSplit:
+		args = append(args, "-h")
+	}
+
+	cmd := exec.Command("tmux", args...)
+
+	pane, err := tmux.commander.Exec(cmd)
+	if err != nil {
+		return "", err
+	}
+
+	for _, c := range commands {
+		tmux.SendKeys(pane, c)
+	}
+
+	return pane, nil
+}
+
+func (tmux Tmux) StopSession(target string) (string, error) {
+	cmd := exec.Command("tmux", "stop-session", "-t", target)
+	return tmux.commander.Exec(cmd)
+}
