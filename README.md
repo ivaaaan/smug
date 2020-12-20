@@ -2,7 +2,7 @@
 
 Inspired by [tmuxinator](https://github.com/tmuxinator/tmuxinator) and [tmuxp](https://github.com/tmux-python/tmuxp).
 
-Smug automates your tmux workflow. You can create a single configuration file, and smug will create all required windows and panes for it.
+Smug automates your [tmux](https://github.com/tmux/tmux) workflow. You can create a single configuration file, and smug will create all required windows and panes from it.
 
 ![gif](https://i.imgur.com/CfLgrz5.gif)
 
@@ -30,9 +30,9 @@ When you already have a running session, and you want to create only some window
 
 ## Configuration
 
-Configuration files are stored in the `~/.config/smug` directory in the `YAML` format, e.g `~/.config/smug/your_project.yml`.
+Configuration files stored in the `~/.config/smug` directory in the `YAML` format, e.g `~/.config/smug/your_project.yml`.
 
-Example:
+Examples:
 
 ```yaml
 session: blog
