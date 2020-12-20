@@ -84,7 +84,7 @@ func (smug Smug) StartSession(config Config, windows []string) error {
 	}
 
 	for _, w := range config.Windows {
-		if (len(windows) == 0 && w.Manual == true) || (len(windows) > 0 && !Contains(windows, w.Name)) {
+		if (len(windows) == 0 && w.Manual) || (len(windows) > 0 && !Contains(windows, w.Name)) {
 			continue
 		}
 
@@ -104,7 +104,10 @@ func (smug Smug) StartSession(config Config, windows []string) error {
 				paneRoot = filepath.Join(windowRoot, p.Root)
 			}
 
-			smug.tmux.SplitWindow(window, p.Type, paneRoot, p.Commands)
+			_, err = smug.tmux.SplitWindow(window, p.Type, paneRoot, p.Commands)
+			if err != nil {
+				return err
+			}
 		}
 	}
 

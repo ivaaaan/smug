@@ -101,7 +101,10 @@ func TestStartSession(t *testing.T) {
 		tmux := Tmux{commander}
 		smug := Smug{tmux, commander}
 
-		smug.StartSession(params.config, params.windows)
+		err := smug.StartSession(params.config, params.windows)
+		if err != nil {
+			t.Fatalf("error %v", err)
+		}
 
 		if !reflect.DeepEqual(params.commands, commander.Commands) {
 			t.Errorf("expected\n%s\ngot\n%s", strings.Join(params.commands, "\n"), strings.Join(commander.Commands, "\n"))
