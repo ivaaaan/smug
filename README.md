@@ -10,7 +10,7 @@ Configration used in this GIF can be found [here](#example-2).
 
 ## Usage
 
-`tmux <command> <project>[:window name] [-w window name]`.
+`smug <command> <project>[:window name] [-w window name]`.
 
 ### Examples
 
