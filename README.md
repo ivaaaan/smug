@@ -6,7 +6,7 @@ Smug automates your [tmux](https://github.com/tmux/tmux) workflow. You can creat
 
 ![gif](https://raw.githubusercontent.com/ivaaaan/gifs/master/smug.gif)
 
-Configration used in this GIF can be found [here](#example-2).
+Configuration used in this GIF can be found [here](#example-2).
 
 ## Usage
 
