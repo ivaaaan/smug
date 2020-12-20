@@ -68,3 +68,27 @@ windows:
           - docker-compose exec php /bin/sh
           - clear
 ```
+
+```yaml
+session: blog
+
+root: ~/Code/blog
+
+before_start:
+  - docker-compose up -d
+
+stop:
+  - docker-compose stop
+
+windows:
+  - name: code
+    commands:
+      - vim app/dependencies.php
+    panes:
+      - type: horizontal
+        commands:
+          - make run-tests
+  - name: ssh
+    commands:
+      - ssh -i ~/keys/blog.pem ubuntu@127.0.0.1
+```
