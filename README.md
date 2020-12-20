@@ -4,7 +4,7 @@ Inspired by [tmuxinator](https://github.com/tmuxinator/tmuxinator) and [tmuxp](h
 
 Smug automates your [tmux](https://github.com/tmux/tmux) workflow. You can create a single configuration file, and smug will create all required windows and panes from it.
 
-![gif](https://media.giphy.com/media/xlaw2fVpr3L2CFs1To/source.gif)
+![gif](https://raw.githubusercontent.com/ivaaaan/gifs/master/smug.gif)
 
 Configration used in this GIF can be found [here](#example-2).
 
