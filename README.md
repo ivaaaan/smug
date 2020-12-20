@@ -4,35 +4,44 @@ Inspired by [tmuxinator](https://github.com/tmuxinator/tmuxinator) and [tmuxp](h
 
 Smug automates your [tmux](https://github.com/tmux/tmux) workflow. You can create a single configuration file, and smug will create all required windows and panes from it.
 
-![gif](https://i.imgur.com/CfLgrz5.gif)
+![gif](https://media.giphy.com/media/xlaw2fVpr3L2CFs1To/source.gif)
+
+Configration used in this GIF can be found [here](#example-2).
 
 ## Usage
 
 `tmux <command> <project>[:window name] [-w window name]`.
 
-## Examples
+### Examples
 
 To start/stop a project and all windows, run:
 
-`$ smug start project`
+```
+$ smug start project
 
-`$ smug stop project`
+$ smug stop project
+```
 
 When you already have a running session, and you want to create only some windows from the configuration file, you can do something like this:
 
-`$ smug start project:window1`
+```
+$ smug start project:window1
 
-`$ smug start project:window1,window2`
+$ smug start project:window1,window2
 
-`$ smug start project -w window1`
+$ smug start project -w window1
 
-`$ smug start project -w window1 -w window2`
+$ smug start project -w window1 -w window2
+```
 
 ## Configuration
 
 Configuration files stored in the `~/.config/smug` directory in the `YAML` format, e.g `~/.config/smug/your_project.yml`.
 
-Examples:
+### Examples
+
+#### Example 1
+
 
 ```yaml
 session: blog
@@ -68,6 +77,7 @@ windows:
           - docker-compose exec php /bin/sh
           - clear
 ```
+#### Example 2
 
 ```yaml
 session: blog
