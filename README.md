@@ -80,6 +80,7 @@ windows:
   - name: code
     root: blog # a relative path to root
     manual: true # you can start this window only manually, using the -w arg
+    layout: main-vertical
     commands:
       - docker-compose start
     panes:
@@ -91,6 +92,7 @@ windows:
 
   - name: infrastructure
     root: ~/Developer/blog/my-microservices
+    layout: tiled
     panes:
       - type: horizontal
         root: .
@@ -114,6 +116,7 @@ stop:
 
 windows:
   - name: code
+    layout: main-horizontal
     commands:
       - vim app/dependencies.php
     panes:

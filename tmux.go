@@ -10,6 +10,14 @@ const (
 	HSplit = "horizontal"
 )
 
+const (
+	EvenHorizontal = "even-horizontal"
+	EvenVertical   = "even-vertical"
+	MainHorizontal = "main-horizontal"
+	MainVertical   = "main-vertical"
+	Tiled          = "tiled"
+)
+
 type Tmux struct {
 	commander Commander
 }
@@ -96,6 +104,11 @@ func (tmux Tmux) SplitWindow(target string, splitType string, root string, comma
 	}
 
 	return pane, nil
+}
+
+func (tmux Tmux) SelectLayout(target string, layoutType string) (string, error) {
+	cmd := exec.Command("tmux", "select-layout", "-t", target, layoutType)
+	return tmux.commander.Exec(cmd)
 }
 
 func (tmux Tmux) StopSession(target string) (string, error) {
