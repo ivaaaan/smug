@@ -49,11 +49,11 @@ xyz@localhost:~$ smug stop project -w window1 -w window2
 
 The easiest is to clone Smug from GitHub and install it using `go-cli`:
 
-```console
-xyz@localhost:~$ cd /tmp
-xyz@localhost:/tmp$ git clone https://github.com/ivaaaan/smug.git
-xyz@localhost:/tmp$ cd smug
-xyz@localhost:/tmp/smug$ go install
+```bash
+cd /tmp
+git clone https://github.com/ivaaaan/smug.git
+cd smug
+go install
 ```
 
 ## Configuration
