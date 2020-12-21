@@ -7,10 +7,11 @@ import (
 	"testing"
 )
 
-var startSessionTestTable = []struct {
-	config   Config
-	commands []string
-	windows  []string
+var testTable = []struct {
+	config        Config
+	startCommands []string
+	stopCommands  []string
+	windows       []string
 }{
 	{
 		Config{
@@ -26,6 +27,9 @@ var startSessionTestTable = []struct {
 			"tmux kill-window -t ses:0",
 			"tmux move-window -r",
 			"tmux attach -t ses:0",
+		},
+		[]string{
+			"tmux kill-session -t ses",
 		},
 		[]string{},
 	},
@@ -43,6 +47,10 @@ var startSessionTestTable = []struct {
 					Manual: true,
 				},
 			},
+			Stop: []string{
+				"stop1",
+				"stop2 -d --foo=bar",
+			},
 		},
 		[]string{
 			"tmux has-session -t ses",
@@ -51,6 +59,11 @@ var startSessionTestTable = []struct {
 			"tmux kill-window -t ses:0",
 			"tmux move-window -r",
 			"tmux attach -t ses:0",
+		},
+		[]string{
+			"/bin/sh -c stop1",
+			"/bin/sh -c stop2 -d --foo=bar",
+			"tmux kill-session -t ses",
 		},
 		[]string{},
 	},
@@ -75,6 +88,9 @@ var startSessionTestTable = []struct {
 			"tmux neww -Pd -t ses: -n win2 -c root",
 		},
 		[]string{
+			"tmux kill-window -t ses:win2",
+		},
+		[]string{
 			"win2",
 		},
 	},
@@ -96,18 +112,37 @@ func (c *MockCommander) ExecSilently(cmd *exec.Cmd) error {
 }
 
 func TestStartSession(t *testing.T) {
-	for _, params := range startSessionTestTable {
-		commander := &MockCommander{}
-		tmux := Tmux{commander}
-		smug := Smug{tmux, commander}
+	for _, params := range testTable {
 
-		err := smug.StartSession(params.config, params.windows)
-		if err != nil {
-			t.Fatalf("error %v", err)
-		}
+		t.Run("test start session", func(t *testing.T) {
+			commander := &MockCommander{}
+			tmux := Tmux{commander}
+			smug := Smug{tmux, commander}
 
-		if !reflect.DeepEqual(params.commands, commander.Commands) {
-			t.Errorf("expected\n%s\ngot\n%s", strings.Join(params.commands, "\n"), strings.Join(commander.Commands, "\n"))
-		}
+			err := smug.Start(params.config, params.windows)
+			if err != nil {
+				t.Fatalf("error %v", err)
+			}
+
+			if !reflect.DeepEqual(params.startCommands, commander.Commands) {
+				t.Errorf("expected\n%s\ngot\n%s", strings.Join(params.startCommands, "\n"), strings.Join(commander.Commands, "\n"))
+			}
+		})
+
+		t.Run("test stop session", func(t *testing.T) {
+			commander := &MockCommander{}
+			tmux := Tmux{commander}
+			smug := Smug{tmux, commander}
+
+			err := smug.Stop(params.config, params.windows)
+			if err != nil {
+				t.Fatalf("error %v", err)
+			}
+
+			if !reflect.DeepEqual(params.stopCommands, commander.Commands) {
+				t.Errorf("expected\n%s\ngot\n%s", strings.Join(params.stopCommands, "\n"), strings.Join(commander.Commands, "\n"))
+			}
+		})
+
 	}
 }

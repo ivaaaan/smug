@@ -49,20 +49,30 @@ func (smug Smug) execShellCommands(commands []string, path string) error {
 	return nil
 }
 
-func (smug Smug) StopSession(config Config) error {
-	sessionRoot := ExpandPath(config.Root)
+func (smug Smug) Stop(config Config, windows []string) error {
+	if len(windows) == 0 {
 
-	err := smug.execShellCommands(config.Stop, sessionRoot)
-	if err != nil {
+		sessionRoot := ExpandPath(config.Root)
+
+		err := smug.execShellCommands(config.Stop, sessionRoot)
+		if err != nil {
+			return err
+		}
+		_, err = smug.tmux.StopSession(config.Session)
 		return err
 	}
 
-	_, err = smug.tmux.StopSession(config.Session)
+	for _, w := range windows {
+		err := smug.tmux.KillWindow(config.Session + ":" + w)
+		if err != nil {
+			return err
+		}
+	}
 
-	return err
+	return nil
 }
 
-func (smug Smug) StartSession(config Config, windows []string) error {
+func (smug Smug) Start(config Config, windows []string) error {
 	var ses string
 	var err error
 

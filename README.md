@@ -32,6 +32,10 @@ $ smug start project:window1,window2
 $ smug start project -w window1
 
 $ smug start project -w window1 -w window2
+
+$ smug stop project:window1
+
+$ smug stop project -w window1 -w window2
 ```
 
 ## Configuration
