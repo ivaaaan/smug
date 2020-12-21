@@ -40,10 +40,14 @@ func main() {
 	switch options.Command {
 	case "start":
 		fmt.Println("Starting a new session...")
-		err = smug.StartSession(*config, options.Windows)
+		err = smug.Start(*config, options.Windows)
 	case "stop":
-		fmt.Println("Terminating session...")
-		err = smug.StopSession(*config)
+		if len(options.Windows) == 0 {
+			fmt.Println("Terminating session...")
+		} else {
+			fmt.Println("Killing windows...")
+		}
+		err = smug.Stop(*config, options.Windows)
 	default:
 		err = fmt.Errorf("Unknown command %q", options.Command)
 	}
