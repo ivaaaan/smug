@@ -16,26 +16,26 @@ Configuration used in this GIF can be found [here](#example-2).
 
 To start/stop a project and all windows, run:
 
-```bash
- smug start project
+```console
+xyz@localhost:~$ smug start project
 
- smug stop project
+xyz@localhost:~$ smug stop project
 ```
 
 When you already have a running session, and you want to create only some windows from the configuration file, you can do something like this:
 
-```bash
-smug start project:window1
+```console
+xyz@localhost:~$ smug start project:window1
 
-smug start project:window1,window2
+xyz@localhost:~$ smug start project:window1,window2
 
-smug start project -w window1
+xyz@localhost:~$ smug start project -w window1
 
-smug start project -w window1 -w window2
+xyz@localhost:~$ smug start project -w window1 -w window2
 
-smug stop project:window1
+xyz@localhost:~$ smug stop project:window1
 
-smug stop project -w window1 -w window2
+xyz@localhost:~$ smug stop project -w window1 -w window2
 ```
 
 ## Installation
@@ -49,11 +49,11 @@ smug stop project -w window1 -w window2
 
 The easiest is to clone Smug from GitHub and install it using `go-cli`:
 
-```bash
-cd /tmp
-git clone https://github.com/ivaaaan/smug.git
-cd smug
-go install
+```console
+xyz@localhost:~$ cd /tmp
+xyz@localhost:/tmp$ git clone https://github.com/ivaaaan/smug.git
+xyz@localhost:/tmp$ cd smug
+xyz@localhost:/tmp/smug$ go install
 ```
 
 ## Configuration
