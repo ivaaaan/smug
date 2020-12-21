@@ -38,6 +38,24 @@ $ smug stop project:window1
 $ smug stop project -w window1 -w window2
 ```
 
+## Installation
+
+#### Prerequisite Tools
+
+* [Git](https://git-scm.com/)
+* [Go (we test it with the last 2 major versions)](https://golang.org/dl/)
+
+#### Fetch from GitHub
+
+The easiest is to clone Smug from GitHub and install it using `go-cli`:
+
+```bash
+cd /tmp
+git clone https://github.com/ivaaaan/smug.git
+cd smug
+go install
+```
+
 ## Configuration
 
 Configuration files stored in the `~/.config/smug` directory in the `YAML` format, e.g `~/.config/smug/your_project.yml`.
