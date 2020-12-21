@@ -16,26 +16,26 @@ Configuration used in this GIF can be found [here](#example-2).
 
 To start/stop a project and all windows, run:
 
-```bash
- smug start project
+```console
+xyz@localhost:~$ smug start project
 
- smug stop project
+xyz@localhost:~$ smug stop project
 ```
 
 When you already have a running session, and you want to create only some windows from the configuration file, you can do something like this:
 
-```bash
-smug start project:window1
+```console
+xyz@localhost:~$ smug start project:window1
 
-smug start project:window1,window2
+xyz@localhost:~$ smug start project:window1,window2
 
-smug start project -w window1
+xyz@localhost:~$ smug start project -w window1
 
-smug start project -w window1 -w window2
+xyz@localhost:~$ smug start project -w window1 -w window2
 
-smug stop project:window1
+xyz@localhost:~$ smug stop project:window1
 
-smug stop project -w window1 -w window2
+xyz@localhost:~$ smug stop project -w window1 -w window2
 ```
 
 ## Installation
