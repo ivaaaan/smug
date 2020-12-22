@@ -147,7 +147,7 @@ func (smug Smug) Start(config Config, windows []string) error {
 			return err
 		}
 
-		err = smug.tmux.Attach(ses+"0", os.Stdin, os.Stdout, os.Stderr)
+		err = smug.tmux.Attach(ses + windows[0], os.Stdin, os.Stdout, os.Stderr)
 		if err != nil {
 			return err
 		}

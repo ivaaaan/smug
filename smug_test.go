@@ -27,7 +27,7 @@ var testTable = []struct {
 			"tmux list-windows -t ses: -F #{window_index}",
 			"tmux kill-window -t ses:ses:",
 			"tmux move-window -r",
-			"tmux attach -t ses:0",
+			"tmux attach -t ses:ses:",
 		},
 		[]string{
 			"tmux kill-session -t ses",
@@ -69,7 +69,7 @@ var testTable = []struct {
 			"tmux list-windows -t ses: -F #{window_index}",
 			"tmux kill-window -t ses:ses:",
 			"tmux move-window -r",
-			"tmux attach -t ses:0",
+			"tmux attach -t ses:ses:",
 		},
 		[]string{
 			"/bin/sh -c stop1",
