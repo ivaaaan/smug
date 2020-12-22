@@ -122,7 +122,12 @@ func (smug Smug) Start(config Config, windows []string) error {
 	}
 
 	if len(windows) == 0 {
-		err = smug.tmux.KillWindow(ses + "0")
+		windows, err := smug.tmux.ListWindows(ses)
+		if err != nil {
+			return err
+		}
+
+		err = smug.tmux.KillWindow(ses + windows[0])
 		if err != nil {
 			return err
 		}

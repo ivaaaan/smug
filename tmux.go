@@ -3,6 +3,7 @@ package main
 import (
 	"os"
 	"os/exec"
+	"strings"
 )
 
 const (
@@ -101,4 +102,15 @@ func (tmux Tmux) SplitWindow(target string, splitType string, root string, comma
 func (tmux Tmux) StopSession(target string) (string, error) {
 	cmd := exec.Command("tmux", "kill-session", "-t", target)
 	return tmux.commander.Exec(cmd)
+}
+
+func (tmux Tmux) ListWindows(target string) ([]string, error) {
+	cmd := exec.Command("tmux", "list-windows", "-t", target, "-F", "#{window_index}")
+
+	output, err := tmux.commander.Exec(cmd)
+	if err != nil {
+		return []string{}, err
+	}
+
+	return strings.Split(output, "\n"), nil
 }
