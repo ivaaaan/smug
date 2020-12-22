@@ -12,8 +12,7 @@ The configuration used in this GIF can be found [here](#example-2).
 
 ### Download from the releases page
 
-Download the latest version of Smug from the [releases page](https://github.com/ivaaaan/smug/releases)
-After that, run this command:
+Download the latest version of Smug from the [releases page](https://github.com/ivaaaan/smug/releases) and then run:
 
 ```bash
 mkdir smug && tar -xzf smug_0.1.0_Darwin_x86_64.tar.gz -C ./smug && sudo mv smug/smug /usr/local/bin && rm -rf smug
