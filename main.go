@@ -41,6 +41,10 @@ func main() {
 	case "start":
 		fmt.Println("Starting a new session...")
 		err = smug.Start(*config, options.Windows)
+		if err != nil {
+			fmt.Println("Oops, an error happened. Rolling back...")
+			smug.Stop(*config, options.Windows)
+		}
 	case "stop":
 		if len(options.Windows) == 0 {
 			fmt.Println("Terminating session...")
