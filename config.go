@@ -14,7 +14,8 @@ type Window struct {
 	BeforeStart []string `yaml:"before_start"`
 	Panes       []Pane   `yaml:"panes"`
 	Commands    []string `yaml:"commands"`
-	Manual      bool
+	Layout      string   `yaml:"layout"`
+	Manual      bool     `yaml:"manual"`
 }
 
 type Config struct {

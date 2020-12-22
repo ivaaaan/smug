@@ -119,6 +119,16 @@ func (smug Smug) Start(config Config, windows []string) error {
 				return err
 			}
 		}
+
+		layout := w.Layout
+		if layout == "" {
+			layout = EvenHorizontal
+		}
+
+		_, err = smug.tmux.SelectLayout(ses+w.Name, layout)
+		if err != nil {
+			return err
+		}
 	}
 
 	if len(windows) == 0 {

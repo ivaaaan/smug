@@ -42,10 +42,17 @@ var testTable = []struct {
 				{
 					Name:   "win1",
 					Manual: false,
+					Layout: "main-horizontal",
+					Panes: []Pane{
+						Pane{
+							Type: "horizontal",
+						},
+					},
 				},
 				{
 					Name:   "win2",
 					Manual: true,
+					Layout: "tiled",
 				},
 			},
 			Stop: []string{
@@ -57,6 +64,8 @@ var testTable = []struct {
 			"tmux has-session -t ses",
 			"tmux new -Pd -s ses",
 			"tmux neww -Pd -t ses: -n win1 -c root",
+			"tmux split-window -Pd -t ses: -c root -h",
+			"tmux select-layout -t ses:win1 main-horizontal",
 			"tmux list-windows -t ses: -F #{window_index}",
 			"tmux kill-window -t ses:ses:",
 			"tmux move-window -r",
@@ -88,6 +97,7 @@ var testTable = []struct {
 			"tmux has-session -t ses",
 			"tmux new -Pd -s ses",
 			"tmux neww -Pd -t ses: -n win2 -c root",
+			"tmux select-layout -t ses:win2 even-horizontal",
 		},
 		[]string{
 			"tmux kill-window -t ses:win2",
