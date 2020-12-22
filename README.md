@@ -2,11 +2,42 @@
 
 Inspired by [tmuxinator](https://github.com/tmuxinator/tmuxinator) and [tmuxp](https://github.com/tmux-python/tmuxp).
 
-Smug automates your [tmux](https://github.com/tmux/tmux) workflow. You can create a single configuration file, and smug will create all required windows and panes from it.
+Smug automates your [tmux](https://github.com/tmux/tmux) workflow. You can create a single configuration file, and Smug will create all the required windows and panes from it.
 
 ![gif](https://raw.githubusercontent.com/ivaaaan/gifs/master/smug.gif)
 
-Configuration used in this GIF can be found [here](#example-2).
+The configuration used in this GIF can be found [here](#example-2).
+
+## Installation
+
+### Download from the releases page
+
+Download the latest version of Smug from the [releases page](https://github.com/ivaaaan/smug/releases)
+After that, run this command:
+
+```bash
+mkdir smug && tar -xzf smug_0.1.0_Darwin_x86_64.tar.gz -C ./smug && sudo mv smug/smug /usr/local/bin && rm -rf smug
+```
+
+Don't forget to replace `smug_0.1.0_Darwin_x86_64.tar.gz` with the archive that you've downloaded.
+
+### Git
+
+#### Prerequisite Tools
+
+* [Git](https://git-scm.com/)
+* [Go (we test it with the last 2 major versions)](https://golang.org/dl/)
+
+#### Fetch from GitHub
+
+The easiest way is to clone Smug from GitHub and install it using `go-cli`:
+
+```bash
+cd /tmp
+git clone https://github.com/ivaaaan/smug.git
+cd smug
+go install
+```
 
 ## Usage
 
@@ -22,7 +53,7 @@ xyz@localhost:~$ smug start project
 xyz@localhost:~$ smug stop project
 ```
 
-When you already have a running session, and you want to create only some windows from the configuration file, you can do something like this:
+When you already have a running session, and you want only to create some windows from the configuration file, you can do something like this:
 
 ```console
 xyz@localhost:~$ smug start project:window1
@@ -36,24 +67,6 @@ xyz@localhost:~$ smug start project -w window1 -w window2
 xyz@localhost:~$ smug stop project:window1
 
 xyz@localhost:~$ smug stop project -w window1 -w window2
-```
-
-## Installation
-
-#### Prerequisite Tools
-
-* [Git](https://git-scm.com/)
-* [Go (we test it with the last 2 major versions)](https://golang.org/dl/)
-
-#### Fetch from GitHub
-
-The easiest is to clone Smug from GitHub and install it using `go-cli`:
-
-```bash
-cd /tmp
-git clone https://github.com/ivaaaan/smug.git
-cd smug
-go install
 ```
 
 ## Configuration
