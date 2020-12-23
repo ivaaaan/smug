@@ -9,10 +9,11 @@ import (
 const usage = `Smug - tmux session manager.
 
 Usage:
-	smug <command> <project> [-w <window>]...
+	smug <command> <project> [--force] [-w <window>] ...
 
 Options:
 	-w List of windows to start. If session exists, those windows will be attached to current session.
+	-s Switch client to a created session when ran inside a tmux session
 
 Examples:
 	$ smug start blog
@@ -26,6 +27,7 @@ type Options struct {
 	Command string
 	Project string
 	Windows []string
+	Force   bool
 }
 
 func ParseOptions(p docopt.Parser, argv []string) (Options, error) {
@@ -47,6 +49,11 @@ func ParseOptions(p docopt.Parser, argv []string) (Options, error) {
 		return Options{}, err
 	}
 
+	force, err := arguments.Bool("--force")
+	if err != nil {
+		return Options{}, err
+	}
+
 	var windows []string
 
 	if strings.Contains(project, ":") {
@@ -57,5 +64,5 @@ func ParseOptions(p docopt.Parser, argv []string) (Options, error) {
 		windows = arguments["-w"].([]string)
 	}
 
-	return Options{cmd, project, windows}, nil
+	return Options{cmd, project, windows, force}, nil
 }

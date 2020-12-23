@@ -23,11 +23,8 @@ var testTable = []struct {
 			"tmux has-session -t ses",
 			"/bin/sh -c command1",
 			"/bin/sh -c command2",
-			"tmux new -Pd -s ses",
-			"tmux list-windows -t ses: -F #{window_index}",
-			"tmux kill-window -t ses:ses:",
-			"tmux move-window -r",
-			"tmux attach -t ses:ses:",
+			"tmux new -Pd -s ses -n ",
+			"tmux attach -d -t ses:",
 		},
 		[]string{
 			"tmux kill-session -t ses",
@@ -62,14 +59,10 @@ var testTable = []struct {
 		},
 		[]string{
 			"tmux has-session -t ses",
-			"tmux new -Pd -s ses",
-			"tmux neww -Pd -t ses: -n win1 -c root",
-			"tmux split-window -Pd -t ses: -c root -h",
+			"tmux new -Pd -s ses -n win1",
+			"tmux split-window -Pd -t ses:win1 -c root -h",
 			"tmux select-layout -t ses:win1 main-horizontal",
-			"tmux list-windows -t ses: -F #{window_index}",
-			"tmux kill-window -t ses:ses:",
-			"tmux move-window -r",
-			"tmux attach -t ses:ses:",
+			"tmux attach -d -t ses:",
 		},
 		[]string{
 			"/bin/sh -c stop1",
@@ -95,8 +88,7 @@ var testTable = []struct {
 		},
 		[]string{
 			"tmux has-session -t ses",
-			"tmux new -Pd -s ses",
-			"tmux neww -Pd -t ses: -n win2 -c root",
+			"tmux new -Pd -s ses -n win2",
 			"tmux select-layout -t ses:win2 even-horizontal",
 		},
 		[]string{
@@ -131,7 +123,7 @@ func TestStartSession(t *testing.T) {
 			tmux := Tmux{commander}
 			smug := Smug{tmux, commander}
 
-			err := smug.Start(params.config, params.windows)
+			err := smug.Start(params.config, params.windows, false)
 			if err != nil {
 				t.Fatalf("error %v", err)
 			}

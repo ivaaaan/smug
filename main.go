@@ -40,7 +40,7 @@ func main() {
 	switch options.Command {
 	case "start":
 		fmt.Println("Starting a new session...")
-		err = smug.Start(*config, options.Windows)
+		err = smug.Start(*config, options.Windows, options.Force)
 		if err != nil {
 			fmt.Println("Oops, an error occurred! Rolling back...")
 			smug.Stop(*config, options.Windows)
