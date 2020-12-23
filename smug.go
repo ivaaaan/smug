@@ -72,7 +72,7 @@ func (smug Smug) Stop(config Config, windows []string) error {
 	return nil
 }
 
-func (smug Smug) Start(config Config, windows []string, force bool) error {
+func (smug Smug) Start(config Config, windows []string, attach bool) error {
 	var ses string
 	var err error
 
@@ -155,8 +155,8 @@ func (smug Smug) Start(config Config, windows []string, force bool) error {
 	}
 
 	if len(windows) == 0 {
-		// If Smug ran inside tmux session and user passed --force flag to switch client
-		if os.Getenv("TERM") == "screen" && force {
+		// If Smug ran inside tmux session and user passed --attach flag to switch client
+		if os.Getenv("TERM") == "screen" && attach {
 			err = smug.tmux.SwitchClient(ses)
 		} else {
 

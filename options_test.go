@@ -24,7 +24,7 @@ var usageTestTable = []struct {
 		Options{"start", "smug", []string{"foo", "bar"}, false},
 	},
 	{
-		[]string{"start", "smug", "--force"},
+		[]string{"start", "smug", "--attach"},
 		Options{"start", "smug", []string{}, true},
 	},
 }
