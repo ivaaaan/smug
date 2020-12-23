@@ -40,7 +40,7 @@ go install
 
 ## Usage
 
-`smug <command> <project>[:window name] [-w window name]`.
+`smug <command> <project>[:window name] [-w window name]... [--attach]`.
 
 ### Examples
 

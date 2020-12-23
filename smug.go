@@ -49,6 +49,16 @@ func (smug Smug) execShellCommands(commands []string, path string) error {
 	return nil
 }
 
+func (smug Smug) switchOrAttach(ses string, windows []string, attach bool) error {
+	insideTmuxSession := os.Getenv("TERM") == "screen"
+	if insideTmuxSession && attach {
+		return smug.tmux.SwitchClient(ses)
+	} else if !insideTmuxSession {
+		return smug.tmux.Attach(ses, os.Stdin, os.Stdout, os.Stderr)
+	}
+	return nil
+}
+
 func (smug Smug) Stop(config Config, windows []string) error {
 	if len(windows) == 0 {
 
@@ -72,7 +82,7 @@ func (smug Smug) Stop(config Config, windows []string) error {
 	return nil
 }
 
-func (smug Smug) Start(config Config, windows []string) error {
+func (smug Smug) Start(config Config, windows []string, attach bool) error {
 	var ses string
 	var err error
 
@@ -85,15 +95,27 @@ func (smug Smug) Start(config Config, windows []string) error {
 			return err
 		}
 
-		ses, err = smug.tmux.NewSession(config.Session)
+		var defaultWindowName string
+		if len(windows) > 0 {
+			defaultWindowName = windows[0]
+		} else if len(config.Windows) > 0 {
+			defaultWindowName = config.Windows[0].Name
+		}
+
+		ses, err = smug.tmux.NewSession(config.Session, sessionRoot, defaultWindowName)
 		if err != nil {
 			return err
 		}
 	} else {
 		ses = config.Session + ":"
+		if len(windows) == 0 {
+			smug.switchOrAttach(ses, windows, attach)
+			return nil
+		}
 	}
 
-	for _, w := range config.Windows {
+	var createdWindows []string
+	for wIndex, w := range config.Windows {
 		if (len(windows) == 0 && w.Manual) || (len(windows) > 0 && !Contains(windows, w.Name)) {
 			continue
 		}
@@ -103,9 +125,24 @@ func (smug Smug) Start(config Config, windows []string) error {
 			windowRoot = filepath.Join(sessionRoot, w.Root)
 		}
 
-		window, err := smug.tmux.NewWindow(ses, w.Name, windowRoot, w.Commands)
-		if err != nil {
-			return err
+		var window string
+
+		if (wIndex == 0 || len(createdWindows) == 0) && !sessionExists {
+			window = ses + w.Name
+		} else {
+
+			window, err = smug.tmux.NewWindow(ses, w.Name, windowRoot)
+			if err != nil {
+				return err
+			}
+			createdWindows = append(createdWindows, window)
+		}
+
+		for _, c := range w.Commands {
+			err = smug.tmux.SendKeys(window, c)
+			if err != nil {
+				return err
+			}
 		}
 
 		for _, p := range w.Panes {
@@ -132,25 +169,7 @@ func (smug Smug) Start(config Config, windows []string) error {
 	}
 
 	if len(windows) == 0 {
-		windows, err := smug.tmux.ListWindows(ses)
-		if err != nil {
-			return err
-		}
-
-		err = smug.tmux.KillWindow(ses + windows[0])
-		if err != nil {
-			return err
-		}
-
-		err = smug.tmux.RenumberWindows()
-		if err != nil {
-			return err
-		}
-
-		err = smug.tmux.Attach(ses + windows[0], os.Stdin, os.Stdout, os.Stderr)
-		if err != nil {
-			return err
-		}
+		smug.switchOrAttach(ses, windows, attach)
 	}
 
 	return nil

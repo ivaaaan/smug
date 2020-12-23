@@ -23,8 +23,8 @@ type Tmux struct {
 	commander Commander
 }
 
-func (tmux Tmux) NewSession(name string) (string, error) {
-	cmd := exec.Command("tmux", "new", "-Pd", "-s", name)
+func (tmux Tmux) NewSession(name string, root string, windowName string) (string, error) {
+	cmd := exec.Command("tmux", "new", "-Pd", "-s", name, "-n", windowName, "-c", root)
 	return tmux.commander.Exec(cmd)
 }
 
@@ -40,22 +40,10 @@ func (tmux Tmux) KillWindow(target string) error {
 	return err
 }
 
-func (tmux Tmux) NewWindow(target string, name string, root string, commands []string) (string, error) {
+func (tmux Tmux) NewWindow(target string, name string, root string) (string, error) {
 	cmd := exec.Command("tmux", "neww", "-Pd", "-t", target, "-n", name, "-c", root)
 
-	window, err := tmux.commander.Exec(cmd)
-	if err != nil {
-		return "", err
-	}
-
-	for _, c := range commands {
-		err = tmux.SendKeys(window, c)
-		if err != nil {
-			return "", err
-		}
-	}
-
-	return window, nil
+	return tmux.commander.Exec(cmd)
 }
 
 func (tmux Tmux) SendKeys(target string, command string) error {
@@ -65,7 +53,7 @@ func (tmux Tmux) SendKeys(target string, command string) error {
 }
 
 func (tmux Tmux) Attach(target string, stdin *os.File, stdout *os.File, stderr *os.File) error {
-	cmd := exec.Command("tmux", "attach", "-t", target)
+	cmd := exec.Command("tmux", "attach", "-d", "-t", target)
 
 	cmd.Stdin = stdin
 	cmd.Stdout = stdout
@@ -74,7 +62,7 @@ func (tmux Tmux) Attach(target string, stdin *os.File, stdout *os.File, stderr *
 	return tmux.commander.ExecSilently(cmd)
 }
 
-func (tmux Tmux) RenumberWindows() error {
+func (tmux Tmux) RenumberWindows(target string) error {
 	cmd := exec.Command("tmux", "move-window", "-r")
 	_, err := tmux.commander.Exec(cmd)
 	return err
@@ -126,4 +114,9 @@ func (tmux Tmux) ListWindows(target string) ([]string, error) {
 	}
 
 	return strings.Split(output, "\n"), nil
+}
+
+func (tmux Tmux) SwitchClient(target string) error {
+	cmd := exec.Command("tmux", "switch-client", "-t", target)
+	return tmux.commander.ExecSilently(cmd)
 }
