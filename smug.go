@@ -49,6 +49,16 @@ func (smug Smug) execShellCommands(commands []string, path string) error {
 	return nil
 }
 
+func (smug Smug) switchOrAttach(ses string, windows []string, attach bool) error {
+	insideTmuxSession := os.Getenv("TERM") == "screen"
+	if insideTmuxSession && attach {
+		return smug.tmux.SwitchClient(ses)
+	} else if !insideTmuxSession {
+		return smug.tmux.Attach(ses, os.Stdin, os.Stdout, os.Stderr)
+	}
+	return nil
+}
+
 func (smug Smug) Stop(config Config, windows []string) error {
 	if len(windows) == 0 {
 
@@ -98,6 +108,10 @@ func (smug Smug) Start(config Config, windows []string, attach bool) error {
 		}
 	} else {
 		ses = config.Session + ":"
+		if len(windows) == 0 {
+			smug.switchOrAttach(ses, windows, attach)
+			return nil
+		}
 	}
 
 	var createdWindows []string
@@ -155,17 +169,7 @@ func (smug Smug) Start(config Config, windows []string, attach bool) error {
 	}
 
 	if len(windows) == 0 {
-		// If Smug ran inside tmux session and user passed --attach flag to switch client
-		if os.Getenv("TERM") == "screen" && attach {
-			err = smug.tmux.SwitchClient(ses)
-		} else {
-
-			err = smug.tmux.Attach(ses, os.Stdin, os.Stdout, os.Stderr)
-		}
-
-		if err != nil {
-			return err
-		}
+		smug.switchOrAttach(ses, windows, attach)
 	}
 
 	return nil
