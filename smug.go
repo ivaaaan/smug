@@ -102,7 +102,7 @@ func (smug Smug) Start(config Config, windows []string, attach bool) error {
 			defaultWindowName = config.Windows[0].Name
 		}
 
-		ses, err = smug.tmux.NewSession(config.Session, defaultWindowName)
+		ses, err = smug.tmux.NewSession(config.Session, sessionRoot, defaultWindowName)
 		if err != nil {
 			return err
 		}

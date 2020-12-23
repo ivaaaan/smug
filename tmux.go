@@ -23,8 +23,8 @@ type Tmux struct {
 	commander Commander
 }
 
-func (tmux Tmux) NewSession(name string, windowName string) (string, error) {
-	cmd := exec.Command("tmux", "new", "-Pd", "-s", name, "-n", windowName)
+func (tmux Tmux) NewSession(name string, root string, windowName string) (string, error) {
+	cmd := exec.Command("tmux", "new", "-Pd", "-s", name, "-n", windowName, "-c", root)
 	return tmux.commander.Exec(cmd)
 }
 

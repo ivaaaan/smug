@@ -23,7 +23,7 @@ var testTable = []struct {
 			"tmux has-session -t ses",
 			"/bin/sh -c command1",
 			"/bin/sh -c command2",
-			"tmux new -Pd -s ses -n ",
+			"tmux new -Pd -s ses -n  -c root",
 			"tmux attach -d -t ses:",
 		},
 		[]string{
@@ -59,7 +59,7 @@ var testTable = []struct {
 		},
 		[]string{
 			"tmux has-session -t ses",
-			"tmux new -Pd -s ses -n win1",
+			"tmux new -Pd -s ses -n win1 -c root",
 			"tmux split-window -Pd -t ses:win1 -c root -h",
 			"tmux select-layout -t ses:win1 main-horizontal",
 			"tmux attach -d -t ses:",
@@ -88,7 +88,7 @@ var testTable = []struct {
 		},
 		[]string{
 			"tmux has-session -t ses",
-			"tmux new -Pd -s ses -n win2",
+			"tmux new -Pd -s ses -n win2 -c root",
 			"tmux select-layout -t ses:win2 even-horizontal",
 		},
 		[]string{
