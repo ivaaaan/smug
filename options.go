@@ -9,7 +9,7 @@ import (
 const usage = `Smug - tmux session manager.
 
 Usage:
-	smug <command> <project> [-w <window>]... [--attach]
+	smug <command> <project> [-w <window>]... [--attach] [--debug]
 
 Options:
 	-w List of windows to start. If session exists, those windows will be attached to current session.
@@ -27,6 +27,7 @@ type Options struct {
 	Project string
 	Windows []string
 	Attach  bool
+	Debug   bool
 }
 
 func ParseOptions(p docopt.Parser, argv []string) (Options, error) {
@@ -50,6 +51,11 @@ func ParseOptions(p docopt.Parser, argv []string) (Options, error) {
 		return Options{}, err
 	}
 
+	debug, err := arguments.Bool("--debug")
+	if err != nil {
+		return Options{}, err
+	}
+
 	var windows []string
 
 	if strings.Contains(project, ":") {
@@ -60,5 +66,5 @@ func ParseOptions(p docopt.Parser, argv []string) (Options, error) {
 		windows = arguments["-w"].([]string)
 	}
 
-	return Options{cmd, project, windows, attach}, nil
+	return Options{cmd, project, windows, attach, debug}, nil
 }

@@ -1,6 +1,7 @@
 package main
 
 import (
+	"log"
 	"os/exec"
 	"strings"
 )
@@ -11,12 +12,15 @@ type Commander interface {
 }
 
 type DefaultCommander struct {
+	logger *log.Logger
 }
 
 func (c DefaultCommander) Exec(cmd *exec.Cmd) (string, error) {
-	output, err := cmd.CombinedOutput()
+	c.logger.Println(strings.Join(cmd.Args, " "))
 
+	output, err := cmd.CombinedOutput()
 	if err != nil {
+		c.logger.Println(err)
 		return "", &ShellError{strings.Join(cmd.Args, " "), err}
 	}
 
@@ -24,8 +28,12 @@ func (c DefaultCommander) Exec(cmd *exec.Cmd) (string, error) {
 }
 
 func (c DefaultCommander) ExecSilently(cmd *exec.Cmd) error {
+	c.logger.Println(strings.Join(cmd.Args, " "))
+
 	err := cmd.Run()
 	if err != nil {
+
+		c.logger.Println(err)
 		return &ShellError{strings.Join(cmd.Args, " "), err}
 	}
 	return nil
