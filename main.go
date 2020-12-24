@@ -3,6 +3,7 @@ package main
 import (
 	"fmt"
 	"io/ioutil"
+	"log"
 	"os"
 	"path/filepath"
 
@@ -33,7 +34,17 @@ func main() {
 		os.Exit(1)
 	}
 
-	commander := DefaultCommander{}
+	var logger *log.Logger
+	if options.Debug {
+		logFile, err := os.Create(filepath.Join(userConfigDir, "smug.log"))
+		if err != nil {
+			fmt.Fprintln(os.Stderr, err.Error())
+			os.Exit(1)
+		}
+		logger = log.New(logFile, "", 0)
+	}
+
+	commander := DefaultCommander{logger}
 	tmux := Tmux{commander}
 	smug := Smug{tmux, commander}
 

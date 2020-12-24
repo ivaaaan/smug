@@ -98,6 +98,40 @@ var testTable = []struct {
 			"win2",
 		},
 	},
+	{
+		Config{
+			Session: "ses",
+			Root:    "root",
+			Windows: []Window{
+				{
+					Name:     "win1",
+					Manual:   false,
+					Commands: []string{"command1", "command2"},
+				},
+				{
+					Name:     "win2",
+					Manual:   false,
+					Commands: []string{"command3", "command4"},
+				},
+			},
+		},
+		[]string{
+			"tmux has-session -t ses",
+			"tmux new -Pd -s ses -n win1 -c root",
+			"tmux send-keys -t ses:win1 command1 Enter",
+			"tmux send-keys -t ses:win1 command2 Enter",
+			"tmux select-layout -t ses:win1 even-horizontal",
+			"tmux neww -Pd -t ses: -n win2 -c root",
+			"tmux send-keys -t ses:win2 command3 Enter",
+			"tmux send-keys -t ses:win2 command4 Enter",
+			"tmux select-layout -t ses:win2 even-horizontal",
+			"tmux attach -d -t ses:",
+		},
+		[]string{
+			"tmux kill-session -t ses",
+		},
+		[]string{},
+	},
 }
 
 type MockCommander struct {
