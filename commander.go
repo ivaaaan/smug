@@ -16,11 +16,15 @@ type DefaultCommander struct {
 }
 
 func (c DefaultCommander) Exec(cmd *exec.Cmd) (string, error) {
-	c.logger.Println(strings.Join(cmd.Args, " "))
+	if c.logger != nil {
+		c.logger.Println(strings.Join(cmd.Args, " "))
+	}
 
 	output, err := cmd.CombinedOutput()
 	if err != nil {
-		c.logger.Println(err)
+		if c.logger != nil {
+			c.logger.Println(err)
+		}
 		return "", &ShellError{strings.Join(cmd.Args, " "), err}
 	}
 
@@ -28,12 +32,15 @@ func (c DefaultCommander) Exec(cmd *exec.Cmd) (string, error) {
 }
 
 func (c DefaultCommander) ExecSilently(cmd *exec.Cmd) error {
-	c.logger.Println(strings.Join(cmd.Args, " "))
+	if c.logger != nil {
+		c.logger.Println(strings.Join(cmd.Args, " "))
+	}
 
 	err := cmd.Run()
 	if err != nil {
-
-		c.logger.Println(err)
+		if c.logger != nil {
+			c.logger.Println(err)
+		}
 		return &ShellError{strings.Join(cmd.Args, " "), err}
 	}
 	return nil

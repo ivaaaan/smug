@@ -114,7 +114,6 @@ func (smug Smug) Start(config Config, windows []string, attach bool) error {
 		}
 	}
 
-	var createdWindows []string
 	for wIndex, w := range config.Windows {
 		if (len(windows) == 0 && w.Manual) || (len(windows) > 0 && !Contains(windows, w.Name)) {
 			continue
@@ -125,17 +124,12 @@ func (smug Smug) Start(config Config, windows []string, attach bool) error {
 			windowRoot = filepath.Join(sessionRoot, w.Root)
 		}
 
-		var window string
-
-		if (wIndex == 0 || len(createdWindows) == 0) && !sessionExists {
-			window = ses + w.Name
-		} else {
-
-			window, err = smug.tmux.NewWindow(ses, w.Name, windowRoot)
+		window := ses + w.Name
+		if (!sessionExists && wIndex > 0 && len(windows) == 0) || (sessionExists && len(windows) > 0) {
+			_, err = smug.tmux.NewWindow(ses, w.Name, windowRoot)
 			if err != nil {
 				return err
 			}
-			createdWindows = append(createdWindows, window)
 		}
 
 		for _, c := range w.Commands {
