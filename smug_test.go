@@ -8,10 +8,11 @@ import (
 )
 
 var testTable = []struct {
-	config        Config
-	startCommands []string
-	stopCommands  []string
-	windows       []string
+	config          Config
+	startCommands   []string
+	stopCommands    []string
+	windows         []string
+	commanderOutput string
 }{
 	{
 		Config{
@@ -20,7 +21,7 @@ var testTable = []struct {
 			BeforeStart: []string{"command1", "command2"},
 		},
 		[]string{
-			"tmux has-session -t ses",
+			"tmux has-session -t ses:",
 			"/bin/sh -c command1",
 			"/bin/sh -c command2",
 			"tmux new -Pd -s ses -n  -c root",
@@ -30,6 +31,7 @@ var testTable = []struct {
 			"tmux kill-session -t ses",
 		},
 		[]string{},
+		"xyz",
 	},
 	{
 		Config{
@@ -58,7 +60,7 @@ var testTable = []struct {
 			},
 		},
 		[]string{
-			"tmux has-session -t ses",
+			"tmux has-session -t ses:",
 			"tmux new -Pd -s ses -n win1 -c root",
 			"tmux split-window -Pd -t ses:win1 -c root -h",
 			"tmux select-layout -t ses:win1 main-horizontal",
@@ -70,6 +72,7 @@ var testTable = []struct {
 			"tmux kill-session -t ses",
 		},
 		[]string{},
+		"xyz",
 	},
 	{
 		Config{
@@ -87,7 +90,7 @@ var testTable = []struct {
 			},
 		},
 		[]string{
-			"tmux has-session -t ses",
+			"tmux has-session -t ses:",
 			"tmux new -Pd -s ses -n win2 -c root",
 			"tmux select-layout -t ses:win2 even-horizontal",
 		},
@@ -97,6 +100,7 @@ var testTable = []struct {
 		[]string{
 			"win2",
 		},
+		"xyz",
 	},
 	{
 		Config{
@@ -116,7 +120,7 @@ var testTable = []struct {
 			},
 		},
 		[]string{
-			"tmux has-session -t ses",
+			"tmux has-session -t ses:",
 			"tmux new -Pd -s ses -n win1 -c root",
 			"tmux send-keys -t ses:win1 command1 Enter",
 			"tmux send-keys -t ses:win1 command2 Enter",
@@ -131,17 +135,36 @@ var testTable = []struct {
 			"tmux kill-session -t ses",
 		},
 		[]string{},
+		"xyz",
+	},
+
+	{
+		Config{
+			Session:     "ses",
+			Root:        "root",
+			BeforeStart: []string{"command1", "command2"},
+		},
+		[]string{
+			"tmux has-session -t ses:",
+			"tmux attach -d -t ses:",
+		},
+		[]string{
+			"tmux kill-session -t ses",
+		},
+		[]string{},
+		"",
 	},
 }
 
 type MockCommander struct {
-	Commands []string
+	Commands      []string
+	DefaultOutput string
 }
 
 func (c *MockCommander) Exec(cmd *exec.Cmd) (string, error) {
 	c.Commands = append(c.Commands, strings.Join(cmd.Args, " "))
 
-	return "ses:", nil
+	return c.DefaultOutput, nil
 }
 
 func (c *MockCommander) ExecSilently(cmd *exec.Cmd) error {
@@ -153,7 +176,7 @@ func TestStartSession(t *testing.T) {
 	for _, params := range testTable {
 
 		t.Run("test start session", func(t *testing.T) {
-			commander := &MockCommander{}
+			commander := &MockCommander{[]string{}, params.commanderOutput}
 			tmux := Tmux{commander}
 			smug := Smug{tmux, commander}
 
@@ -168,7 +191,7 @@ func TestStartSession(t *testing.T) {
 		})
 
 		t.Run("test stop session", func(t *testing.T) {
-			commander := &MockCommander{}
+			commander := &MockCommander{[]string{}, params.commanderOutput}
 			tmux := Tmux{commander}
 			smug := Smug{tmux, commander}
 

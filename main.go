@@ -5,10 +5,21 @@ import (
 	"io/ioutil"
 	"log"
 	"os"
+	"os/exec"
 	"path/filepath"
 
 	"github.com/docopt/docopt-go"
 )
+
+func editConfig(commander Commander, path string) error {
+	_, err := os.Stat(path)
+	if os.IsNotExist(err) {
+		os.Create(path)
+	}
+
+	cmd := exec.Command(os.Getenv("EDITOR"), path)
+	return commander.ExecSilently(cmd)
+}
 
 func main() {
 	parser := docopt.Parser{}
@@ -67,6 +78,9 @@ func main() {
 			fmt.Println("Killing windows...")
 		}
 		err = smug.Stop(*config, options.Windows)
+	case "edit":
+	case "create":
+		err = editConfig(commander, configPath)
 	default:
 		err = fmt.Errorf("Unknown command %q", options.Command)
 	}
