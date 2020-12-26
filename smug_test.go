@@ -9,9 +9,10 @@ import (
 
 var testTable = []struct {
 	config          Config
+	options         Options
+	context         Context
 	startCommands   []string
 	stopCommands    []string
-	windows         []string
 	commanderOutput string
 }{
 	{
@@ -20,6 +21,10 @@ var testTable = []struct {
 			Root:        "root",
 			BeforeStart: []string{"command1", "command2"},
 		},
+		Options{
+			Windows: []string{},
+		},
+		Context{},
 		[]string{
 			"tmux has-session -t ses:",
 			"/bin/sh -c command1",
@@ -30,7 +35,6 @@ var testTable = []struct {
 		[]string{
 			"tmux kill-session -t ses",
 		},
-		[]string{},
 		"xyz",
 	},
 	{
@@ -59,6 +63,8 @@ var testTable = []struct {
 				"stop2 -d --foo=bar",
 			},
 		},
+		Options{},
+		Context{},
 		[]string{
 			"tmux has-session -t ses:",
 			"tmux new -Pd -s ses -n win1 -c root",
@@ -71,7 +77,6 @@ var testTable = []struct {
 			"/bin/sh -c stop2 -d --foo=bar",
 			"tmux kill-session -t ses",
 		},
-		[]string{},
 		"xyz",
 	},
 	{
@@ -89,6 +94,10 @@ var testTable = []struct {
 				},
 			},
 		},
+		Options{
+			Windows: []string{"win2"},
+		},
+		Context{},
 		[]string{
 			"tmux has-session -t ses:",
 			"tmux new -Pd -s ses -n win2 -c root",
@@ -96,9 +105,6 @@ var testTable = []struct {
 		},
 		[]string{
 			"tmux kill-window -t ses:win2",
-		},
-		[]string{
-			"win2",
 		},
 		"xyz",
 	},
@@ -119,6 +125,10 @@ var testTable = []struct {
 				},
 			},
 		},
+		Options{
+			Windows: []string{},
+		},
+		Context{},
 		[]string{
 			"tmux has-session -t ses:",
 			"tmux new -Pd -s ses -n win1 -c root",
@@ -134,7 +144,6 @@ var testTable = []struct {
 		[]string{
 			"tmux kill-session -t ses",
 		},
-		[]string{},
 		"xyz",
 	},
 
@@ -144,6 +153,8 @@ var testTable = []struct {
 			Root:        "root",
 			BeforeStart: []string{"command1", "command2"},
 		},
+		Options{},
+		Context{},
 		[]string{
 			"tmux has-session -t ses:",
 			"tmux attach -d -t ses:",
@@ -151,7 +162,55 @@ var testTable = []struct {
 		[]string{
 			"tmux kill-session -t ses",
 		},
-		[]string{},
+		"",
+	},
+	{
+		Config{
+			Session: "ses",
+			Root:    "root",
+		},
+		Options{Attach: true},
+		Context{InsideTmuxSession: true},
+		[]string{
+			"tmux has-session -t ses:",
+			"tmux new -Pd -s ses -n  -c root",
+			"tmux switch-client -t ses:",
+		},
+		[]string{
+			"tmux kill-session -t ses",
+		},
+		"xyz",
+	},
+	{
+		Config{
+			Session: "ses",
+			Root:    "root",
+		},
+		Options{Attach: false},
+		Context{InsideTmuxSession: true},
+		[]string{
+			"tmux has-session -t ses:",
+			"tmux new -Pd -s ses -n  -c root",
+		},
+		[]string{
+			"tmux kill-session -t ses",
+		},
+		"xyz",
+	},
+	{
+		Config{
+			Session: "ses",
+			Root:    "root",
+		},
+		Options{Attach: true},
+		Context{InsideTmuxSession: true},
+		[]string{
+			"tmux has-session -t ses:",
+			"tmux switch-client -t ses:",
+		},
+		[]string{
+			"tmux kill-session -t ses",
+		},
 		"",
 	},
 }
@@ -180,7 +239,7 @@ func TestStartSession(t *testing.T) {
 			tmux := Tmux{commander}
 			smug := Smug{tmux, commander}
 
-			err := smug.Start(params.config, params.windows, false)
+			err := smug.Start(params.config, params.options, params.context)
 			if err != nil {
 				t.Fatalf("error %v", err)
 			}
@@ -195,7 +254,7 @@ func TestStartSession(t *testing.T) {
 			tmux := Tmux{commander}
 			smug := Smug{tmux, commander}
 
-			err := smug.Stop(params.config, params.windows)
+			err := smug.Stop(params.config, params.options, params.context)
 			if err != nil {
 				t.Fatalf("error %v", err)
 			}

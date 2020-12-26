@@ -5,21 +5,10 @@ import (
 	"io/ioutil"
 	"log"
 	"os"
-	"os/exec"
 	"path/filepath"
 
 	"github.com/docopt/docopt-go"
 )
-
-func editConfig(commander Commander, path string) error {
-	_, err := os.Stat(path)
-	if os.IsNotExist(err) {
-		os.Create(path)
-	}
-
-	cmd := exec.Command(os.Getenv("EDITOR"), path)
-	return commander.ExecSilently(cmd)
-}
 
 func main() {
 	parser := docopt.Parser{}
@@ -59,6 +48,8 @@ func main() {
 	tmux := Tmux{commander}
 	smug := Smug{tmux, commander}
 
+	context := CreateContext()
+
 	switch options.Command {
 	case "start":
 		if len(options.Windows) == 0 {
@@ -66,10 +57,10 @@ func main() {
 		} else {
 			fmt.Println("Starting new windows...")
 		}
-		err = smug.Start(*config, options.Windows, options.Attach)
+		err = smug.Start(*config, options, *context)
 		if err != nil {
 			fmt.Println("Oops, an error occurred! Rolling back...")
-			smug.Stop(*config, options.Windows)
+			smug.Stop(*config, options, *context)
 		}
 	case "stop":
 		if len(options.Windows) == 0 {
@@ -77,10 +68,7 @@ func main() {
 		} else {
 			fmt.Println("Killing windows...")
 		}
-		err = smug.Stop(*config, options.Windows)
-	case "edit":
-	case "create":
-		err = editConfig(commander, configPath)
+		err = smug.Stop(*config, options, *context)
 	default:
 		err = fmt.Errorf("Unknown command %q", options.Command)
 	}

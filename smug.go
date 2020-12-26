@@ -48,8 +48,7 @@ func (smug Smug) execShellCommands(commands []string, path string) error {
 	return nil
 }
 
-func (smug Smug) switchOrAttach(sessionName string, windows []string, attach bool) error {
-	insideTmuxSession := os.Getenv("TERM") == "screen"
+func (smug Smug) switchOrAttach(sessionName string, attach bool, insideTmuxSession bool) error {
 	if insideTmuxSession && attach {
 		return smug.tmux.SwitchClient(sessionName)
 	} else if !insideTmuxSession {
@@ -58,7 +57,8 @@ func (smug Smug) switchOrAttach(sessionName string, windows []string, attach boo
 	return nil
 }
 
-func (smug Smug) Stop(config Config, windows []string) error {
+func (smug Smug) Stop(config Config, options Options, context Context) error {
+	windows := options.Windows
 	if len(windows) == 0 {
 		sessionRoot := ExpandPath(config.Root)
 
@@ -80,10 +80,13 @@ func (smug Smug) Stop(config Config, windows []string) error {
 	return nil
 }
 
-func (smug Smug) Start(config Config, windows []string, attach bool) error {
+func (smug Smug) Start(config Config, options Options, context Context) error {
 	sessionName := config.Session + ":"
 	sessionExists := smug.tmux.SessionExists(sessionName)
 	sessionRoot := ExpandPath(config.Root)
+
+	windows := options.Windows
+	attach := options.Attach
 
 	if !sessionExists {
 		err := smug.execShellCommands(config.BeforeStart, sessionRoot)
@@ -103,8 +106,7 @@ func (smug Smug) Start(config Config, windows []string, attach bool) error {
 			return err
 		}
 	} else if len(windows) == 0 {
-		smug.switchOrAttach(sessionName, windows, attach)
-		return nil
+		return smug.switchOrAttach(sessionName, attach, context.InsideTmuxSession)
 	}
 
 	for wIndex, w := range config.Windows {
@@ -156,10 +158,7 @@ func (smug Smug) Start(config Config, windows []string, attach bool) error {
 	}
 
 	if len(windows) == 0 {
-		err := smug.switchOrAttach(sessionName, windows, attach)
-		if err != nil {
-			return err
-		}
+		return smug.switchOrAttach(sessionName, attach, context.InsideTmuxSession)
 	}
 
 	return nil
