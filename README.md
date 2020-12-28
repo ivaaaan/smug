@@ -130,7 +130,7 @@ windows:
   - name: code
     layout: main-horizontal
     commands:
-      - vim app/dependencies.php
+      - $EDITOR app/dependencies.php
     panes:
       - type: horizontal
         commands:
