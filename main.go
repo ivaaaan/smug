@@ -48,6 +48,8 @@ func main() {
 	tmux := Tmux{commander}
 	smug := Smug{tmux, commander}
 
+	context := CreateContext()
+
 	switch options.Command {
 	case "start":
 		if len(options.Windows) == 0 {
@@ -55,10 +57,10 @@ func main() {
 		} else {
 			fmt.Println("Starting new windows...")
 		}
-		err = smug.Start(*config, options.Windows, options.Attach)
+		err = smug.Start(*config, options, *context)
 		if err != nil {
 			fmt.Println("Oops, an error occurred! Rolling back...")
-			smug.Stop(*config, options.Windows)
+			smug.Stop(*config, options, *context)
 		}
 	case "stop":
 		if len(options.Windows) == 0 {
@@ -66,7 +68,7 @@ func main() {
 		} else {
 			fmt.Println("Killing windows...")
 		}
-		err = smug.Stop(*config, options.Windows)
+		err = smug.Stop(*config, options, *context)
 	default:
 		err = fmt.Errorf("Unknown command %q", options.Command)
 	}
