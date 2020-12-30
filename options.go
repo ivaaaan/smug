@@ -6,7 +6,7 @@ import (
 	"github.com/docopt/docopt-go"
 )
 
-const usage = `Smug - tmux session manager. Version v0.1.3
+const usage = `Smug - tmux session manager. Version v0.1.3.1
 
 Usage:
 	smug <command> <project> [-w <window>]... [--attach] [--debug]
