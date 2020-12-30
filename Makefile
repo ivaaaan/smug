@@ -1,3 +1,5 @@
+VERSION_REGEX  := 's/(v[0-9\.]+)/$(version)'
+
 build:
 	go build -o smug *.go
 
@@ -9,7 +11,11 @@ coverage:
 	go tool cover -html=coverage.out
 
 release:
-	rm -rf dist
+ifndef GITHUB_TOKEN
+	$(error GITHUB_TOKEN is not defined)
+endif
+	sed -i '$(VERSION_REGEX)' main.go > main.go
+	git commit -am '$(version)'
 	git tag -a $(version) -m '$(version)'
 	git push origin $(version)
-	goreleaser
+	goreleaser --rm-dist
