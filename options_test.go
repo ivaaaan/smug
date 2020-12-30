@@ -33,7 +33,7 @@ var usageTestTable = []struct {
 
 func TestParseOptions(t *testing.T) {
 	for _, v := range usageTestTable {
-		opts, err := ParseOptions(v.argv)
+		opts, err := ParseOptions(v.argv, func() {})
 
 		if err != nil {
 			t.Fail()
