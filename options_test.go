@@ -1,6 +1,7 @@
 package main
 
 import (
+	"errors"
 	"reflect"
 	"testing"
 
@@ -91,6 +92,12 @@ var usageTestTable = []struct {
 		ErrHelp,
 		1,
 	},
+	{
+		[]string{"start", "--test"},
+		Options{},
+		errors.New("unknown flag: --test"),
+		0,
+	},
 }
 
 func TestParseOptions(t *testing.T) {
@@ -116,7 +123,7 @@ func TestParseOptions(t *testing.T) {
 			t.Errorf("expected to get %d help calls, got %d", v.helpCalls, helpCalls)
 		}
 
-		if err != v.err {
+		if v.err != nil && err.Error() != v.err.Error() {
 			t.Errorf("expected to get error %v, got %v", v.err, err)
 		}
 
