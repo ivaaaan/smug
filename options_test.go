@@ -3,8 +3,6 @@ package main
 import (
 	"reflect"
 	"testing"
-
-	"github.com/docopt/docopt-go"
 )
 
 var usageTestTable = []struct {
@@ -16,7 +14,7 @@ var usageTestTable = []struct {
 		Options{"start", "smug", []string{}, false, false},
 	},
 	{
-		[]string{"start", "smug", "-wfoo"},
+		[]string{"start", "smug", "-w", "foo"},
 		Options{"start", "smug", []string{"foo"}, false, false},
 	},
 	{
@@ -27,12 +25,15 @@ var usageTestTable = []struct {
 		[]string{"start", "smug", "--attach", "--debug"},
 		Options{"start", "smug", []string{}, true, true},
 	},
+	{
+		[]string{"start", "smug", "-ad"},
+		Options{"start", "smug", []string{}, true, true},
+	},
 }
 
 func TestParseOptions(t *testing.T) {
-	parser := docopt.Parser{}
 	for _, v := range usageTestTable {
-		opts, err := ParseOptions(parser, v.argv)
+		opts, err := ParseOptions(v.argv)
 
 		if err != nil {
 			t.Fail()

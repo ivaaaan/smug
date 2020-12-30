@@ -1,26 +1,16 @@
 package main
 
 import (
+	"errors"
 	"strings"
 
-	"github.com/docopt/docopt-go"
+	"github.com/spf13/pflag"
 )
 
-const usage = `Smug - tmux session manager. Version v0.1.5
-
-Usage:
-	smug <command> <project> [-w <window>]... [--attach] [--debug]
-
-Options:
-	-w List of windows to start. If session exists, those windows will be attached to current session.
-
-Examples:
-	$ smug start blog
-	$ smug start blog:win1
-	$ smug start blog -w win1
-	$ smug start blog:win1,win2
-	$ smug stop blog
-`
+const (
+	CommandStart = "start"
+	CommandStop  = "stop"
+)
 
 type Options struct {
 	Command string
@@ -30,41 +20,43 @@ type Options struct {
 	Debug   bool
 }
 
-func ParseOptions(p docopt.Parser, argv []string) (Options, error) {
-	arguments, err := p.ParseArgs(usage, argv, "")
+var ErrHelp = errors.New("help requested")
+
+const (
+	WindowsUsage = "List of windows to start. If session exists, those windows will be attached to current session."
+	AttachUsage  = "Force switch client for a session"
+	DebugUsage   = "Print all commands to ~/.config/smug/smug.log"
+)
+
+func ParseOptions(argv []string, helpRequested func()) (Options, error) {
+	if len(argv) < 2 {
+		helpRequested()
+		return Options{}, ErrHelp
+	}
+
+	cmd := argv[0]
+	project := argv[1]
+
+	flags := pflag.NewFlagSet(cmd, 0)
+	windows := flags.StringArrayP("windows", "w", []string{}, WindowsUsage)
+	attach := flags.BoolP("attach", "a", false, AttachUsage)
+	debug := flags.BoolP("debug", "d", false, DebugUsage)
+
+	err := flags.Parse(argv)
+	if err == pflag.ErrHelp {
+		return Options{}, ErrHelp
+	}
+
 	if err != nil {
 		return Options{}, err
 	}
-
-	cmd, err := arguments.String("<command>")
-	if err != nil {
-		return Options{}, err
-	}
-
-	project, err := arguments.String("<project>")
-	if err != nil {
-		return Options{}, err
-	}
-
-	attach, err := arguments.Bool("--attach")
-	if err != nil {
-		return Options{}, err
-	}
-
-	debug, err := arguments.Bool("--debug")
-	if err != nil {
-		return Options{}, err
-	}
-
-	var windows []string
 
 	if strings.Contains(project, ":") {
 		parts := strings.Split(project, ":")
 		project = parts[0]
-		windows = strings.Split(parts[1], ",")
-	} else {
-		windows = arguments["-w"].([]string)
+		wl := strings.Split(parts[1], ",")
+		windows = &wl
 	}
 
-	return Options{cmd, project, windows, attach, debug}, nil
+	return Options{cmd, project, *windows, *attach, *debug}, nil
 }
