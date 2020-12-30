@@ -12,8 +12,9 @@ const version = "v0.1.6"
 
 var usage = fmt.Sprintf(`Smug - tmux session manager. Version %s
 
+
 Usage:
-	smug <command> <project> [-w <window>]... [--attach] [--debug]
+	smug <command> [<project>] [-f, --file <file>] [-w, --windows <window>]... [-a, --attach] [-d, --debug]
 
 Options:
 	-f, --file %s
