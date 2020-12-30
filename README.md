@@ -40,7 +40,9 @@ go install
 
 ## Usage
 
-`smug <command> [<project>] [-f, --file <file>] [-w, --windows <window>]... [-a, --attach] [-d, --debug]`
+```
+smug <command> [<project>] [-f, --file <file>] [-w, --windows <window>]... [-a, --attach] [-d, --debug]
+```
 
 ### Options:
 
