@@ -6,14 +6,39 @@ import (
 	"log"
 	"os"
 	"path/filepath"
-
-	"github.com/docopt/docopt-go"
 )
 
-func main() {
-	parser := docopt.Parser{}
+const version = "v0.1.5"
 
-	options, err := ParseOptions(parser, os.Args[1:])
+var usage = fmt.Sprintf(`Smug - tmux session manager. Version %s
+
+Usage:
+	smug <command> <project> [-w <window>]... [--attach] [--debug]
+
+Options:
+	-w, --windows %s
+	-a, --attach %s
+	-d, --debug %s
+
+Examples:
+	$ smug start blog
+	$ smug start blog:win1
+	$ smug start blog -w win1
+	$ smug start blog:win1,win2
+	$ smug stop blog
+	$ smug start blog --attach
+`, version, WindowsUsage, AttachUsage, DebugUsage)
+
+func main() {
+	options, err := ParseOptions(os.Args[1:], func() {
+		fmt.Fprintf(os.Stdout, usage)
+		os.Exit(0)
+	})
+
+	if err == ErrHelp {
+		os.Exit(0)
+	}
+
 	if err != nil {
 		fmt.Fprintf(os.Stderr, "Cannot parse command line otions: %q", err.Error())
 		os.Exit(1)
@@ -51,7 +76,7 @@ func main() {
 	context := CreateContext()
 
 	switch options.Command {
-	case "start":
+	case CommandStart:
 		if len(options.Windows) == 0 {
 			fmt.Println("Starting a new session...")
 		} else {
@@ -62,15 +87,13 @@ func main() {
 			fmt.Println("Oops, an error occurred! Rolling back...")
 			smug.Stop(*config, options, *context)
 		}
-	case "stop":
+	case CommandStop:
 		if len(options.Windows) == 0 {
 			fmt.Println("Terminating session...")
 		} else {
 			fmt.Println("Killing windows...")
 		}
 		err = smug.Stop(*config, options, *context)
-	default:
-		err = fmt.Errorf("Unknown command %q", options.Command)
 	}
 
 	if err != nil {
