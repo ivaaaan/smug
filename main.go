@@ -12,10 +12,12 @@ const version = "v0.1.6"
 
 var usage = fmt.Sprintf(`Smug - tmux session manager. Version %s
 
+
 Usage:
-	smug <command> <project> [-w <window>]... [--attach] [--debug]
+	smug <command> [<project>] [-f, --file <file>] [-w, --windows <window>]... [-a, --attach] [-d, --debug]
 
 Options:
+	-f, --file %s
 	-w, --windows %s
 	-a, --attach %s
 	-d, --debug %s
@@ -27,7 +29,7 @@ Examples:
 	$ smug start blog:win1,win2
 	$ smug stop blog
 	$ smug start blog --attach
-`, version, WindowsUsage, AttachUsage, DebugUsage)
+`, version, FileUsage, WindowsUsage, AttachUsage, DebugUsage)
 
 func main() {
 	options, err := ParseOptions(os.Args[1:], func() {
@@ -45,7 +47,13 @@ func main() {
 	}
 
 	userConfigDir := filepath.Join(ExpandPath("~/"), ".config/smug")
-	configPath := filepath.Join(userConfigDir, options.Project+".yml")
+
+	var configPath string
+	if options.Config != "" {
+		configPath = options.Config
+	} else {
+		configPath = filepath.Join(userConfigDir, options.Project+".yml")
+	}
 
 	f, err := ioutil.ReadFile(configPath)
 	if err != nil {

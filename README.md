@@ -40,7 +40,31 @@ go install
 
 ## Usage
 
-`smug <command> <project>[:window name] [-w window name]... [--attach]`.
+```
+smug <command> [<project>] [-f, --file <file>] [-w, --windows <window>]... [-a, --attach] [-d, --debug]
+```
+
+### Options:
+
+```
+-f, --file A custom path to a config file
+-w, --windows List of windows to start. If session exists, those windows will be attached to current session.
+-a, --attach Force switch client for a session
+-d, --debug Print all commands to ~/.config/smug/smug.log
+```
+
+### Examples:
+
+```
+$ smug start blog
+$ smug start blog:win1
+$ smug start blog -w win1
+$ smug start blog:win1,win2
+$ smug stop blog
+$ smug start blog --attach
+$ smug start -f ./project.yml -w win1 -w win2
+$ smug stop -f ./project.yml -w win1
+```
 
 ### Examples
 
