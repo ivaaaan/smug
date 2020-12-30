@@ -12,6 +12,8 @@ const (
 	CommandStop  = "stop"
 )
 
+var validCommands = []string{CommandStart, CommandStop}
+
 type Options struct {
 	Command string
 	Project string
@@ -43,7 +45,16 @@ func ParseOptions(argv []string, helpRequested func()) (Options, error) {
 		return Options{}, ErrHelp
 	}
 
+	if argv[0] == "--help" || argv[0] == "-h" {
+		helpRequested()
+		return Options{}, ErrHelp
+	}
+
 	cmd := argv[0]
+	if !Contains(validCommands, cmd) {
+		helpRequested()
+		return Options{}, ErrHelp
+	}
 
 	flags := NewFlagSet(cmd)
 

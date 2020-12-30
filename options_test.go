@@ -44,6 +44,18 @@ var usageTestTable = []struct {
 		0,
 	},
 	{
+		[]string{"start", "-f", "test.yml"},
+		Options{"start", "", "test.yml", []string{}, false, false},
+		nil,
+		0,
+	},
+	{
+		[]string{"start", "-f", "test.yml", "-w", "win1", "-w", "win2"},
+		Options{"start", "", "test.yml", []string{"win1", "win2"}, false, false},
+		nil,
+		0,
+	},
+	{
 		[]string{"start"},
 		Options{},
 		ErrHelp,
@@ -51,6 +63,30 @@ var usageTestTable = []struct {
 	},
 	{
 		[]string{"start", "--help"},
+		Options{},
+		ErrHelp,
+		1,
+	},
+	{
+		[]string{"start"},
+		Options{},
+		ErrHelp,
+		1,
+	},
+	{
+		[]string{"test"},
+		Options{},
+		ErrHelp,
+		1,
+	},
+	{
+		[]string{},
+		Options{},
+		ErrHelp,
+		1,
+	},
+	{
+		[]string{"--help"},
 		Options{},
 		ErrHelp,
 		1,
