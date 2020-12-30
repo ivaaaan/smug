@@ -28,6 +28,12 @@ const (
 	DebugUsage   = "Print all commands to ~/.config/smug/smug.log"
 )
 
+// Creates a new FlagSet.
+// Moved it to a variable to be able to override it in the tests.
+var NewFlagSet = func(cmd string) *pflag.FlagSet {
+	return pflag.NewFlagSet(cmd, pflag.ContinueOnError)
+}
+
 func ParseOptions(argv []string, helpRequested func()) (Options, error) {
 	if len(argv) < 2 {
 		helpRequested()
@@ -37,7 +43,8 @@ func ParseOptions(argv []string, helpRequested func()) (Options, error) {
 	cmd := argv[0]
 	project := argv[1]
 
-	flags := pflag.NewFlagSet(cmd, 0)
+	flags := NewFlagSet(cmd)
+
 	windows := flags.StringArrayP("windows", "w", []string{}, WindowsUsage)
 	attach := flags.BoolP("attach", "a", false, AttachUsage)
 	debug := flags.BoolP("debug", "d", false, DebugUsage)
