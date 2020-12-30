@@ -53,19 +53,6 @@ smug <command> [<project>] [-f, --file <file>] [-w, --windows <window>]... [-a, 
 -d, --debug Print all commands to ~/.config/smug/smug.log
 ```
 
-### Examples:
-
-```
-$ smug start blog
-$ smug start blog:win1
-$ smug start blog -w win1
-$ smug start blog:win1,win2
-$ smug stop blog
-$ smug start blog --attach
-$ smug start -f ./project.yml -w win1 -w win2
-$ smug stop -f ./project.yml -w win1
-```
-
 ### Examples
 
 To start/stop a project and all windows, run:
@@ -90,6 +77,16 @@ xyz@localhost:~$ smug start project -w window1 -w window2
 xyz@localhost:~$ smug stop project:window1
 
 xyz@localhost:~$ smug stop project -w window1 -w window2
+```
+
+Also, you are not obliged to put your files in the `~/.config/smug` directory. You can use a custom path in the `-f` flag:
+
+```console
+xyz@localhost:~$ smug start -f ./project.yml
+
+xyz@localhost:~$ smug stop -f ./project.yml
+
+xyz@localhost:~$ smug start -f ./project.yml -w window1 -w window2
 ```
 
 ## Configuration
