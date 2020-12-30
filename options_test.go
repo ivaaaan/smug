@@ -15,31 +15,31 @@ var usageTestTable = []struct {
 }{
 	{
 		[]string{"start", "smug"},
-		Options{"start", "smug", []string{}, false, false},
+		Options{"start", "smug", "", []string{}, false, false},
 		nil,
 		0,
 	},
 	{
 		[]string{"start", "smug", "-w", "foo"},
-		Options{"start", "smug", []string{"foo"}, false, false},
+		Options{"start", "smug", "", []string{"foo"}, false, false},
 		nil,
 		0,
 	},
 	{
 		[]string{"start", "smug:foo,bar"},
-		Options{"start", "smug", []string{"foo", "bar"}, false, false},
+		Options{"start", "smug", "", []string{"foo", "bar"}, false, false},
 		nil,
 		0,
 	},
 	{
 		[]string{"start", "smug", "--attach", "--debug"},
-		Options{"start", "smug", []string{}, true, true},
+		Options{"start", "smug", "", []string{}, true, true},
 		nil,
 		0,
 	},
 	{
 		[]string{"start", "smug", "-ad"},
-		Options{"start", "smug", []string{}, true, true},
+		Options{"start", "smug", "", []string{}, true, true},
 		nil,
 		0,
 	},

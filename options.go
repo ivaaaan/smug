@@ -15,6 +15,7 @@ const (
 type Options struct {
 	Command string
 	Project string
+	Config  string
 	Windows []string
 	Attach  bool
 	Debug   bool
@@ -26,25 +27,27 @@ const (
 	WindowsUsage = "List of windows to start. If session exists, those windows will be attached to current session."
 	AttachUsage  = "Force switch client for a session"
 	DebugUsage   = "Print all commands to ~/.config/smug/smug.log"
+	FileUsage    = "A custom path to a config file"
 )
 
 // Creates a new FlagSet.
 // Moved it to a variable to be able to override it in the tests.
 var NewFlagSet = func(cmd string) *pflag.FlagSet {
-	return pflag.NewFlagSet(cmd, pflag.ContinueOnError)
+	f := pflag.NewFlagSet(cmd, pflag.ContinueOnError)
+	return f
 }
 
 func ParseOptions(argv []string, helpRequested func()) (Options, error) {
-	if len(argv) < 2 {
+	if len(argv) == 0 {
 		helpRequested()
 		return Options{}, ErrHelp
 	}
 
 	cmd := argv[0]
-	project := argv[1]
 
 	flags := NewFlagSet(cmd)
 
+	config := flags.StringP("file", "f", "", FileUsage)
 	windows := flags.StringArrayP("windows", "w", []string{}, WindowsUsage)
 	attach := flags.BoolP("attach", "a", false, AttachUsage)
 	debug := flags.BoolP("debug", "d", false, DebugUsage)
@@ -58,6 +61,16 @@ func ParseOptions(argv []string, helpRequested func()) (Options, error) {
 		return Options{}, err
 	}
 
+	if len(argv) < 2 && *config == "" {
+		helpRequested()
+		return Options{}, ErrHelp
+	}
+
+	var project string
+	if *config == "" {
+		project = argv[1]
+	}
+
 	if strings.Contains(project, ":") {
 		parts := strings.Split(project, ":")
 		project = parts[0]
@@ -65,5 +78,5 @@ func ParseOptions(argv []string, helpRequested func()) (Options, error) {
 		windows = &wl
 	}
 
-	return Options{cmd, project, *windows, *attach, *debug}, nil
+	return Options{cmd, project, *config, *windows, *attach, *debug}, nil
 }
