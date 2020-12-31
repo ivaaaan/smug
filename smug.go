@@ -1,6 +1,8 @@
 package main
 
 import (
+	"fmt"
+	"log"
 	"os"
 	"os/exec"
 	"path/filepath"
@@ -57,7 +59,20 @@ func (smug Smug) switchOrAttach(sessionName string, attach bool, insideTmuxSessi
 	return nil
 }
 
-func (smug Smug) Create(options Options) error {
+//Exists verifies if file exists
+func Exists(path string) (bool, error) {
+	_, err := os.Stat(path)
+	if err == nil {
+		return true, nil
+	}
+	if os.IsNotExist(err) {
+		return false, nil
+	}
+	return false, err
+}
+
+//ConfigPath returns a string of the full filepath
+func ConfigPath(options Options) string {
 	userConfigDir := filepath.Join(ExpandPath("~/"), ".config/smug")
 
 	var configPath string
@@ -66,34 +81,43 @@ func (smug Smug) Create(options Options) error {
 	} else {
 		configPath = filepath.Join(userConfigDir, options.Project+".yml")
 	}
-	_, err := os.Create(configPath)
-	// if files exists, then DO nNOT create case
+	return configPath
+}
+
+//Create creates a new file with name options.project, unless it already exists
+func (smug Smug) Create(options Options) error {
+	path := ConfigPath(options)
+
+	t, err := Exists(path)
+	if t {
+		fmt.Println("File Already Exists", path)
+	} else {
+		f, err := os.Create(path)
+		fmt.Println("File Created!", path)
+		if err != nil {
+			log.Fatal(err)
+		}
+		if err := f.Close(); err != nil {
+			log.Fatal(err)
+		}
+	}
 	return err
 }
 
+//Edit edits a existing file with name options.project
 func (smug Smug) Edit(options Options) error {
-	userConfigDir := filepath.Join(ExpandPath("~/"), ".config/smug")
-
-	var configPath string
-	if options.Config != "" {
-		configPath = options.Config
-	} else {
-		configPath = filepath.Join(userConfigDir, options.Project+".yml")
-	}
+	path := ConfigPath(options)
 
 	editor := os.Getenv("EDITOR")
 	if editor == "" {
 		editor = "vim"
 	}
-	// Get the full executable path for the editor.
+
 	executable, err := exec.LookPath(editor)
 	if err != nil {
 		return err
 	}
-	cmd := exec.Command(executable, configPath)
-	cmd.Stdin = os.Stdin
-	cmd.Stdout = os.Stdout
-	cmd.Stderr = os.Stderr
+	cmd := exec.Command(executable, path)
 	cmd.Run()
 
 	return err

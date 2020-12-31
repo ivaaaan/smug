@@ -98,11 +98,13 @@ func main() {
 			smug.Stop(*config, options, context)
 		}
 	case CommandCreate:
+		fmt.Printf("Creating %s...\n", options.Project)
 		err = smug.Create(options)
 		if err != nil {
 			fmt.Println("Oops, an error occurred! Unable to create file...")
 		}
 	case CommandEdit:
+		fmt.Printf("Opening %s in editor...\n", options.Project)
 		err = smug.Edit(options)
 		if err != nil {
 			fmt.Println("Oops, an error occurred! Unable to edit file...")
