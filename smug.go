@@ -57,6 +57,20 @@ func (smug Smug) switchOrAttach(sessionName string, attach bool, insideTmuxSessi
 	return nil
 }
 
+func (smug Smug) Create(options Options) error {
+	userConfigDir := filepath.Join(ExpandPath("~/"), ".config/smug")
+
+	var configPath string
+	if options.Config != "" {
+		configPath = options.Config
+	} else {
+		configPath = filepath.Join(userConfigDir, options.Project+".yml")
+	}
+	_, err := os.Create(configPath)
+	// if files exists, then DO nNOT create case
+	return err
+}
+
 func (smug Smug) Edit(options Options) error {
 	userConfigDir := filepath.Join(ExpandPath("~/"), ".config/smug")
 

@@ -8,12 +8,13 @@ import (
 )
 
 const (
-	CommandStart = "start"
-	CommandStop  = "stop"
-	CommandEdit  = "edit"
+	CommandStart  = "start"
+	CommandStop   = "stop"
+	CommandCreate = "create"
+	CommandEdit   = "edit"
 )
 
-var validCommands = []string{CommandStart, CommandStop, CommandEdit}
+var validCommands = []string{CommandStart, CommandStop, CommandCreate, CommandEdit}
 
 type Options struct {
 	Command string

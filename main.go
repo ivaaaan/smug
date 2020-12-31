@@ -58,7 +58,7 @@ func main() {
 	}
 
 	f, err := ioutil.ReadFile(configPath)
-	if err != nil {
+	if options.Command != "create" && err != nil {
 		fmt.Fprintln(os.Stderr, err.Error())
 		os.Exit(1)
 	}
@@ -97,9 +97,16 @@ func main() {
 			fmt.Println("Oops, an error occurred! Rolling back...")
 			smug.Stop(*config, options, context)
 		}
+	case CommandCreate:
+		err = smug.Create(options)
+		if err != nil {
+			fmt.Println("Oops, an error occurred! Unable to create file...")
+		}
 	case CommandEdit:
-		smug.Edit(options)
-
+		err = smug.Edit(options)
+		if err != nil {
+			fmt.Println("Oops, an error occurred! Unable to edit file...")
+		}
 	case CommandStop:
 		if len(options.Windows) == 0 {
 			fmt.Println("Terminating session...")
