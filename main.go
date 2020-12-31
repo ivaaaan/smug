@@ -58,7 +58,7 @@ func main() {
 	}
 
 	f, err := ioutil.ReadFile(configPath)
-	if options.Command != "create" && err != nil {
+	if options.Command != CommandCreate && err != nil {
 		fmt.Fprintln(os.Stderr, err.Error())
 		os.Exit(1)
 	}
@@ -81,7 +81,7 @@ func main() {
 
 	commander := DefaultCommander{logger}
 	tmux := Tmux{commander}
-	smug := Smug{tmux, commander}
+	smug := Smug{tmux, commander, configPath}
 
 	context := CreateContext()
 
@@ -98,17 +98,9 @@ func main() {
 			smug.Stop(*config, options, context)
 		}
 	case CommandCreate:
-		fmt.Printf("Creating %s...\n", options.Project)
 		err = smug.Create(options)
-		if err != nil {
-			fmt.Println("Oops, an error occurred! Unable to create file...")
-		}
 	case CommandEdit:
-		fmt.Printf("Opening %s in editor...\n", options.Project)
 		err = smug.Edit(options)
-		if err != nil {
-			fmt.Println("Oops, an error occurred! Unable to edit file...")
-		}
 	case CommandStop:
 		if len(options.Windows) == 0 {
 			fmt.Println("Terminating session...")

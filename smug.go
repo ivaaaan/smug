@@ -1,8 +1,7 @@
 package main
 
 import (
-	"fmt"
-	"log"
+	"errors"
 	"os"
 	"os/exec"
 	"path/filepath"
@@ -33,8 +32,9 @@ func Contains(slice []string, s string) bool {
 }
 
 type Smug struct {
-	tmux      Tmux
-	commander Commander
+	tmux       Tmux
+	commander  Commander
+	configPath string
 }
 
 func (smug Smug) execShellCommands(commands []string, path string) error {
@@ -59,8 +59,7 @@ func (smug Smug) switchOrAttach(sessionName string, attach bool, insideTmuxSessi
 	return nil
 }
 
-//Exists verifies if file exists
-func Exists(path string) (bool, error) {
+func IsFileExists(path string) (bool, error) {
 	_, err := os.Stat(path)
 	if err == nil {
 		return true, nil
@@ -71,42 +70,20 @@ func Exists(path string) (bool, error) {
 	return false, err
 }
 
-//ConfigPath returns a string of the full filepath
-func ConfigPath(options Options) string {
-	userConfigDir := filepath.Join(ExpandPath("~/"), ".config/smug")
-
-	var configPath string
-	if options.Config != "" {
-		configPath = options.Config
-	} else {
-		configPath = filepath.Join(userConfigDir, options.Project+".yml")
-	}
-	return configPath
-}
-
-//Create creates a new file with name options.project, unless it already exists
 func (smug Smug) Create(options Options) error {
-	path := ConfigPath(options)
+	path := smug.configPath
 
-	t, err := Exists(path)
-	if t {
-		fmt.Println("File Already Exists", path)
-	} else {
-		f, err := os.Create(path)
-		fmt.Println("File Created!", path)
-		if err != nil {
-			log.Fatal(err)
-		}
-		if err := f.Close(); err != nil {
-			log.Fatal(err)
-		}
+	exists, _ := IsFileExists(path)
+	if exists {
+		return errors.New("File already exists")
 	}
+	file, err := os.Create(path)
+	defer file.Close()
 	return err
 }
 
-//Edit edits a existing file with name options.project
 func (smug Smug) Edit(options Options) error {
-	path := ConfigPath(options)
+	path := smug.configPath
 
 	editor := os.Getenv("EDITOR")
 	if editor == "" {
