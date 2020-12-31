@@ -2,6 +2,7 @@ package main
 
 import (
 	"os/exec"
+	"path/filepath"
 	"reflect"
 	"strings"
 	"testing"
@@ -232,12 +233,16 @@ func (c *MockCommander) ExecSilently(cmd *exec.Cmd) error {
 }
 
 func TestStartSession(t *testing.T) {
+
 	for _, params := range testTable {
+
+		userConfigDir := filepath.Join(ExpandPath("~/"), ".config/smug")
+		configPath := filepath.Join(userConfigDir, params.options.Project+".yml")
 
 		t.Run("test start session", func(t *testing.T) {
 			commander := &MockCommander{[]string{}, params.commanderOutput}
 			tmux := Tmux{commander}
-			smug := Smug{tmux, commander}
+			smug := Smug{tmux, commander, configPath}
 
 			err := smug.Start(params.config, params.options, params.context)
 			if err != nil {
@@ -252,7 +257,7 @@ func TestStartSession(t *testing.T) {
 		t.Run("test stop session", func(t *testing.T) {
 			commander := &MockCommander{[]string{}, params.commanderOutput}
 			tmux := Tmux{commander}
-			smug := Smug{tmux, commander}
+			smug := Smug{tmux, commander, configPath}
 
 			err := smug.Stop(params.config, params.options, params.context)
 			if err != nil {
