@@ -29,6 +29,8 @@ Examples:
 	$ smug start blog:win1,win2
 	$ smug stop blog
 	$ smug start blog --attach
+	$ smug create blog
+	$ smug edit blog
 `, version, FileUsage, WindowsUsage, AttachUsage, DebugUsage)
 
 func main() {
@@ -95,6 +97,9 @@ func main() {
 			fmt.Println("Oops, an error occurred! Rolling back...")
 			smug.Stop(*config, options, context)
 		}
+	case CommandEdit:
+		smug.Edit(options)
+
 	case CommandStop:
 		if len(options.Windows) == 0 {
 			fmt.Println("Terminating session...")

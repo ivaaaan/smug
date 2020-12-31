@@ -10,9 +10,10 @@ import (
 const (
 	CommandStart = "start"
 	CommandStop  = "stop"
+	CommandEdit  = "edit"
 )
 
-var validCommands = []string{CommandStart, CommandStop}
+var validCommands = []string{CommandStart, CommandStop, CommandEdit}
 
 type Options struct {
 	Command string

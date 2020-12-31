@@ -57,6 +57,34 @@ func (smug Smug) switchOrAttach(sessionName string, attach bool, insideTmuxSessi
 	return nil
 }
 
+func (smug Smug) Edit(options Options) error {
+	userConfigDir := filepath.Join(ExpandPath("~/"), ".config/smug")
+
+	var configPath string
+	if options.Config != "" {
+		configPath = options.Config
+	} else {
+		configPath = filepath.Join(userConfigDir, options.Project+".yml")
+	}
+
+	editor := os.Getenv("EDITOR")
+	if editor == "" {
+		editor = "vim"
+	}
+	// Get the full executable path for the editor.
+	executable, err := exec.LookPath(editor)
+	if err != nil {
+		return err
+	}
+	cmd := exec.Command(executable, configPath)
+	cmd.Stdin = os.Stdin
+	cmd.Stdout = os.Stdout
+	cmd.Stderr = os.Stderr
+	cmd.Run()
+
+	return err
+}
+
 func (smug Smug) Stop(config Config, options Options, context Context) error {
 	windows := options.Windows
 	if len(windows) == 0 {
