@@ -71,20 +71,19 @@ func IsFileExists(path string) (bool, error) {
 }
 
 func (smug Smug) Create(options Options) error {
-	path := smug.configPath
-
-	exists, _ := IsFileExists(path)
+	exists, err := IsFileExists(smug.configPath)
+	if err != nil {
+		return err
+	}
 	if exists {
 		return errors.New("File already exists")
 	}
-	file, err := os.Create(path)
+	file, err := os.Create(smug.configPath)
 	defer file.Close()
 	return err
 }
 
 func (smug Smug) Edit(options Options) error {
-	path := smug.configPath
-
 	editor := os.Getenv("EDITOR")
 	if editor == "" {
 		editor = "vim"
@@ -94,7 +93,7 @@ func (smug Smug) Edit(options Options) error {
 	if err != nil {
 		return err
 	}
-	cmd := exec.Command(executable, path)
+	cmd := exec.Command(executable, smug.configPath)
 	cmd.Run()
 
 	return err
