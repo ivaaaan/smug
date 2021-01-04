@@ -318,5 +318,4 @@ func TestSmug_CreateEdit(t *testing.T) {
 			// }
 		})
 	}
-
 }
