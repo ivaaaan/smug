@@ -313,18 +313,10 @@ func TestSmug_CreateEdit(t *testing.T) {
 			if err := smug.Create(); (err != nil) != tt.wantErr {
 				t.Errorf("Smug.Create() error = %v, wantErr %v", err, tt.wantErr)
 			}
-		})
-	}
-	for _, tt := range tests {
-		go t.Run(tt.name, func(t *testing.T) {
-			smug := Smug{
-				tmux:       tt.fields.tmux,
-				commander:  tt.fields.commander,
-				configPath: tt.fields.configPath,
-			}
 			if err := smug.Edit(); (err != nil) != tt.wantErr {
 				t.Errorf("Smug.Edit() error = %v, wantErr %v", err, tt.wantErr)
 			}
 		})
 	}
+
 }
