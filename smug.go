@@ -4,8 +4,11 @@ import (
 	"os"
 	"os/exec"
 	"path/filepath"
+	"strconv"
 	"strings"
 )
+
+const defaultWindowName = "smug_def"
 
 func ExpandPath(path string) string {
 	if strings.HasPrefix(path, "~/") {
@@ -52,7 +55,7 @@ func (smug Smug) switchOrAttach(sessionName string, attach bool, insideTmuxSessi
 	if insideTmuxSession && attach {
 		return smug.tmux.SwitchClient(sessionName)
 	} else if !insideTmuxSession {
-		return smug.tmux.Attach(sessionName, os.Stdin, os.Stdout, os.Stderr)
+		return smug.tmux.Attach(sessionName+"0", os.Stdin, os.Stdout, os.Stderr)
 	}
 	return nil
 }
@@ -94,14 +97,7 @@ func (smug Smug) Start(config Config, options Options, context Context) error {
 			return err
 		}
 
-		var defaultWindowName string
-		if len(windows) > 0 {
-			defaultWindowName = windows[0]
-		} else if len(config.Windows) > 0 {
-			defaultWindowName = config.Windows[0].Name
-		}
-
-		_, err = smug.tmux.NewSession(strings.Replace(sessionName, ":", "", 1), sessionRoot, defaultWindowName)
+		_, err = smug.tmux.NewSession(config.Session, sessionRoot, defaultWindowName)
 		if err != nil {
 			return err
 		}
@@ -109,7 +105,7 @@ func (smug Smug) Start(config Config, options Options, context Context) error {
 		return smug.switchOrAttach(sessionName, attach, context.InsideTmuxSession)
 	}
 
-	for wIndex, w := range config.Windows {
+	for _, w := range config.Windows {
 		if (len(windows) == 0 && w.Manual) || (len(windows) > 0 && !Contains(windows, w.Name)) {
 			continue
 		}
@@ -120,27 +116,13 @@ func (smug Smug) Start(config Config, options Options, context Context) error {
 		}
 
 		window := sessionName + w.Name
-		if (!sessionExists && wIndex > 0 && len(windows) == 0) || (sessionExists && len(windows) > 0) {
-			_, err := smug.tmux.NewWindow(sessionName, w.Name, windowRoot)
-			if err != nil {
-				return err
-			}
+		_, err := smug.tmux.NewWindow(sessionName, w.Name, windowRoot)
+		if err != nil {
+			return err
 		}
 
 		for _, c := range w.Commands {
 			err := smug.tmux.SendKeys(window, c)
-			if err != nil {
-				return err
-			}
-		}
-
-		for _, p := range w.Panes {
-			paneRoot := ExpandPath(p.Root)
-			if paneRoot == "" || !filepath.IsAbs(p.Root) {
-				paneRoot = filepath.Join(windowRoot, p.Root)
-			}
-
-			_, err := smug.tmux.SplitWindow(window, p.Type, paneRoot, p.Commands)
 			if err != nil {
 				return err
 			}
@@ -151,11 +133,33 @@ func (smug Smug) Start(config Config, options Options, context Context) error {
 			layout = EvenHorizontal
 		}
 
-		_, err := smug.tmux.SelectLayout(sessionName+w.Name, layout)
+		_, err = smug.tmux.SelectLayout(sessionName+w.Name, layout)
 		if err != nil {
 			return err
 		}
+
+		for pIndex, p := range w.Panes {
+			paneRoot := ExpandPath(p.Root)
+			if paneRoot == "" || !filepath.IsAbs(p.Root) {
+				paneRoot = filepath.Join(windowRoot, p.Root)
+			}
+
+			_, err := smug.tmux.SplitWindow(window, p.Type, paneRoot)
+			if err != nil {
+				return err
+			}
+
+			for _, c := range p.Commands {
+				err = smug.tmux.SendKeys(window+"."+strconv.Itoa(pIndex+1), c)
+				if err != nil {
+					return err
+				}
+			}
+		}
 	}
+
+	_ = smug.tmux.KillWindow(sessionName + defaultWindowName)
+	_ = smug.tmux.RenumberWindows(sessionName)
 
 	if len(windows) == 0 {
 		return smug.switchOrAttach(sessionName, attach, context.InsideTmuxSession)

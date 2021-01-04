@@ -146,7 +146,42 @@ var testTable = []struct {
 		},
 		"xyz",
 	},
-
+	{
+		Config{
+			Session: "ses",
+			Root:    "root",
+			Windows: []Window{
+				{
+					Name:   "win1",
+					Manual: false,
+					Root:   "./win1",
+					Panes: []Pane{
+						{
+							Root: "pane1",
+							Type: "vertical",
+							Commands: []string{
+								"command1",
+							},
+						},
+					},
+				},
+			},
+		},
+		Options{},
+		Context{},
+		[]string{
+			"tmux has-session -t ses:",
+			"tmux new -Pd -s ses -n win1 -c root/win1",
+			"tmux split-window -Pd -t ses:win1.0 -c root/win1/pane1 -v",
+			"tmux send-keys -t ses:win1.0 command1 Enter",
+			"tmux select-layout -t ses:win1 even-horizontal",
+			"tmux attach -d -t ses:",
+		},
+		[]string{
+			"tmux kill-session -t ses",
+		},
+		"xyz",
+	},
 	{
 		Config{
 			Session:     "ses",

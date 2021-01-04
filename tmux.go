@@ -47,8 +47,7 @@ func (tmux Tmux) NewWindow(target string, name string, root string) (string, err
 
 func (tmux Tmux) SendKeys(target string, command string) error {
 	cmd := exec.Command("tmux", "send-keys", "-t", target, command, "Enter")
-	_, err := tmux.commander.Exec(cmd)
-	return err
+	return tmux.commander.ExecSilently(cmd)
 }
 
 func (tmux Tmux) Attach(target string, stdin *os.File, stdout *os.File, stderr *os.File) error {
@@ -62,12 +61,12 @@ func (tmux Tmux) Attach(target string, stdin *os.File, stdout *os.File, stderr *
 }
 
 func (tmux Tmux) RenumberWindows(target string) error {
-	cmd := exec.Command("tmux", "move-window", "-r")
+	cmd := exec.Command("tmux", "move-window", "-r", "-s", target, "-t", target)
 	_, err := tmux.commander.Exec(cmd)
 	return err
 }
 
-func (tmux Tmux) SplitWindow(target string, splitType string, root string, commands []string) (string, error) {
+func (tmux Tmux) SplitWindow(target string, splitType string, root string) (string, error) {
 	args := []string{"split-window", "-Pd", "-t", target, "-c", root}
 
 	switch splitType {
@@ -82,13 +81,6 @@ func (tmux Tmux) SplitWindow(target string, splitType string, root string, comma
 	pane, err := tmux.commander.Exec(cmd)
 	if err != nil {
 		return "", err
-	}
-
-	for _, c := range commands {
-		err = tmux.SendKeys(pane, c)
-		if err != nil {
-			return "", err
-		}
 	}
 
 	return pane, nil
