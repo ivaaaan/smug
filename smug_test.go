@@ -275,7 +275,7 @@ func TestStartSession(t *testing.T) {
 
 func TestSmug_CreateEdit(t *testing.T) {
 	tmpdir := t.TempDir()
-	os.Setenv("EDITOR", "/usr/local/bin/code")
+	os.Setenv("EDITOR", "/usr/bin/vim")
 
 	type fields struct {
 		tmux       Tmux
