@@ -98,9 +98,9 @@ func main() {
 			smug.Stop(*config, options, context)
 		}
 	case CommandCreate:
-		err = smug.Create(options)
+		err = smug.Create()
 	case CommandEdit:
-		err = smug.Edit(options)
+		err = smug.Edit()
 	case CommandStop:
 		if len(options.Windows) == 0 {
 			fmt.Println("Terminating session...")

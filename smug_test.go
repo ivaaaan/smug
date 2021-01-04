@@ -1,6 +1,7 @@
 package main
 
 import (
+	"os"
 	"os/exec"
 	"path/filepath"
 	"reflect"
@@ -269,5 +270,52 @@ func TestStartSession(t *testing.T) {
 			}
 		})
 
+	}
+}
+
+func TestSmug_CreateEdit(t *testing.T) {
+	tmpdir := t.TempDir()
+	os.Setenv("EDITOR", "/usr/local/bin/code")
+
+	type fields struct {
+		tmux       Tmux
+		commander  Commander
+		configPath string
+	}
+	tests := []struct {
+		name    string
+		fields  fields
+		wantErr bool
+	}{
+		{
+			fields: fields{
+				configPath: filepath.Join(tmpdir, "test1.yml"),
+			},
+		},
+		{
+			fields: fields{
+				configPath: filepath.Join(tmpdir, "test2.yml"),
+			},
+		},
+		{
+			fields: fields{
+				configPath: filepath.Join(tmpdir, "test3.yml"),
+			},
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			smug := Smug{
+				tmux:       tt.fields.tmux,
+				commander:  tt.fields.commander,
+				configPath: tt.fields.configPath,
+			}
+			if err := smug.Create(); (err != nil) != tt.wantErr {
+				t.Errorf("Smug.Create() error = %v, wantErr %v", err, tt.wantErr)
+			}
+			if err := smug.Edit(); (err != nil) != tt.wantErr {
+				t.Errorf("Smug.Edit() error = %v, wantErr %v", err, tt.wantErr)
+			}
+		})
 	}
 }

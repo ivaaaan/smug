@@ -70,7 +70,7 @@ func IsFileExists(path string) (bool, error) {
 	return false, err
 }
 
-func (smug Smug) Create(options Options) error {
+func (smug Smug) Create() error {
 	exists, err := IsFileExists(smug.configPath)
 	if err != nil {
 		return err
@@ -83,18 +83,17 @@ func (smug Smug) Create(options Options) error {
 	return err
 }
 
-func (smug Smug) Edit(options Options) error {
+func (smug Smug) Edit() error {
 	editor := os.Getenv("EDITOR")
 	if editor == "" {
 		editor = "vim"
 	}
 
-	executable, err := exec.LookPath(editor)
-	if err != nil {
-		return err
-	}
-	cmd := exec.Command(executable, smug.configPath)
-	cmd.Run()
+	cmd := exec.Command(editor, smug.configPath)
+	cmd.Stdin = os.Stdin
+	cmd.Stdout = os.Stdout
+	cmd.Stderr = os.Stderr
+	err := cmd.Run()
 
 	return err
 }
