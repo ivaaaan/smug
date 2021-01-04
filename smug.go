@@ -51,11 +51,11 @@ func (smug Smug) execShellCommands(commands []string, path string) error {
 	return nil
 }
 
-func (smug Smug) switchOrAttach(sessionName string, attach bool, insideTmuxSession bool) error {
+func (smug Smug) switchOrAttach(target string, attach bool, insideTmuxSession bool) error {
 	if insideTmuxSession && attach {
-		return smug.tmux.SwitchClient(sessionName)
+		return smug.tmux.SwitchClient(target)
 	} else if !insideTmuxSession {
-		return smug.tmux.Attach(sessionName+"0", os.Stdin, os.Stdout, os.Stderr)
+		return smug.tmux.Attach(target, os.Stdin, os.Stdout, os.Stderr)
 	}
 	return nil
 }
@@ -158,11 +158,11 @@ func (smug Smug) Start(config Config, options Options, context Context) error {
 		}
 	}
 
-	_ = smug.tmux.KillWindow(sessionName + defaultWindowName)
-	_ = smug.tmux.RenumberWindows(sessionName)
+	smug.tmux.KillWindow(sessionName + defaultWindowName)
+	smug.tmux.RenumberWindows(sessionName)
 
-	if len(windows) == 0 {
-		return smug.switchOrAttach(sessionName, attach, context.InsideTmuxSession)
+	if len(windows) == 0 && len(config.Windows) > 0 {
+		return smug.switchOrAttach(sessionName+config.Windows[0].Name, attach, context.InsideTmuxSession)
 	}
 
 	return nil
