@@ -2,13 +2,12 @@ package main
 
 import (
 	"fmt"
-	"io/ioutil"
 	"log"
 	"os"
 	"path/filepath"
 )
 
-const version = "v0.1.6"
+const version = "v0.1.7"
 
 var usage = fmt.Sprintf(`Smug - tmux session manager. Version %s
 
@@ -55,18 +54,6 @@ func main() {
 		configPath = filepath.Join(userConfigDir, options.Project+".yml")
 	}
 
-	f, err := ioutil.ReadFile(configPath)
-	if err != nil {
-		fmt.Fprintln(os.Stderr, err.Error())
-		os.Exit(1)
-	}
-
-	config, err := ParseConfig(string(f))
-	if err != nil {
-		fmt.Fprintln(os.Stderr, err.Error())
-		os.Exit(1)
-	}
-
 	var logger *log.Logger
 	if options.Debug {
 		logFile, err := os.Create(filepath.Join(userConfigDir, "smug.log"))
@@ -89,10 +76,15 @@ func main() {
 		} else {
 			fmt.Println("Starting new windows...")
 		}
-		err = smug.Start(*config, options, context)
+		config, err := GetConfig(configPath)
+		if err != nil {
+			fmt.Fprintf(os.Stderr, err.Error())
+		}
+
+		err = smug.Start(config, options, context)
 		if err != nil {
 			fmt.Println("Oops, an error occurred! Rolling back...")
-			smug.Stop(*config, options, context)
+			smug.Stop(config, options, context)
 		}
 	case CommandStop:
 		if len(options.Windows) == 0 {
@@ -100,11 +92,21 @@ func main() {
 		} else {
 			fmt.Println("Killing windows...")
 		}
-		err = smug.Stop(*config, options, context)
+		config, err := GetConfig(configPath)
+		if err != nil {
+			fmt.Fprintf(os.Stderr, err.Error())
+		}
+
+		err = smug.Stop(config, options, context)
+		if err != nil {
+			fmt.Fprintf(os.Stderr, err.Error())
+		}
+	case CommandNew:
+	case CommandEdit:
+		err := EditConfig(configPath)
+		if err != nil {
+			fmt.Fprintf(os.Stderr, err.Error())
+		}
 	}
 
-	if err != nil {
-		fmt.Fprintln(os.Stderr, err.Error())
-		os.Exit(1)
-	}
 }

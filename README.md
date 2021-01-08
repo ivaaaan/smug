@@ -44,6 +44,7 @@ go install
 smug <command> [<project>] [-f, --file <file>] [-w, --windows <window>]... [-a, --attach] [-d, --debug]
 ```
 
+
 ### Options:
 
 ```
@@ -54,6 +55,14 @@ smug <command> [<project>] [-f, --file <file>] [-w, --windows <window>]... [-a, 
 ```
 
 ### Examples
+
+To create a new project, or edit an existing one in the `$EDITOR`:
+
+```console
+xyz@localhost:~$ smug new project
+
+xyz@localhost:~$ smug edit project
+```
 
 To start/stop a project and all windows, run:
 
