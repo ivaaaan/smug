@@ -1,5 +1,8 @@
 # Smug - tmux session manager
 
+[![Actions Status](https://github.com/ivaaaan/smug/workflows/Go/badge.svg)](https://github.com/ivaaaan/smug/actions)
+[![Go Report Card](https://goreportcard.com/badge/github.com/ivaaaan/smug)](https://goreportcard.com/report/github.com/ivaaaan/smug)
+
 Inspired by [tmuxinator](https://github.com/tmuxinator/tmuxinator) and [tmuxp](https://github.com/tmux-python/tmuxp).
 
 Smug automates your [tmux](https://github.com/tmux/tmux) workflow. You can create a single configuration file, and Smug will create all the required windows and panes from it.
