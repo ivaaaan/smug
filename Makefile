@@ -15,6 +15,7 @@ ifndef GITHUB_TOKEN
 	$(error GITHUB_TOKEN is not defined)
 endif
 	sed -E -i.bak $(VERSION_REGEX) 'main.go' && rm main.go.bak
+	git commit -am 'Update version to $(version)'
 	git tag -a $(version) -m '$(version)'
 	git push origin $(version)
 	goreleaser --rm-dist
