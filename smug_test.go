@@ -56,7 +56,7 @@ var testTable = []struct {
 					Manual: false,
 					Layout: "main-horizontal",
 					Panes: []Pane{
-						Pane{
+						{
 							Type: "horizontal",
 						},
 					},
