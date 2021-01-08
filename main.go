@@ -42,7 +42,7 @@ func main() {
 	}
 
 	if err != nil {
-		fmt.Fprintf(os.Stderr, "Cannot parse command line otions: %q", err.Error())
+		fmt.Fprintf(os.Stderr, "Cannot parse command line options: %q", err.Error())
 		os.Exit(1)
 	}
 
@@ -80,7 +80,6 @@ func main() {
 	commander := DefaultCommander{logger}
 	tmux := Tmux{commander}
 	smug := Smug{tmux, commander}
-
 	context := CreateContext()
 
 	switch options.Command {

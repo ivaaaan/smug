@@ -8,7 +8,6 @@ type Context struct {
 
 func CreateContext() Context {
 	_, tmux := os.LookupEnv("TMUX")
-	os.Environ()
 	insideTmuxSession := os.Getenv("TERM") == "screen" || tmux
 	return Context{insideTmuxSession}
 }
