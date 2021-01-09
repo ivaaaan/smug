@@ -1,10 +1,20 @@
 package main
 
 import (
+	"fmt"
 	"log"
 	"os/exec"
 	"strings"
 )
+
+type ShellError struct {
+	Command string
+	Err     error
+}
+
+func (e *ShellError) Error() string {
+	return fmt.Sprintf("Cannot run %q. Error %v", e.Command, e.Err)
+}
 
 type Commander interface {
 	Exec(cmd *exec.Cmd) (string, error)
