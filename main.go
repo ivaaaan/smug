@@ -7,7 +7,7 @@ import (
 	"path/filepath"
 )
 
-const version = "v0.1.7"
+const version = "v0.1.8"
 
 var usage = fmt.Sprintf(`Smug - tmux session manager. Version %s
 
