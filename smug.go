@@ -4,7 +4,6 @@ import (
 	"os"
 	"os/exec"
 	"path/filepath"
-	"strconv"
 	"strings"
 )
 
@@ -138,19 +137,19 @@ func (smug Smug) Start(config Config, options Options, context Context) error {
 			return err
 		}
 
-		for pIndex, p := range w.Panes {
+		for _, p := range w.Panes {
 			paneRoot := ExpandPath(p.Root)
 			if paneRoot == "" || !filepath.IsAbs(p.Root) {
 				paneRoot = filepath.Join(windowRoot, p.Root)
 			}
 
-			_, err := smug.tmux.SplitWindow(window, p.Type, paneRoot)
+			newPane, err := smug.tmux.SplitWindow(window, p.Type, paneRoot)
 			if err != nil {
 				return err
 			}
 
 			for _, c := range p.Commands {
-				err = smug.tmux.SendKeys(window+"."+strconv.Itoa(pIndex+1), c)
+				err = smug.tmux.SendKeys(window+"."+newPane, c)
 				if err != nil {
 					return err
 				}
