@@ -67,7 +67,7 @@ func (tmux Tmux) RenumberWindows(target string) error {
 }
 
 func (tmux Tmux) SplitWindow(target string, splitType string, root string) (string, error) {
-	args := []string{"split-window", "-Pd", "-t", target, "-c", root, "-F", "#{pane_id}"}
+	args := []string{"split-window", "-Pd"}
 
 	switch splitType {
 	case VSplit:
@@ -75,6 +75,8 @@ func (tmux Tmux) SplitWindow(target string, splitType string, root string) (stri
 	case HSplit:
 		args = append(args, "-h")
 	}
+
+	args = append(args, []string{"-t", target, "-c", root, "-F", "#{pane_id}"}...)
 
 	cmd := exec.Command("tmux", args...)
 
