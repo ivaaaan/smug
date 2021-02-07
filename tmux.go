@@ -40,7 +40,7 @@ func (tmux Tmux) KillWindow(target string) error {
 }
 
 func (tmux Tmux) NewWindow(target string, name string, root string) (string, error) {
-	cmd := exec.Command("tmux", "neww", "-Pd", "-t", target, "-n", name, "-c", root, "-F", "#{window_id}.#{pane_id}")
+	cmd := exec.Command("tmux", "neww", "-Pd", "-t", target, "-n", name, "-c", root)
 
 	return tmux.commander.Exec(cmd)
 }
