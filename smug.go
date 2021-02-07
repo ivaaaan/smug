@@ -1,7 +1,6 @@
 package main
 
 import (
-	"fmt"
 	"os"
 	"os/exec"
 	"path/filepath"
@@ -138,17 +137,19 @@ func (smug Smug) Start(config Config, options Options, context Context) error {
 			return err
 		}
 
-		for pIndex, p := range w.Panes {
+		var lastPane string
+		for _, p := range w.Panes {
 			paneRoot := ExpandPath(p.Root)
 			if paneRoot == "" || !filepath.IsAbs(p.Root) {
 				paneRoot = filepath.Join(windowRoot, p.Root)
 			}
 
-			target := fmt.Sprintf("%s.%d", window, pIndex)
-			newPane, err := smug.tmux.SplitWindow(target, p.Type, paneRoot)
+			newPane, err := smug.tmux.SplitWindow(window+"."+lastPane, p.Type, paneRoot)
 			if err != nil {
 				return err
 			}
+
+			lastPane = newPane
 
 			for _, c := range p.Commands {
 				err = smug.tmux.SendKeys(window+"."+newPane, c)
