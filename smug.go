@@ -1,7 +1,6 @@
 package main
 
 import (
-	"fmt"
 	"os"
 	"os/exec"
 	"path/filepath"
@@ -119,7 +118,6 @@ func (smug Smug) Start(config Config, options Options, context Context) error {
 		if err != nil {
 			return err
 		}
-		fmt.Println(window)
 
 		for _, c := range w.Commands {
 			err := smug.tmux.SendKeys(window, c)
