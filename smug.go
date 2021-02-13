@@ -126,16 +126,6 @@ func (smug Smug) Start(config Config, options Options, context Context) error {
 			}
 		}
 
-		layout := w.Layout
-		if layout == "" {
-			layout = EvenHorizontal
-		}
-
-		_, err = smug.tmux.SelectLayout(window, layout)
-		if err != nil {
-			return err
-		}
-
 		for _, p := range w.Panes {
 			paneRoot := ExpandPath(p.Root)
 			if paneRoot == "" || !filepath.IsAbs(p.Root) {
@@ -153,6 +143,16 @@ func (smug Smug) Start(config Config, options Options, context Context) error {
 					return err
 				}
 			}
+		}
+
+		layout := w.Layout
+		if layout == "" {
+			layout = EvenHorizontal
+		}
+
+		_, err = smug.tmux.SelectLayout(window, layout)
+		if err != nil {
+			return err
 		}
 	}
 
