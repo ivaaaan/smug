@@ -105,8 +105,7 @@ func main() {
 			fmt.Fprintf(os.Stderr, err.Error())
 			os.Exit(1)
 		}
-	case CommandNew:
-	case CommandEdit:
+	case CommandNew, CommandEdit:
 		err := EditConfig(configPath)
 		if err != nil {
 			fmt.Fprintf(os.Stderr, err.Error())
