@@ -114,8 +114,7 @@ func (smug Smug) Start(config Config, options Options, context Context) error {
 			windowRoot = filepath.Join(sessionRoot, w.Root)
 		}
 
-		window := sessionName + w.Name
-		_, err := smug.tmux.NewWindow(sessionName, w.Name, windowRoot)
+		window, err := smug.tmux.NewWindow(sessionName, w.Name, windowRoot)
 		if err != nil {
 			return err
 		}
@@ -132,24 +131,21 @@ func (smug Smug) Start(config Config, options Options, context Context) error {
 			layout = EvenHorizontal
 		}
 
-		_, err = smug.tmux.SelectLayout(sessionName+w.Name, layout)
+		_, err = smug.tmux.SelectLayout(window, layout)
 		if err != nil {
 			return err
 		}
 
-		var lastPane string
 		for _, p := range w.Panes {
 			paneRoot := ExpandPath(p.Root)
 			if paneRoot == "" || !filepath.IsAbs(p.Root) {
 				paneRoot = filepath.Join(windowRoot, p.Root)
 			}
 
-			newPane, err := smug.tmux.SplitWindow(window+"."+lastPane, p.Type, paneRoot)
+			newPane, err := smug.tmux.SplitWindow(window, p.Type, paneRoot)
 			if err != nil {
 				return err
 			}
-
-			lastPane = newPane
 
 			for _, c := range p.Commands {
 				err = smug.tmux.SendKeys(window+"."+newPane, c)
