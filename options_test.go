@@ -57,19 +57,7 @@ var usageTestTable = []struct {
 		0,
 	},
 	{
-		[]string{"start"},
-		Options{},
-		ErrHelp,
-		1,
-	},
-	{
 		[]string{"start", "--help"},
-		Options{},
-		ErrHelp,
-		1,
-	},
-	{
-		[]string{"start"},
 		Options{},
 		ErrHelp,
 		1,

@@ -65,3 +65,18 @@ func ParseConfig(data string) (Config, error) {
 
 	return c, nil
 }
+
+func ListConfigs(path string) ([]string, error) {
+	var result []string
+	files, err := os.ReadDir(path)
+
+	if err != nil {
+		return result, err
+	}
+
+	for _, file := range files {
+		result = append(result, file.Name())
+	}
+
+	return result, nil
+}
