@@ -5,6 +5,7 @@ import (
 	"log"
 	"os"
 	"path/filepath"
+	"strings"
 )
 
 const version = "v0.1.9"
@@ -22,6 +23,7 @@ Options:
 	-d, --debug %s
 
 Examples:
+	$ smug list
 	$ smug start blog
 	$ smug start blog:win1
 	$ smug start blog -w win1
@@ -111,6 +113,14 @@ func main() {
 			fmt.Fprintf(os.Stderr, err.Error())
 			os.Exit(1)
 		}
+	case CommandList:
+		configs, err := ListConfigs(userConfigDir)
+		if err != nil {
+			fmt.Fprintf(os.Stderr, err.Error())
+			os.Exit(1)
+		}
+
+		fmt.Println(strings.Join(configs, "\n"))
 	}
 
 }

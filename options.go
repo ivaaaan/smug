@@ -12,9 +12,10 @@ const (
 	CommandStop  = "stop"
 	CommandNew   = "new"
 	CommandEdit  = "edit"
+	CommandList  = "list"
 )
 
-var validCommands = []string{CommandStart, CommandStop, CommandNew, CommandEdit}
+var validCommands = []string{CommandStart, CommandStop, CommandNew, CommandEdit, CommandList}
 
 type Options struct {
 	Command string
@@ -74,13 +75,8 @@ func ParseOptions(argv []string, helpRequested func()) (Options, error) {
 		return Options{}, err
 	}
 
-	if len(argv) < 2 && *config == "" {
-		helpRequested()
-		return Options{}, ErrHelp
-	}
-
 	var project string
-	if *config == "" {
+	if *config == "" && len(argv) > 1 {
 		project = argv[1]
 	}
 
