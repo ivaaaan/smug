@@ -165,3 +165,23 @@ func (smug Smug) Start(config Config, options Options, context Context) error {
 
 	return nil
 }
+
+func (smug Smug) Print(options Options, context Context) (Config, error) {
+	config := Config{}
+	config.Session = options.Project
+
+	tmuxWindows, err := smug.tmux.ListWindows(options.Project)
+	if err != nil {
+		return Config{}, err
+	}
+
+	for _, w := range tmuxWindows {
+		config.Windows = append(config.Windows, Window{
+			Name:   w.Name,
+			Layout: w.Layout,
+			Root:   w.Root,
+		})
+	}
+
+	return config, nil
+}

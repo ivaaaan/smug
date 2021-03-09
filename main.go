@@ -6,6 +6,8 @@ import (
 	"os"
 	"path/filepath"
 	"strings"
+
+	"gopkg.in/yaml.v2"
 )
 
 var version = "[dev build]"
@@ -125,5 +127,19 @@ func main() {
 		}
 
 		fmt.Println(strings.Join(configs, "\n"))
+	case CommandPrint:
+		config, err := smug.Print(options, context)
+		if err != nil {
+			fmt.Fprintf(os.Stderr, err.Error())
+			os.Exit(1)
+		}
+
+		d, err := yaml.Marshal(&config)
+		if err != nil {
+			fmt.Fprintf(os.Stderr, err.Error())
+			os.Exit(1)
+		}
+
+		fmt.Println(string(d))
 	}
 }

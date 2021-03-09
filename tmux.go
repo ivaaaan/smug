@@ -3,6 +3,7 @@ package main
 import (
 	"os"
 	"os/exec"
+	"strings"
 )
 
 const (
@@ -20,6 +21,17 @@ const (
 
 type Tmux struct {
 	commander Commander
+}
+
+type TmuxWindow struct {
+	Name   string
+	Layout string
+	Root   string
+}
+
+type TmuxPane struct {
+	Root string
+	Type string
 }
 
 func (tmux Tmux) NewSession(name string, root string, windowName string) (string, error) {
@@ -101,4 +113,54 @@ func (tmux Tmux) StopSession(target string) (string, error) {
 func (tmux Tmux) SwitchClient(target string) error {
 	cmd := exec.Command("tmux", "switch-client", "-t", target)
 	return tmux.commander.ExecSilently(cmd)
+}
+
+func (tmux Tmux) ListWindows(target string) ([]TmuxWindow, error) {
+	var windows []TmuxWindow
+
+	cmd := exec.Command("tmux", "list-windows", "-F", "#{window_name};#{window_layout};#{pane_current_path}", "-t", target)
+	out, err := tmux.commander.Exec(cmd)
+	if err != nil {
+		return windows, err
+	}
+
+	windowsList := strings.Split(out, "\n")
+
+	for _, w := range windowsList {
+		windowInfo := strings.Split(w, ";")
+		window := TmuxWindow{
+			Name:   windowInfo[0],
+			Layout: windowInfo[1],
+			Root:   windowInfo[2],
+		}
+		windows = append(windows, window)
+	}
+
+	return windows, nil
+
+}
+
+func (tmux Tmux) ListPanes(target string) ([]TmuxPane, error) {
+	var panes []TmuxPane
+
+	cmd := exec.Command("tmux", "list-panes", "-F", "", "-t", target)
+
+	out, err := tmux.commander.Exec(cmd)
+	if err != nil {
+		return panes, err
+	}
+
+	panesList := strings.Split(out, "\n")
+
+	for _, p := range panesList {
+		paneInfo := strings.Split(p, ";")
+		pane := TmuxPane{
+			Type: paneInfo[0],
+			Root: paneInfo[1],
+		}
+
+		panes = append(panes, pane)
+	}
+
+	return panes, nil
 }
