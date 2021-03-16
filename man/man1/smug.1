@@ -1,0 +1,93 @@
+.ig
+The MIT License (MIT)
+
+Copyright (c) 2020-2021 Ivan Klymenchenko
+
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the "Software"), to deal
+in the Software without restriction, including without limitation the rights
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the Software is
+furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in
+all copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+THE SOFTWARE.
+..
+.TH smug 1 "Mar 2021" "smug 0.1.9" "smug - a session manager for tmux written in go"
+
+.SH NAME
+smug - a session manager for tmux written in go
+
+.SH SYNOPSIS
+smug [options] [command]
+
+.SH DESCRIPTION
+smug is a session manager for tmux. Configuration is inspired by tmuxinator and tmuxp.
+
+.SH GLOBAL OPTIONS
+.TP
+.B "-d, --debug"
+Print all commands to ~/.config/smug/smug.log
+
+.SH COMMANDS
+.TP
+.B "list"
+Display all smug project configurations.
+.TP
+.B "start [<projectname>]"
+Start a tmux project session.
+.br
+
+.B COMMAND OPTIONS
+.TP
+.IP
+.B "-f, --file"
+A custom path to a config file.
+.TP
+.IP
+.B "-w, --windows"
+List of windows to start. If session exists, those windows will be attached to current session.
+.TP
+.IP
+.B "-a, --attach"
+Force switch client for a session.
+
+.TP
+.B "stop [<projectname>]"
+Stop tmux project session
+
+.SH EXAMPLES
+$ smug list
+.br
+$ smug start blog
+.br
+$ smug start blog:win1
+.br
+$ smug start blog -w win1
+.br
+$ smug start blog:win1,win2
+.br
+$ smug stop blog
+.br
+$ smug start blog --attach
+
+.SH AUTHOR
+Ivan Klymenchenko
+
+.SH SEE ALSO
+.B Project homepage:
+.RS
+.I https://github.com/ivaaaan/smug
+.RE
+.br
+
+.SH LICENSE
+MIT
