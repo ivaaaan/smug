@@ -2,6 +2,8 @@ package main
 
 import (
 	"io/ioutil"
+	"strings"
+	"path"
 	"os"
 	"os/exec"
 
@@ -66,16 +68,16 @@ func ParseConfig(data string) (Config, error) {
 	return c, nil
 }
 
-func ListConfigs(path string) ([]string, error) {
+func ListConfigs(dir string) ([]string, error) {
 	var result []string
-	files, err := os.ReadDir(path)
+	files, err := os.ReadDir(dir)
 
 	if err != nil {
 		return result, err
 	}
 
 	for _, file := range files {
-		result = append(result, file.Name())
+		result = append(result, strings.TrimSuffix(file.Name(), path.Ext(file.Name())))
 	}
 
 	return result, nil
