@@ -8,7 +8,7 @@ import (
 	"strings"
 )
 
-const version = "v0.1.9"
+var version = "[dev build]"
 
 var usage = fmt.Sprintf(`Smug - tmux session manager. Version %s
 
@@ -43,7 +43,11 @@ func main() {
 	}
 
 	if err != nil {
-		fmt.Fprintf(os.Stderr, "Cannot parse command line options: %q", err.Error())
+		fmt.Fprintf(
+			os.Stderr,
+			"Cannot parse command line options: %q",
+			err.Error(),
+		)
 		os.Exit(1)
 	}
 
@@ -122,5 +126,4 @@ func main() {
 
 		fmt.Println(strings.Join(configs, "\n"))
 	}
-
 }
