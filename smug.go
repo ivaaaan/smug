@@ -166,7 +166,7 @@ func (smug Smug) Start(config Config, options Options, context Context) error {
 	return nil
 }
 
-func (smug Smug) Print(options Options, context Context) (Config, error) {
+func (smug Smug) GetConfigFromSession(options Options, context Context) (Config, error) {
 	config := Config{}
 	config.Session = options.Project
 
@@ -176,10 +176,27 @@ func (smug Smug) Print(options Options, context Context) (Config, error) {
 	}
 
 	for _, w := range tmuxWindows {
+		tmuxPanes, err := smug.tmux.ListPanes(options.Project + ":" + w.Name)
+		if err != nil {
+			return Config{}, err
+		}
+
+		panes := []Pane{}
+		for _, p := range tmuxPanes {
+			root := p.Root
+			if root == w.Root {
+				root = ""
+			}
+			panes = append(panes, Pane{
+				Root: root,
+			})
+		}
+
 		config.Windows = append(config.Windows, Window{
 			Name:   w.Name,
 			Layout: w.Layout,
 			Root:   w.Root,
+			Panes:  panes,
 		})
 	}
 

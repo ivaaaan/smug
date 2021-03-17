@@ -11,19 +11,19 @@ import (
 )
 
 type Pane struct {
-	Root     string   `yaml:"root"`
-	Type     string   `yaml:"type"`
+	Root     string   `yaml:"root,omitempty"`
+	Type     string   `yaml:"type,omitempty"`
 	Commands []string `yaml:"commands"`
 }
 
 type Window struct {
 	Name        string   `yaml:"name"`
-	Root        string   `yaml:"root"`
+	Root        string   `yaml:"root,omitempty"`
 	BeforeStart []string `yaml:"before_start"`
 	Panes       []Pane   `yaml:"panes"`
 	Commands    []string `yaml:"commands"`
 	Layout      string   `yaml:"layout"`
-	Manual      bool     `yaml:"manual"`
+	Manual      bool     `yaml:"manual,omitempty"`
 }
 
 type Config struct {

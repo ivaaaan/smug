@@ -1,6 +1,7 @@
 package main
 
 import (
+	"fmt"
 	"os"
 	"os/exec"
 	"strings"
@@ -31,7 +32,6 @@ type TmuxWindow struct {
 
 type TmuxPane struct {
 	Root string
-	Type string
 }
 
 func (tmux Tmux) NewSession(name string, root string, windowName string) (string, error) {
@@ -143,7 +143,7 @@ func (tmux Tmux) ListWindows(target string) ([]TmuxWindow, error) {
 func (tmux Tmux) ListPanes(target string) ([]TmuxPane, error) {
 	var panes []TmuxPane
 
-	cmd := exec.Command("tmux", "list-panes", "-F", "", "-t", target)
+	cmd := exec.Command("tmux", "list-panes", "-F", "#{pane_current_path}", "-t", target)
 
 	out, err := tmux.commander.Exec(cmd)
 	if err != nil {
@@ -154,9 +154,9 @@ func (tmux Tmux) ListPanes(target string) ([]TmuxPane, error) {
 
 	for _, p := range panesList {
 		paneInfo := strings.Split(p, ";")
+		fmt.Println(paneInfo)
 		pane := TmuxPane{
-			Type: paneInfo[0],
-			Root: paneInfo[1],
+			Root: paneInfo[0],
 		}
 
 		panes = append(panes, pane)

@@ -128,7 +128,7 @@ func main() {
 
 		fmt.Println(strings.Join(configs, "\n"))
 	case CommandPrint:
-		config, err := smug.Print(options, context)
+		config, err := smug.GetConfigFromSession(options, context)
 		if err != nil {
 			fmt.Fprintf(os.Stderr, err.Error())
 			os.Exit(1)
