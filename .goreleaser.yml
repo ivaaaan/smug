@@ -6,6 +6,10 @@ before:
 builds:
   - env:
       - CGO_ENABLED=0
+    gcflags:
+      - "all=-trimpath={{.Env.GOPATH}}"
+    ldflags:
+     - "-X=main.version={{.Env.VERSION}}"
     goos:
       - linux
       - windows

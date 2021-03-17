@@ -1,10 +1,13 @@
-VERSION_REGEX  := 's/(v[0-9\.]+)/$(version)/g'
+VERSION = $(shell git describe --tags --abbrev=0)
+
+version:
+	@echo $(VERSION)
 
 build:
-	go build -o smug *.go
+	go build -ldflags "-X=main.version=$(VERSION)" -gcflags "all=-trimpath=$(GOPATH)"
 
 test:
-	go test .
+	go test
 
 coverage:
 	go test -coverprofile=coverage.out
@@ -14,8 +17,6 @@ release:
 ifndef GITHUB_TOKEN
 	$(error GITHUB_TOKEN is not defined)
 endif
-	sed -E -i.bak $(VERSION_REGEX) 'main.go' && rm main.go.bak
-	git commit -am 'Update version to $(version)'
 	git tag -a $(version) -m '$(version)'
 	git push origin $(version)
-	goreleaser --rm-dist
+	VERSION=$(version) goreleaser --rm-dist
