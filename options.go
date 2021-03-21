@@ -13,9 +13,10 @@ const (
 	CommandNew   = "new"
 	CommandEdit  = "edit"
 	CommandList  = "list"
+	CommandPrint = "print"
 )
 
-var validCommands = []string{CommandStart, CommandStop, CommandNew, CommandEdit, CommandList}
+var validCommands = []string{CommandStart, CommandStop, CommandNew, CommandEdit, CommandList, CommandPrint}
 
 type Options struct {
 	Command string
