@@ -1,7 +1,6 @@
 package main
 
 import (
-	"fmt"
 	"os"
 	"os/exec"
 	"strings"
@@ -154,7 +153,6 @@ func (tmux Tmux) ListPanes(target string) ([]TmuxPane, error) {
 
 	for _, p := range panesList {
 		paneInfo := strings.Split(p, ";")
-		fmt.Println(paneInfo)
 		pane := TmuxPane{
 			Root: paneInfo[0],
 		}

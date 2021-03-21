@@ -8,12 +8,12 @@ import (
 )
 
 var testTable = []struct {
-	config          Config
-	options         Options
-	context         Context
-	startCommands   []string
-	stopCommands    []string
-	commanderOutput string
+	config           Config
+	options          Options
+	context          Context
+	startCommands    []string
+	stopCommands     []string
+	commanderOutputs []string
 }{
 	{
 		Config{
@@ -44,7 +44,7 @@ var testTable = []struct {
 		[]string{
 			"tmux kill-session -t ses",
 		},
-		"xyz",
+		[]string{"xyz"},
 	},
 	{
 		Config{
@@ -89,7 +89,7 @@ var testTable = []struct {
 			"/bin/sh -c stop2 -d --foo=bar",
 			"tmux kill-session -t ses",
 		},
-		"1",
+		[]string{"1"},
 	},
 	{
 		Config{
@@ -121,7 +121,7 @@ var testTable = []struct {
 		[]string{
 			"tmux kill-window -t ses:win2",
 		},
-		"xyz",
+		[]string{"xyz"},
 	},
 	{
 		Config{
@@ -162,7 +162,7 @@ var testTable = []struct {
 		[]string{
 			"tmux kill-session -t ses",
 		},
-		"xyz",
+		[]string{"xyz"},
 	},
 	{
 		Config{
@@ -201,7 +201,7 @@ var testTable = []struct {
 		[]string{
 			"tmux kill-session -t ses",
 		},
-		"1",
+		[]string{"1"},
 	},
 	{
 		Config{
@@ -221,7 +221,7 @@ var testTable = []struct {
 		[]string{
 			"tmux kill-session -t ses",
 		},
-		"",
+		[]string{""},
 	},
 	{
 		Config{
@@ -247,7 +247,7 @@ var testTable = []struct {
 		[]string{
 			"tmux kill-session -t ses",
 		},
-		"xyz",
+		[]string{"xyz"},
 	},
 	{
 		Config{
@@ -265,7 +265,7 @@ var testTable = []struct {
 		[]string{
 			"tmux kill-session -t ses",
 		},
-		"xyz",
+		[]string{"xyz"},
 	},
 	{
 		Config{
@@ -284,19 +284,26 @@ var testTable = []struct {
 		[]string{
 			"tmux kill-session -t ses",
 		},
-		"",
+		[]string{""},
 	},
 }
 
 type MockCommander struct {
-	Commands      []string
-	DefaultOutput string
+	Commands []string
+	Outputs  []string
 }
 
 func (c *MockCommander) Exec(cmd *exec.Cmd) (string, error) {
 	c.Commands = append(c.Commands, strings.Join(cmd.Args, " "))
 
-	return c.DefaultOutput, nil
+	output := ""
+	if len(c.Outputs) > 1 {
+		output, c.Outputs = c.Outputs[0], c.Outputs[1:]
+	} else if len(c.Outputs) == 1 {
+		output = c.Outputs[0]
+	}
+
+	return output, nil
 }
 
 func (c *MockCommander) ExecSilently(cmd *exec.Cmd) error {
@@ -304,11 +311,11 @@ func (c *MockCommander) ExecSilently(cmd *exec.Cmd) error {
 	return nil
 }
 
-func TestStartSession(t *testing.T) {
+func TestStartStopSession(t *testing.T) {
 	for _, params := range testTable {
 
 		t.Run("test start session", func(t *testing.T) {
-			commander := &MockCommander{[]string{}, params.commanderOutput}
+			commander := &MockCommander{[]string{}, params.commanderOutputs}
 			tmux := Tmux{commander}
 			smug := Smug{tmux, commander}
 
@@ -323,7 +330,7 @@ func TestStartSession(t *testing.T) {
 		})
 
 		t.Run("test stop session", func(t *testing.T) {
-			commander := &MockCommander{[]string{}, params.commanderOutput}
+			commander := &MockCommander{[]string{}, params.commanderOutputs}
 			tmux := Tmux{commander}
 			smug := Smug{tmux, commander}
 
@@ -337,5 +344,41 @@ func TestStartSession(t *testing.T) {
 			}
 		})
 
+	}
+}
+
+func TestPrintCurrentSession(t *testing.T) {
+	expectedConfig := Config{
+		Session: "test",
+		Windows: []Window{
+			Window{
+				Name:   "win1",
+				Root:   "root",
+				Layout: "layout",
+				Panes: []Pane{
+					Pane{},
+					Pane{
+						Root: "/tmp",
+					},
+				},
+			},
+		},
+	}
+
+	commander := &MockCommander{[]string{}, []string{
+		"win1;layout;root",
+		"root\n/tmp",
+	}}
+	tmux := Tmux{commander}
+
+	smug := Smug{tmux, commander}
+
+	actualConfig, err := smug.GetConfigFromSession(Options{Project: "test"}, Context{})
+	if err != nil {
+		t.Fatalf("error %v", err)
+	}
+
+	if !reflect.DeepEqual(expectedConfig, actualConfig) {
+		t.Errorf("expected %v, got %v", expectedConfig, actualConfig)
 	}
 }
