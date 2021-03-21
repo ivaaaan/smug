@@ -176,7 +176,7 @@ func (smug Smug) GetConfigFromSession(options Options, context Context) (Config,
 	}
 
 	for _, w := range tmuxWindows {
-		tmuxPanes, err := smug.tmux.ListPanes(options.Project + ":" + w.Name)
+		tmuxPanes, err := smug.tmux.ListPanes(options.Project + ":" + w.Id)
 		if err != nil {
 			return Config{}, err
 		}

@@ -24,6 +24,7 @@ type Tmux struct {
 }
 
 type TmuxWindow struct {
+	Id     string
 	Name   string
 	Layout string
 	Root   string
@@ -117,7 +118,7 @@ func (tmux Tmux) SwitchClient(target string) error {
 func (tmux Tmux) ListWindows(target string) ([]TmuxWindow, error) {
 	var windows []TmuxWindow
 
-	cmd := exec.Command("tmux", "list-windows", "-F", "#{window_name};#{window_layout};#{pane_current_path}", "-t", target)
+	cmd := exec.Command("tmux", "list-windows", "-F", "#{window_id};#{window_name};#{window_layout};#{pane_current_path}", "-t", target)
 	out, err := tmux.commander.Exec(cmd)
 	if err != nil {
 		return windows, err
@@ -128,9 +129,10 @@ func (tmux Tmux) ListWindows(target string) ([]TmuxWindow, error) {
 	for _, w := range windowsList {
 		windowInfo := strings.Split(w, ";")
 		window := TmuxWindow{
-			Name:   windowInfo[0],
-			Layout: windowInfo[1],
-			Root:   windowInfo[2],
+			Id:     windowInfo[0],
+			Name:   windowInfo[1],
+			Layout: windowInfo[2],
+			Root:   windowInfo[3],
 		}
 		windows = append(windows, window)
 	}

@@ -366,7 +366,7 @@ func TestPrintCurrentSession(t *testing.T) {
 	}
 
 	commander := &MockCommander{[]string{}, []string{
-		"win1;layout;root",
+		"id1;win1;layout;root",
 		"root\n/tmp",
 	}}
 	tmux := Tmux{commander}
