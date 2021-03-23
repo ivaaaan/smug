@@ -21,7 +21,7 @@ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.
 ..
-.TH smug 1 "Mar 2021" "smug 0.1.9" "smug - a session manager for tmux written in go"
+.TH smug 1 "Mar 2021" "smug 0.2.0" "smug - a session manager for tmux written in go"
 
 .SH NAME
 smug - a session manager for tmux written in go
@@ -64,6 +64,10 @@ Force switch client for a session.
 .B "stop [<projectname>]"
 Stop tmux project session
 
+.TP
+.B "print"
+Print current session configuration as yaml to stdout
+
 .SH EXAMPLES
 $ smug list
 .br
@@ -78,6 +82,8 @@ $ smug start blog:win1,win2
 $ smug stop blog
 .br
 $ smug start blog --attach
+.br
+$ smug print > ~/.config/smug/new_project.yml
 
 .SH AUTHOR
 Ivan Klymenchenko

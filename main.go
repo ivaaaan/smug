@@ -24,6 +24,12 @@ Options:
 	-a, --attach %s
 	-d, --debug %s
 
+Commands:
+	list    list available project sessions
+	start   start project session
+	stop    stop project session
+	print   session configuration to stdout
+
 Examples:
 	$ smug list
 	$ smug start blog
