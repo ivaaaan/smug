@@ -168,7 +168,12 @@ func (smug Smug) Start(config Config, options Options, context Context) error {
 
 func (smug Smug) GetConfigFromSession(options Options, context Context) (Config, error) {
 	config := Config{}
-	config.Session = options.Project
+
+	tmuxSession, err := smug.tmux.SessionName()
+	if err != nil {
+		return Config{}, err
+	}
+	config.Session = tmuxSession
 
 	tmuxWindows, err := smug.tmux.ListWindows(options.Project)
 	if err != nil {

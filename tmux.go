@@ -115,6 +115,18 @@ func (tmux Tmux) SwitchClient(target string) error {
 	return tmux.commander.ExecSilently(cmd)
 }
 
+func (tmux Tmux) SessionName() (string, error) {
+
+	cmd := exec.Command("tmux", "display-message", "-p", "#S")
+	sessionName, err := tmux.commander.Exec(cmd)
+
+	if err != nil {
+		return sessionName, err
+	}
+
+	return sessionName, nil
+}
+
 func (tmux Tmux) ListWindows(target string) ([]TmuxWindow, error) {
 	var windows []TmuxWindow
 

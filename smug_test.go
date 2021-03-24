@@ -349,7 +349,7 @@ func TestStartStopSession(t *testing.T) {
 
 func TestPrintCurrentSession(t *testing.T) {
 	expectedConfig := Config{
-		Session: "test",
+		Session: "session_name",
 		Windows: []Window{
 			Window{
 				Name:   "win1",
@@ -366,6 +366,7 @@ func TestPrintCurrentSession(t *testing.T) {
 	}
 
 	commander := &MockCommander{[]string{}, []string{
+		"session_name",
 		"id1;win1;layout;root",
 		"root\n/tmp",
 	}}
