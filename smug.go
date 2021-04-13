@@ -159,7 +159,7 @@ func (smug Smug) Start(config Config, options Options, context Context) error {
 	smug.tmux.KillWindow(sessionName + defaultWindowName)
 	smug.tmux.RenumberWindows(sessionName)
 
-	if len(windows) == 0 && len(config.Windows) > 0 {
+	if len(windows) == 0 && len(config.Windows) > 0 && options.Detach == false {
 		return smug.switchOrAttach(sessionName+config.Windows[0].Name, attach, context.InsideTmuxSession)
 	}
 

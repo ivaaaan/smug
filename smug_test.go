@@ -27,6 +27,36 @@ var testTable = []struct {
 			},
 		},
 		Options{
+			Detach: true,
+		},
+		Context{},
+		[]string{
+			"tmux has-session -t ses:",
+			"/bin/sh -c command1",
+			"/bin/sh -c command2",
+			"tmux new -Pd -s ses -n smug_def -c root",
+			"tmux neww -Pd -t ses: -c root -F #{window_id} -n win1",
+			"tmux select-layout -t xyz even-horizontal",
+			"tmux kill-window -t ses:smug_def",
+			"tmux move-window -r -s ses: -t ses:",
+		},
+		[]string{
+			"tmux kill-session -t ses",
+		},
+		[]string{"xyz"},
+	},
+	{
+		Config{
+			Session:     "ses",
+			Root:        "root",
+			BeforeStart: []string{"command1", "command2"},
+			Windows: []Window{
+				{
+					Name: "win1",
+				},
+			},
+		},
+		Options{
 			Windows: []string{},
 		},
 		Context{},
@@ -123,6 +153,7 @@ var testTable = []struct {
 		},
 		[]string{"xyz"},
 	},
+
 	{
 		Config{
 			Session: "ses",
@@ -266,6 +297,25 @@ var testTable = []struct {
 			"tmux kill-session -t ses",
 		},
 		[]string{"xyz"},
+	},
+	{
+		Config{
+			Session: "ses",
+			Root:    "root",
+			Windows: []Window{
+				{Name: "win1"},
+			},
+		},
+		Options{Attach: true},
+		Context{InsideTmuxSession: true},
+		[]string{
+			"tmux has-session -t ses:",
+			"tmux switch-client -t ses:",
+		},
+		[]string{
+			"tmux kill-session -t ses",
+		},
+		[]string{""},
 	},
 	{
 		Config{
