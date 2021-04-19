@@ -2,10 +2,10 @@ package main
 
 import (
 	"io/ioutil"
-	"strings"
-	"path"
 	"os"
 	"os/exec"
+	"path"
+	"strings"
 
 	"gopkg.in/yaml.v2"
 )
@@ -70,7 +70,7 @@ func ParseConfig(data string) (Config, error) {
 
 func ListConfigs(dir string) ([]string, error) {
 	var result []string
-	files, err := os.ReadDir(dir)
+	files, err := ioutil.ReadDir(dir)
 
 	if err != nil {
 		return result, err
