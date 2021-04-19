@@ -8,7 +8,11 @@ import (
 )
 
 const defaultWindowName = "smug_def"
-const defaultRebalancePanesThreshold = 5
+
+// Very wisely picked default value,
+// after which panes will be rebalanced for each `split-window`
+// Helps with "no space for new pane" error
+const defaultRebalancePanesThreshold = 4
 
 func ExpandPath(path string) string {
 	if strings.HasPrefix(path, "~/") {
