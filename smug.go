@@ -12,7 +12,7 @@ const defaultWindowName = "smug_def"
 // Very wisely picked default value,
 // after which panes will be rebalanced for each `split-window`
 // Helps with "no space for new pane" error
-const defaultRebalancePanesThreshold = 4
+const defaultRebalancePanesThreshold = 5
 
 func ExpandPath(path string) string {
 	if strings.HasPrefix(path, "~/") {
@@ -155,7 +155,7 @@ func (smug Smug) Start(config Config, options Options, context Context) error {
 				}
 			}
 
-			if pIndex >= rebalancePanesThreshold {
+			if pIndex+1 >= rebalancePanesThreshold {
 				_, err = smug.tmux.SelectLayout(window, Tiled)
 				if err != nil {
 					return err
