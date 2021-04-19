@@ -2,6 +2,7 @@ package main
 
 import (
 	"errors"
+	"fmt"
 	"strings"
 
 	"github.com/spf13/pflag"
@@ -19,23 +20,25 @@ const (
 var validCommands = []string{CommandStart, CommandStop, CommandNew, CommandEdit, CommandList, CommandPrint}
 
 type Options struct {
-	Command string
-	Project string
-	Config  string
-	Windows []string
-	Attach  bool
-	Detach  bool
-	Debug   bool
+	Command  string
+	Project  string
+	Config   string
+	Windows  []string
+	Settings map[string]string
+	Attach   bool
+	Detach   bool
+	Debug    bool
 }
 
 var ErrHelp = errors.New("help requested")
 
 const (
-	WindowsUsage = "List of windows to start. If session exists, those windows will be attached to current session."
-	AttachUsage  = "Force switch client for a session"
-	DetachUsage  = "Detach tmux session. The same as -d flag in the tmux"
-	DebugUsage   = "Print all commands to ~/.config/smug/smug.log"
-	FileUsage    = "A custom path to a config file"
+	WindowsUsage  = "List of windows to start. If session exists, those windows will be attached to current session."
+	AttachUsage   = "Force switch client for a session"
+	DetachUsage   = "Detach tmux session. The same as -d flag in the tmux"
+	DebugUsage    = "Print all commands to ~/.config/smug/smug.log"
+	FileUsage     = "A custom path to a config file"
+	SettingsUsage = "Custom variables that you can access in a config file"
 )
 
 // Creates a new FlagSet.
@@ -71,6 +74,9 @@ func ParseOptions(argv []string, helpRequested func()) (Options, error) {
 	debug := flags.BoolP("debug", "d", false, DebugUsage)
 
 	err := flags.Parse(argv)
+
+	settings := flags.Args()
+	fmt.Println(settings)
 	if err == pflag.ErrHelp {
 		return Options{}, ErrHelp
 	}

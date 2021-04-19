@@ -2,10 +2,10 @@ package main
 
 import (
 	"io/ioutil"
-	"strings"
-	"path"
 	"os"
 	"os/exec"
+	"path"
+	"strings"
 
 	"gopkg.in/yaml.v2"
 )
