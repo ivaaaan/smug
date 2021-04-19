@@ -27,11 +27,12 @@ type Window struct {
 }
 
 type Config struct {
-	Session     string   `yaml:"session"`
-	Root        string   `yaml:"root"`
-	BeforeStart []string `yaml:"before_start"`
-	Stop        []string `yaml:"stop"`
-	Windows     []Window `yaml:"windows"`
+	Session                   string   `yaml:"session"`
+	Root                      string   `yaml:"root"`
+	BeforeStart               []string `yaml:"before_start"`
+	Stop                      []string `yaml:"stop"`
+	Windows                   []Window `yaml:"windows"`
+	RebalanceWindowsThreshold int      `yaml:"rebalance_panes_after"`
 }
 
 func EditConfig(path string) error {

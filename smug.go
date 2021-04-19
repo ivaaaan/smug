@@ -8,6 +8,7 @@ import (
 )
 
 const defaultWindowName = "smug_def"
+const defaultRebalancePanesThreshold = 5
 
 func ExpandPath(path string) string {
 	if strings.HasPrefix(path, "~/") {
@@ -90,6 +91,11 @@ func (smug Smug) Start(config Config, options Options, context Context) error {
 	windows := options.Windows
 	attach := options.Attach
 
+	rebalancePanesThreshold := config.RebalanceWindowsThreshold
+	if rebalancePanesThreshold == 0 {
+		rebalancePanesThreshold = defaultRebalancePanesThreshold
+	}
+
 	if !sessionExists {
 		err := smug.execShellCommands(config.BeforeStart, sessionRoot)
 		if err != nil {
@@ -126,13 +132,14 @@ func (smug Smug) Start(config Config, options Options, context Context) error {
 			}
 		}
 
-		for _, p := range w.Panes {
+		for pIndex, p := range w.Panes {
 			paneRoot := ExpandPath(p.Root)
 			if paneRoot == "" || !filepath.IsAbs(p.Root) {
 				paneRoot = filepath.Join(windowRoot, p.Root)
 			}
 
 			newPane, err := smug.tmux.SplitWindow(window, p.Type, paneRoot)
+
 			if err != nil {
 				return err
 			}
@@ -142,6 +149,14 @@ func (smug Smug) Start(config Config, options Options, context Context) error {
 				if err != nil {
 					return err
 				}
+			}
+
+			if pIndex >= rebalancePanesThreshold {
+				_, err = smug.tmux.SelectLayout(window, Tiled)
+				if err != nil {
+					return err
+				}
+
 			}
 		}
 
