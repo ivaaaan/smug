@@ -32,12 +32,11 @@ type Options struct {
 var ErrHelp = errors.New("help requested")
 
 const (
-	WindowsUsage  = "List of windows to start. If session exists, those windows will be attached to current session."
-	AttachUsage   = "Force switch client for a session"
-	DetachUsage   = "Detach tmux session. The same as -d flag in the tmux"
-	DebugUsage    = "Print all commands to ~/.config/smug/smug.log"
-	FileUsage     = "A custom path to a config file"
-	SettingsUsage = "Custom variables that you can access in a config file"
+	WindowsUsage = "List of windows to start. If session exists, those windows will be attached to current session."
+	AttachUsage  = "Force switch client for a session"
+	DetachUsage  = "Detach tmux session. The same as -d flag in the tmux"
+	DebugUsage   = "Print all commands to ~/.config/smug/smug.log"
+	FileUsage    = "A custom path to a config file"
 )
 
 // Creates a new FlagSet.
