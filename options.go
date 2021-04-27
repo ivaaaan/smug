@@ -2,7 +2,6 @@ package main
 
 import (
 	"errors"
-	"fmt"
 	"strings"
 
 	"github.com/spf13/pflag"
@@ -75,8 +74,6 @@ func ParseOptions(argv []string, helpRequested func()) (Options, error) {
 
 	err := flags.Parse(argv)
 
-	settings := flags.Args()
-	fmt.Println(settings)
 	if err == pflag.ErrHelp {
 		return Options{}, ErrHelp
 	}
@@ -97,13 +94,26 @@ func ParseOptions(argv []string, helpRequested func()) (Options, error) {
 		windows = &wl
 	}
 
+	settings := make(map[string]string)
+	userSettings := flags.Args()[1:]
+	if len(userSettings) > 0 {
+		for _, kv := range userSettings {
+			s := strings.Split(kv, "=")
+			if len(s) < 2 {
+				continue
+			}
+			settings[s[0]] = s[1]
+		}
+	}
+
 	return Options{
-		Project: project,
-		Config:  *config,
-		Command: cmd,
-		Windows: *windows,
-		Attach:  *attach,
-		Detach:  *detach,
-		Debug:   *debug,
+		Project:  project,
+		Config:   *config,
+		Command:  cmd,
+		Settings: settings,
+		Windows:  *windows,
+		Attach:   *attach,
+		Detach:   *detach,
+		Debug:    *debug,
 	}, nil
 }
