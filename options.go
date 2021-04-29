@@ -19,13 +19,14 @@ const (
 var validCommands = []string{CommandStart, CommandStop, CommandNew, CommandEdit, CommandList, CommandPrint}
 
 type Options struct {
-	Command string
-	Project string
-	Config  string
-	Windows []string
-	Attach  bool
-	Detach  bool
-	Debug   bool
+	Command  string
+	Project  string
+	Config   string
+	Windows  []string
+	Settings map[string]string
+	Attach   bool
+	Detach   bool
+	Debug    bool
 }
 
 var ErrHelp = errors.New("help requested")
@@ -71,6 +72,7 @@ func ParseOptions(argv []string, helpRequested func()) (Options, error) {
 	debug := flags.BoolP("debug", "d", false, DebugUsage)
 
 	err := flags.Parse(argv)
+
 	if err == pflag.ErrHelp {
 		return Options{}, ErrHelp
 	}
@@ -91,13 +93,26 @@ func ParseOptions(argv []string, helpRequested func()) (Options, error) {
 		windows = &wl
 	}
 
+	settings := make(map[string]string)
+	userSettings := flags.Args()[1:]
+	if len(userSettings) > 0 {
+		for _, kv := range userSettings {
+			s := strings.Split(kv, "=")
+			if len(s) < 2 {
+				continue
+			}
+			settings[s[0]] = s[1]
+		}
+	}
+
 	return Options{
-		Project: project,
-		Config:  *config,
-		Command: cmd,
-		Windows: *windows,
-		Attach:  *attach,
-		Detach:  *detach,
-		Debug:   *debug,
+		Project:  project,
+		Config:   *config,
+		Command:  cmd,
+		Settings: settings,
+		Windows:  *windows,
+		Attach:   *attach,
+		Detach:   *detach,
+		Debug:    *debug,
 	}, nil
 }

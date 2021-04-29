@@ -16,7 +16,7 @@ var usage = fmt.Sprintf(`Smug - tmux session manager. Version %s
 
 
 Usage:
-	smug <command> [<project>] [-f, --file <file>] [-w, --windows <window>]... [-a, --attach] [-d, --debug]
+	smug <command> [<project>] [-f, --file <file>] [-w, --windows <window>]... [-a, --attach] [-d, --debug] [<key>=<value>]...
 
 Options:
 	-f, --file %s
@@ -90,7 +90,7 @@ func main() {
 		} else {
 			fmt.Println("Starting new windows...")
 		}
-		config, err := GetConfig(configPath)
+		config, err := GetConfig(configPath, options.Settings)
 		if err != nil {
 			fmt.Fprintf(os.Stderr, err.Error())
 			os.Exit(1)
@@ -108,7 +108,7 @@ func main() {
 		} else {
 			fmt.Println("Killing windows...")
 		}
-		config, err := GetConfig(configPath)
+		config, err := GetConfig(configPath, options.Settings)
 		if err != nil {
 			fmt.Fprintf(os.Stderr, err.Error())
 			os.Exit(1)

@@ -49,13 +49,22 @@ func EditConfig(path string) error {
 	return cmd.Run()
 }
 
-func GetConfig(path string) (Config, error) {
+func GetConfig(path string, settings map[string]string) (Config, error) {
 	f, err := ioutil.ReadFile(path)
 	if err != nil {
 		return Config{}, err
 	}
 
-	return ParseConfig(string(f))
+	config := string(f)
+	config = os.Expand(config, func(v string) string {
+		if val, ok := settings[v]; ok {
+			return val
+		}
+
+		return v
+	})
+
+	return ParseConfig(config)
 }
 
 func ParseConfig(data string) (Config, error) {

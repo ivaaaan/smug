@@ -47,7 +47,6 @@ go install
 smug <command> [<project>] [-f, --file <file>] [-w, --windows <window>]... [-a, --attach] [-d, --debug]
 ```
 
-
 ### Options:
 
 ```
@@ -56,6 +55,14 @@ smug <command> [<project>] [-f, --file <file>] [-w, --windows <window>]... [-a, 
 -a, --attach Force switch client for a session
 -d, --debug Print all commands to ~/.config/smug/smug.log
 --detach Detach session. The same as `-d` flag in the tmux
+```
+
+### Custom settings
+
+You can pass custom settings into your configuration file. Use `${variable_name}` syntax in your config and then pass key-value args:
+
+```
+smug start project variable_name=value
 ```
 
 ### Examples
@@ -110,7 +117,6 @@ Configuration files stored in the `~/.config/smug` directory in the `YAML` forma
 
 #### Example 1
 
-
 ```yaml
 session: blog
 
@@ -147,6 +153,7 @@ windows:
           - docker-compose exec php /bin/sh
           - clear
 ```
+
 #### Example 2
 
 ```yaml
