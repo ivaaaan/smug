@@ -61,8 +61,8 @@ smug <command> [<project>] [-f, --file <file>] [-w, --windows <window>]... [-a, 
 
 You can pass custom settings into your configuration file. Use `${variable_name}` syntax in your config and then pass key-value args:
 
-```
-smug start project variable_name=value
+```console
+xyz@localhost:~$ smug start project variable_name=value
 ```
 
 ### Examples
