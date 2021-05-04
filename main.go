@@ -25,19 +25,24 @@ Options:
 	-d, --debug %s
 
 Commands:
-	list    list available project sessions
+	list    list available project configurations
+	edit    edit project configuration
+	new     new project configuration
 	start   start project session
 	stop    stop project session
 	print   session configuration to stdout
 
 Examples:
 	$ smug list
+	$ smug edit blog
+	$ smug new blog
 	$ smug start blog
 	$ smug start blog:win1
 	$ smug start blog -w win1
 	$ smug start blog:win1,win2
 	$ smug stop blog
 	$ smug start blog --attach
+	$ smug print > ~/.config/smug/blog.yml
 `, version, FileUsage, WindowsUsage, AttachUsage, DebugUsage)
 
 func main() {
