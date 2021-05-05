@@ -1,13 +1,14 @@
 package main
 
 import (
+	"os"
 	"os/exec"
 	"reflect"
 	"strings"
 	"testing"
 )
 
-var testTable = []struct {
+var testTable = map[string]struct {
 	config           Config
 	options          Options
 	context          Context
@@ -15,7 +16,38 @@ var testTable = []struct {
 	stopCommands     []string
 	commanderOutputs []string
 }{
-	{
+	"test with 1 window": {
+		Config{
+			Session:     "ses",
+			Root:        "~/root",
+			BeforeStart: []string{"command1", "command2"},
+			Windows: []Window{
+				{
+					Name:     "win1",
+					Commands: []string{"command1"},
+				},
+			},
+		},
+		Options{},
+		Context{},
+		[]string{
+			"tmux has-session -t ses:",
+			"/bin/sh -c command1",
+			"/bin/sh -c command2",
+			"tmux new -Pd -s ses -n smug_def -c smug/root",
+			"tmux neww -Pd -t ses: -c smug/root -F #{window_id} -n win1",
+			"tmux send-keys -t win1 command1 Enter",
+			"tmux select-layout -t win1 even-horizontal",
+			"tmux kill-window -t ses:smug_def",
+			"tmux move-window -r -s ses: -t ses:",
+			"tmux attach -d -t ses:win1",
+		},
+		[]string{
+			"tmux kill-session -t ses",
+		},
+		[]string{"ses", "win1"},
+	},
+	"test with 1 window and Detach: true": {
 		Config{
 			Session:     "ses",
 			Root:        "root",
@@ -45,38 +77,7 @@ var testTable = []struct {
 		},
 		[]string{"xyz"},
 	},
-	{
-		Config{
-			Session:     "ses",
-			Root:        "root",
-			BeforeStart: []string{"command1", "command2"},
-			Windows: []Window{
-				{
-					Name: "win1",
-				},
-			},
-		},
-		Options{
-			Windows: []string{},
-		},
-		Context{},
-		[]string{
-			"tmux has-session -t ses:",
-			"/bin/sh -c command1",
-			"/bin/sh -c command2",
-			"tmux new -Pd -s ses -n smug_def -c root",
-			"tmux neww -Pd -t ses: -c root -F #{window_id} -n win1",
-			"tmux select-layout -t xyz even-horizontal",
-			"tmux kill-window -t ses:smug_def",
-			"tmux move-window -r -s ses: -t ses:",
-			"tmux attach -d -t ses:win1",
-		},
-		[]string{
-			"tmux kill-session -t ses",
-		},
-		[]string{"xyz"},
-	},
-	{
+	"test with multiple windows and panes": {
 		Config{
 			Session: "ses",
 			Root:    "root",
@@ -87,7 +88,8 @@ var testTable = []struct {
 					Layout: "main-horizontal",
 					Panes: []Pane{
 						{
-							Type: "horizontal",
+							Type:     "horizontal",
+							Commands: []string{"command1"},
 						},
 					},
 				},
@@ -108,8 +110,9 @@ var testTable = []struct {
 			"tmux has-session -t ses:",
 			"tmux new -Pd -s ses -n smug_def -c root",
 			"tmux neww -Pd -t ses: -c root -F #{window_id} -n win1",
-			"tmux split-window -Pd -h -t 1 -c root -F #{pane_id}",
-			"tmux select-layout -t 1 main-horizontal",
+			"tmux split-window -Pd -h -t win1 -c root -F #{pane_id}",
+			"tmux send-keys -t win1.1 command1 Enter",
+			"tmux select-layout -t win1 main-horizontal",
 			"tmux kill-window -t ses:smug_def",
 			"tmux move-window -r -s ses: -t ses:",
 			"tmux attach -d -t ses:win1",
@@ -119,9 +122,9 @@ var testTable = []struct {
 			"/bin/sh -c stop2 -d --foo=bar",
 			"tmux kill-session -t ses",
 		},
-		[]string{"1"},
+		[]string{"ses", "ses", "win1", "1"},
 	},
-	{
+	"test start windows from option's Windows parameter": {
 		Config{
 			Session: "ses",
 			Root:    "root",
@@ -153,92 +156,10 @@ var testTable = []struct {
 		},
 		[]string{"xyz"},
 	},
-
-	{
+	"test attach to the existing session": {
 		Config{
 			Session: "ses",
 			Root:    "root",
-			Windows: []Window{
-				{
-					Name:     "win1",
-					Manual:   false,
-					Commands: []string{"command1", "command2"},
-				},
-				{
-					Name:     "win2",
-					Manual:   false,
-					Commands: []string{"command3", "command4"},
-				},
-			},
-		},
-		Options{
-			Windows: []string{},
-		},
-		Context{},
-		[]string{
-			"tmux has-session -t ses:",
-			"tmux new -Pd -s ses -n smug_def -c root",
-			"tmux neww -Pd -t ses: -c root -F #{window_id} -n win1",
-			"tmux send-keys -t xyz command1 Enter",
-			"tmux send-keys -t xyz command2 Enter",
-			"tmux select-layout -t xyz even-horizontal",
-			"tmux neww -Pd -t ses: -c root -F #{window_id} -n win2",
-			"tmux send-keys -t xyz command3 Enter",
-			"tmux send-keys -t xyz command4 Enter",
-			"tmux select-layout -t xyz even-horizontal",
-			"tmux kill-window -t ses:smug_def",
-			"tmux move-window -r -s ses: -t ses:",
-			"tmux attach -d -t ses:win1",
-		},
-		[]string{
-			"tmux kill-session -t ses",
-		},
-		[]string{"xyz"},
-	},
-	{
-		Config{
-			Session: "ses",
-			Root:    "root",
-			Windows: []Window{
-				{
-					Name:   "win1",
-					Manual: false,
-					Root:   "./win1",
-					Panes: []Pane{
-						{
-							Root: "pane1",
-							Type: "vertical",
-							Commands: []string{
-								"command1",
-							},
-						},
-					},
-				},
-			},
-		},
-		Options{},
-		Context{},
-		[]string{
-			"tmux has-session -t ses:",
-			"tmux new -Pd -s ses -n smug_def -c root",
-			"tmux neww -Pd -t ses: -c root/win1 -F #{window_id} -n win1",
-			"tmux split-window -Pd -v -t 1 -c root/win1/pane1 -F #{pane_id}",
-			"tmux send-keys -t 1.1 command1 Enter",
-			"tmux select-layout -t 1 even-horizontal",
-			"tmux kill-window -t ses:smug_def",
-			"tmux move-window -r -s ses: -t ses:",
-			"tmux attach -d -t ses:win1",
-		},
-		[]string{
-			"tmux kill-session -t ses",
-		},
-		[]string{"1"},
-	},
-	{
-		Config{
-			Session:     "ses",
-			Root:        "root",
-			BeforeStart: []string{"command1", "command2"},
 			Windows: []Window{
 				{Name: "win1"},
 			},
@@ -254,33 +175,7 @@ var testTable = []struct {
 		},
 		[]string{""},
 	},
-	{
-		Config{
-			Session: "ses",
-			Root:    "root",
-			Windows: []Window{
-				{
-					Name: "win1",
-				},
-			},
-		},
-		Options{Attach: true},
-		Context{InsideTmuxSession: true},
-		[]string{
-			"tmux has-session -t ses:",
-			"tmux new -Pd -s ses -n smug_def -c root",
-			"tmux neww -Pd -t ses: -c root -F #{window_id} -n win1",
-			"tmux select-layout -t xyz even-horizontal",
-			"tmux kill-window -t ses:smug_def",
-			"tmux move-window -r -s ses: -t ses:",
-			"tmux switch-client -t ses:win1",
-		},
-		[]string{
-			"tmux kill-session -t ses",
-		},
-		[]string{"xyz"},
-	},
-	{
+	"test start a new session from another tmux session": {
 		Config{
 			Session: "ses",
 			Root:    "root",
@@ -298,26 +193,7 @@ var testTable = []struct {
 		},
 		[]string{"xyz"},
 	},
-	{
-		Config{
-			Session: "ses",
-			Root:    "root",
-			Windows: []Window{
-				{Name: "win1"},
-			},
-		},
-		Options{Attach: true},
-		Context{InsideTmuxSession: true},
-		[]string{
-			"tmux has-session -t ses:",
-			"tmux switch-client -t ses:",
-		},
-		[]string{
-			"tmux kill-session -t ses",
-		},
-		[]string{""},
-	},
-	{
+	"test switch a client from another tmux session": {
 		Config{
 			Session: "ses",
 			Root:    "root",
@@ -362,9 +238,11 @@ func (c *MockCommander) ExecSilently(cmd *exec.Cmd) error {
 }
 
 func TestStartStopSession(t *testing.T) {
-	for _, params := range testTable {
+	os.Setenv("HOME", "smug") // Needed for testing ExpandPath function
 
-		t.Run("test start session", func(t *testing.T) {
+	for testDescription, params := range testTable {
+
+		t.Run("start session: "+testDescription, func(t *testing.T) {
 			commander := &MockCommander{[]string{}, params.commanderOutputs}
 			tmux := Tmux{commander}
 			smug := Smug{tmux, commander}
@@ -379,7 +257,7 @@ func TestStartStopSession(t *testing.T) {
 			}
 		})
 
-		t.Run("test stop session", func(t *testing.T) {
+		t.Run("stop session: "+testDescription, func(t *testing.T) {
 			commander := &MockCommander{[]string{}, params.commanderOutputs}
 			tmux := Tmux{commander}
 			smug := Smug{tmux, commander}

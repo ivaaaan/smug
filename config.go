@@ -56,7 +56,12 @@ func GetConfig(path string, settings map[string]string) (Config, error) {
 	}
 
 	config := string(f)
-	config = os.Expand(config, func(v string) string {
+
+	return ParseConfig(config, settings)
+}
+
+func ParseConfig(data string, settings map[string]string) (Config, error) {
+	data = os.Expand(data, func(v string) string {
 		if val, ok := settings[v]; ok {
 			return val
 		}
@@ -64,10 +69,6 @@ func GetConfig(path string, settings map[string]string) (Config, error) {
 		return v
 	})
 
-	return ParseConfig(config)
-}
-
-func ParseConfig(data string) (Config, error) {
 	c := Config{}
 
 	err := yaml.Unmarshal([]byte(data), &c)
