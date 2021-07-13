@@ -88,7 +88,11 @@ func ListConfigs(dir string) ([]string, error) {
 	}
 
 	for _, file := range files {
-		result = append(result, strings.TrimSuffix(file.Name(), path.Ext(file.Name())))
+		fileExt := path.Ext(file.Name())
+		if fileExt != ".yml" {
+			continue
+		}
+		result = append(result, strings.TrimSuffix(file.Name(), fileExt))
 	}
 
 	return result, nil
