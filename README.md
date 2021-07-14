@@ -41,6 +41,15 @@ cd smug
 go install
 ```
 
+### MacPorts (macOS)
+
+On macOS, you can install Smug using [MacPorts](https://www.macports.org).  Once MacPorts is installed, simply issue the following commands:
+
+```bash
+sudo port selfupdate
+sudo port install smug
+```
+
 ## Usage
 
 ```
