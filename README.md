@@ -134,6 +134,9 @@ root: ~/Developer/blog
 before_start:
   - docker-compose -f my-microservices/docker-compose.yml up -d # my-microservices/docker-compose.yml is a relative to `root`
 
+env:
+  FOO: BAR
+
 stop:
   - docker stop $(docker ps -q)
 
