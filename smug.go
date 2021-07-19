@@ -55,6 +55,17 @@ func (smug Smug) execShellCommands(commands []string, path string) error {
 	return nil
 }
 
+func (smug Smug) setEnvVariables(target string, env map[string]string) error {
+	for key, value := range env {
+		_, err := smug.tmux.SetEnv(target, key, value)
+		if err != nil {
+			return err
+		}
+	}
+
+	return nil
+}
+
 func (smug Smug) switchOrAttach(target string, attach bool, insideTmuxSession bool) error {
 	if insideTmuxSession && attach {
 		return smug.tmux.SwitchClient(target)
@@ -107,6 +118,11 @@ func (smug Smug) Start(config Config, options Options, context Context) error {
 		}
 
 		_, err = smug.tmux.NewSession(config.Session, sessionRoot, defaultWindowName)
+		if err != nil {
+			return err
+		}
+
+		err = smug.setEnvVariables(config.Session, config.Env)
 		if err != nil {
 			return err
 		}

@@ -105,6 +105,11 @@ func (tmux Tmux) SelectLayout(target string, layoutType string) (string, error) 
 	return tmux.commander.Exec(cmd)
 }
 
+func (tmux Tmux) SetEnv(target string, key string, value string) (string, error) {
+	cmd := exec.Command("tmux", "setenv", "-t", target, key, value)
+	return tmux.commander.Exec(cmd)
+}
+
 func (tmux Tmux) StopSession(target string) (string, error) {
 	cmd := exec.Command("tmux", "kill-session", "-t", target)
 	return tmux.commander.Exec(cmd)
