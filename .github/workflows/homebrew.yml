@@ -1,11 +1,15 @@
-name: Update Homebrew formula
-
 on:
   push:
     tags:
       - '*'
-      
-uses: dawidd6/action-homebrew-bump-formula@v3
-  with:
-    token: ${{secrets.TOKEN}}
-    formula: smug
+
+jobs:
+  update-formulae:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Update Homebrew formulae
+        uses: dawidd6/action-homebrew-bump-formula@master
+        with:
+          token: "${{ secrets.TOKEN }}"
+          force: false
+          livecheck: true
