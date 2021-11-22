@@ -1,12 +1,11 @@
-name: Homebrew
+name: Update Homebrew formula
 
 on:
   push:
     tags:
       - '*'
       
-- name: Update Homebrew formula
-  uses: dawidd6/action-homebrew-bump-formula@v3
+uses: dawidd6/action-homebrew-bump-formula@v3
   with:
     token: ${{secrets.TOKEN}}
     formula: smug
