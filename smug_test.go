@@ -279,13 +279,13 @@ func TestPrintCurrentSession(t *testing.T) {
 	expectedConfig := Config{
 		Session: "session_name",
 		Windows: []Window{
-			Window{
+			{
 				Name:   "win1",
 				Root:   "root",
 				Layout: "layout",
 				Panes: []Pane{
-					Pane{},
-					Pane{
+					{},
+					{
 						Root: "/tmp",
 					},
 				},

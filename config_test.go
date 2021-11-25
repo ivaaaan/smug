@@ -27,11 +27,11 @@ windows:
 	expected := Config{
 		Session: "test",
 		Windows: []Window{
-			Window{
+			{
 				Layout:   "tiled",
 				Commands: []string{"echo 1"},
 				Panes: []Pane{
-					Pane{
+					{
 						Type:     "horizontal",
 						Commands: []string{"echo 2"},
 					},
