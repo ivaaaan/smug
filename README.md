@@ -45,7 +45,7 @@ go install
 
 On macOS, you can install Smug using [MacPorts](https://www.macports.org) or [Homebrew](https://brew.sh).
 
-### Homebrew
+#### Homebrew
 
 ```bash
 brew install smug
@@ -56,6 +56,18 @@ brew install smug
 ```bash
 sudo port selfupdate
 sudo port install smug
+```
+
+### Linux
+
+#### Arch
+
+There's [AUR](https://aur.archlinux.org/packages/smug) with smug. 
+
+```bash
+git clone https://aur.archlinux.org/smug.git
+cd smug
+makepkg -si
 ```
 
 ## Usage
