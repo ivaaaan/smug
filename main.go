@@ -16,13 +16,15 @@ var usage = fmt.Sprintf(`Smug - tmux session manager. Version %s
 
 
 Usage:
-	smug <command> [<project>] [-f, --file <file>] [-w, --windows <window>]... [-a, --attach] [-d, --debug] [<key>=<value>]...
+	smug <command> [<project>] [-f, --file <file>] [-w, --windows <window>]... [-a, --attach] [-d, --debug] [--detach] [-i, --inside-current-session] [<key>=<value>]...
 
 Options:
 	-f, --file %s
 	-w, --windows %s
 	-a, --attach %s
+	-i, --inside-current-session %s
 	-d, --debug %s
+	--detach %s
 
 Commands:
 	list    list available project configurations
@@ -43,7 +45,7 @@ Examples:
 	$ smug stop blog
 	$ smug start blog --attach
 	$ smug print > ~/.config/smug/blog.yml
-`, version, FileUsage, WindowsUsage, AttachUsage, DebugUsage)
+`, version, FileUsage, WindowsUsage, AttachUsage, InsideCurrentSessionUsage, DebugUsage, DetachUsage)
 
 func main() {
 	options, err := ParseOptions(os.Args[1:], func() {

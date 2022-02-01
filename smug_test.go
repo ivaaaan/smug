@@ -212,6 +212,28 @@ var testTable = map[string]struct {
 		},
 		[]string{""},
 	},
+	"test create new windows in current session": {
+		Config{
+			Session: "ses",
+			Root:    "root",
+			Windows: []Window{
+				{Name: "win1"},
+			},
+		},
+		Options{
+			InsideCurrentSession: true,
+		},
+		Context{InsideTmuxSession: true},
+		[]string{
+			"tmux has-session -t ses:",
+			"tmux neww -Pd -t ses: -c root -F #{window_id} -n win1",
+			"tmux select-layout -t  even-horizontal",
+		},
+		[]string{
+			"tmux kill-session -t ses",
+		},
+		[]string{""},
+	},
 }
 
 type MockCommander struct {

@@ -82,6 +82,7 @@ smug <command> [<project>] [-f, --file <file>] [-w, --windows <window>]... [-a, 
 -f, --file A custom path to a config file
 -w, --windows List of windows to start. If session exists, those windows will be attached to current session.
 -a, --attach Force switch client for a session
+-i, --inside-current-session Create all windows inside current session
 -d, --debug Print all commands to ~/.config/smug/smug.log
 --detach Detach session. The same as `-d` flag in the tmux
 ```

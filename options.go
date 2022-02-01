@@ -19,24 +19,26 @@ const (
 var validCommands = []string{CommandStart, CommandStop, CommandNew, CommandEdit, CommandList, CommandPrint}
 
 type Options struct {
-	Command  string
-	Project  string
-	Config   string
-	Windows  []string
-	Settings map[string]string
-	Attach   bool
-	Detach   bool
-	Debug    bool
+	Command              string
+	Project              string
+	Config               string
+	Windows              []string
+	Settings             map[string]string
+	Attach               bool
+	Detach               bool
+	Debug                bool
+	InsideCurrentSession bool
 }
 
 var ErrHelp = errors.New("help requested")
 
 const (
-	WindowsUsage = "List of windows to start. If session exists, those windows will be attached to current session."
-	AttachUsage  = "Force switch client for a session"
-	DetachUsage  = "Detach tmux session. The same as -d flag in the tmux"
-	DebugUsage   = "Print all commands to ~/.config/smug/smug.log"
-	FileUsage    = "A custom path to a config file"
+	WindowsUsage              = "List of windows to start. If session exists, those windows will be attached to current session"
+	AttachUsage               = "Force switch client for a session"
+	DetachUsage               = "Detach tmux session. The same as -d flag in the tmux"
+	DebugUsage                = "Print all commands to ~/.config/smug/smug.log"
+	FileUsage                 = "A custom path to a config file"
+	InsideCurrentSessionUsage = "Create all windows inside current session"
 )
 
 // Creates a new FlagSet.
@@ -70,6 +72,7 @@ func ParseOptions(argv []string, helpRequested func()) (Options, error) {
 	attach := flags.BoolP("attach", "a", false, AttachUsage)
 	detach := flags.Bool("detach", false, DetachUsage)
 	debug := flags.BoolP("debug", "d", false, DebugUsage)
+	insideCurrentSession := flags.BoolP("inside-current-session", "i", false, InsideCurrentSessionUsage)
 
 	err := flags.Parse(argv)
 
@@ -106,13 +109,14 @@ func ParseOptions(argv []string, helpRequested func()) (Options, error) {
 	}
 
 	return Options{
-		Project:  project,
-		Config:   *config,
-		Command:  cmd,
-		Settings: settings,
-		Windows:  *windows,
-		Attach:   *attach,
-		Detach:   *detach,
-		Debug:    *debug,
+		Project:              project,
+		Config:               *config,
+		Command:              cmd,
+		Settings:             settings,
+		Windows:              *windows,
+		Attach:               *attach,
+		Detach:               *detach,
+		Debug:                *debug,
+		InsideCurrentSession: *insideCurrentSession,
 	}, nil
 }

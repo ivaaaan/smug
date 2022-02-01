@@ -72,6 +72,7 @@ func (smug Smug) switchOrAttach(target string, attach bool, insideTmuxSession bo
 	} else if !insideTmuxSession {
 		return smug.tmux.Attach(target, os.Stdin, os.Stdout, os.Stderr)
 	}
+
 	return nil
 }
 
@@ -126,7 +127,7 @@ func (smug Smug) Start(config Config, options Options, context Context) error {
 		if err != nil {
 			return err
 		}
-	} else if len(windows) == 0 {
+	} else if len(windows) == 0 && !options.InsideCurrentSession {
 		return smug.switchOrAttach(sessionName, attach, context.InsideTmuxSession)
 	}
 
@@ -191,8 +192,10 @@ func (smug Smug) Start(config Config, options Options, context Context) error {
 		}
 	}
 
-	smug.tmux.KillWindow(sessionName + defaultWindowName)
-	smug.tmux.RenumberWindows(sessionName)
+	if !options.InsideCurrentSession {
+		smug.tmux.KillWindow(sessionName + defaultWindowName)
+		smug.tmux.RenumberWindows(sessionName)
+	}
 
 	if len(windows) == 0 && len(config.Windows) > 0 && options.Detach == false {
 		return smug.switchOrAttach(sessionName+config.Windows[0].Name, attach, context.InsideTmuxSession)
