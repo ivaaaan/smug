@@ -12,5 +12,6 @@ jobs:
         uses: dawidd6/action-homebrew-bump-formula@master
         with:
           token: "${{ secrets.TOKEN }}"
+          formula: smug
           force: false
           livecheck: false
