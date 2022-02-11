@@ -225,6 +225,7 @@ var testTable = map[string]struct {
 		},
 		Context{InsideTmuxSession: true},
 		[]string{
+			"tmux display-message -p #S",
 			"tmux has-session -t ses:",
 			"tmux neww -Pd -t ses: -c root -F #{window_id} -n win1",
 			"tmux select-layout -t  even-horizontal",
@@ -232,7 +233,7 @@ var testTable = map[string]struct {
 		[]string{
 			"tmux kill-session -t ses",
 		},
-		[]string{""},
+		[]string{"ses", ""},
 	},
 	"test create new windows in current session with different name": {
 		Config{
@@ -247,6 +248,7 @@ var testTable = map[string]struct {
 		},
 		Context{InsideTmuxSession: true},
 		[]string{
+			"tmux display-message -p #S",
 			"tmux has-session -t ses:",
 			"tmux neww -Pd -t ses: -c root -F #{window_id} -n win1",
 			"tmux select-layout -t win1 even-horizontal",
@@ -254,7 +256,7 @@ var testTable = map[string]struct {
 		[]string{
 			"tmux kill-session -t ses",
 		},
-		[]string{"win1"},
+		[]string{"ses", "win1"},
 	},
 }
 
