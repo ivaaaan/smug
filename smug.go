@@ -1,6 +1,7 @@
 package main
 
 import (
+	"errors"
 	"os"
 	"os/exec"
 	"path/filepath"
@@ -100,19 +101,35 @@ func (smug Smug) Stop(config Config, options Options, context Context) error {
 }
 
 func (smug Smug) Start(config Config, options Options, context Context) error {
-	sessionName := config.Session + ":"
+	var sessionName string
+	var err error
+
+	createWindowsInsideCurrSession := options.InsideCurrentSession
+	if createWindowsInsideCurrSession && !context.InsideTmuxSession {
+		return errors.New("cannot use -i flag outside of a tmux session")
+	}
+
+	sessionName = config.Session
+	if createWindowsInsideCurrSession {
+		sessionName, err = smug.tmux.SessionName()
+		if err != nil {
+			return err
+		}
+	}
+	sessionName = sessionName + ":"
+
 	sessionExists := smug.tmux.SessionExists(sessionName)
 	sessionRoot := ExpandPath(config.Root)
-
-	windows := options.Windows
-	attach := options.Attach
 
 	rebalancePanesThreshold := config.RebalanceWindowsThreshold
 	if rebalancePanesThreshold == 0 {
 		rebalancePanesThreshold = defaultRebalancePanesThreshold
 	}
 
-	if !sessionExists {
+	windows := options.Windows
+	attach := options.Attach
+
+	if !sessionExists && !createWindowsInsideCurrSession {
 		err := smug.execShellCommands(config.BeforeStart, sessionRoot)
 		if err != nil {
 			return err
@@ -127,7 +144,7 @@ func (smug Smug) Start(config Config, options Options, context Context) error {
 		if err != nil {
 			return err
 		}
-	} else if len(windows) == 0 && !options.InsideCurrentSession {
+	} else if len(windows) == 0 && !createWindowsInsideCurrSession {
 		return smug.switchOrAttach(sessionName, attach, context.InsideTmuxSession)
 	}
 
