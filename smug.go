@@ -112,7 +112,7 @@ func (smug Smug) Start(config Config, options Options, context Context) error {
 		rebalancePanesThreshold = defaultRebalancePanesThreshold
 	}
 
-	if !sessionExists {
+	if !options.InsideCurrentSession && !sessionExists {
 		err := smug.execShellCommands(config.BeforeStart, sessionRoot)
 		if err != nil {
 			return err
