@@ -1,6 +1,7 @@
 package main
 
 import (
+	"os"
 	"reflect"
 	"testing"
 )
@@ -15,6 +16,7 @@ windows:
     panes:
       - commands:
         - echo 2
+        - echo ${HOME}
         type: horizontal`
 
 	config, err := ParseConfig(yaml, map[string]string{
@@ -33,7 +35,7 @@ windows:
 				Panes: []Pane{
 					{
 						Type:     "horizontal",
-						Commands: []string{"echo 2"},
+						Commands: []string{"echo 2", "echo " + os.Getenv("HOME")},
 					},
 				},
 			},

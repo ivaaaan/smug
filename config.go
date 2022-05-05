@@ -67,6 +67,10 @@ func ParseConfig(data string, settings map[string]string) (Config, error) {
 			return val
 		}
 
+		if val, ok := os.LookupEnv(v); ok {
+			return val
+		}
+
 		return v
 	})
 
