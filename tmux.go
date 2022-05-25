@@ -181,3 +181,14 @@ func (tmux Tmux) ListPanes(target string) ([]TmuxPane, error) {
 
 	return panes, nil
 }
+
+func (tmux Tmux) CurrentSession() (string, error) {
+	cmd := exec.Command("tmux", "display-message", "-p", "#S")
+	sessionName, err := tmux.commander.Exec(cmd)
+
+	if err != nil {
+		return sessionName, err
+	}
+
+	return sessionName, nil
+}
