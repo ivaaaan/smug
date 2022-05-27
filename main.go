@@ -66,13 +66,13 @@ func main() {
 		os.Exit(1)
 	}
 
-	userConfigDir := filepath.Join(ExpandPath("~/"), ".config/smug")
+	userConfigDir := GetUserConfigDir()
 
 	var configPath string
 	if options.Config != "" {
 		configPath = options.Config
 	} else {
-		configPath = filepath.Join(userConfigDir, options.Project+".yml")
+		configPath = GetConfigPathToProject(options.Project)
 	}
 
 	var logger *log.Logger
@@ -97,7 +97,7 @@ func main() {
 		} else {
 			fmt.Println("Starting new windows...")
 		}
-		config, err := GetConfig(configPath, options.Settings)
+		config, err := GetConfig(configPath, tmux, options.Settings, options.Project)
 		if err != nil {
 			fmt.Fprintf(os.Stderr, err.Error())
 			os.Exit(1)
@@ -115,7 +115,7 @@ func main() {
 		} else {
 			fmt.Println("Killing windows...")
 		}
-		config, err := GetConfig(configPath, options.Settings)
+		config, err := GetConfig(configPath, tmux, options.Settings, options.Project)
 		if err != nil {
 			fmt.Fprintf(os.Stderr, err.Error())
 			os.Exit(1)

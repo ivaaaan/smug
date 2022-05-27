@@ -1,10 +1,12 @@
 package main
 
 import (
+	"fmt"
 	"io/ioutil"
 	"os"
 	"os/exec"
 	"path"
+	"path/filepath"
 	"strings"
 
 	"gopkg.in/yaml.v2"
@@ -50,7 +52,30 @@ func EditConfig(path string) error {
 	return cmd.Run()
 }
 
-func GetConfig(path string, settings map[string]string) (Config, error) {
+func GetConfigPathToProject(project string) string {
+	return filepath.Join(GetUserConfigDir(), project+".yml")
+}
+
+// TODO make this return a slice of all config files
+func GetConfigPathToAllProjects(project string) string {
+	return filepath.Join(GetUserConfigDir(), project+".yml")
+}
+
+func GetUserConfigDir() string {
+	return filepath.Join(ExpandPath("~/"), ".config/smug")
+}
+
+func GetConfig(path string, tmux Tmux, settings map[string]string, project string) (Config, error) {
+	project = strings.TrimSpace(project)
+
+	// If project is not defined in the arg, see if we can look it up from a current tmux session
+	if len(project) == 0 {
+		fmt.Println("NO PROJECT DEFINED")
+		sessionName, _ := tmux.SessionName()
+		fmt.Println("using " + sessionName)
+
+		path = GetConfigPathToProject(sessionName)
+	}
 	f, err := ioutil.ReadFile(path)
 	if err != nil {
 		return Config{}, err
