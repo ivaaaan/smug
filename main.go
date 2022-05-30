@@ -89,7 +89,7 @@ func main() {
 	} else if options.Project != "" {
 		configPath = filepath.Join(userConfigDir, options.Project+".yml")
 	} else {
-		s, err := tmux.CurrentSession()
+		s, err := tmux.SessionName()
 		if err != nil {
 			fmt.Fprintln(os.Stderr, err.Error())
 			os.Exit(1)
