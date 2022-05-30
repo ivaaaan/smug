@@ -68,13 +68,6 @@ func main() {
 
 	userConfigDir := filepath.Join(ExpandPath("~/"), ".config/smug")
 
-	var configPath string
-	if options.Config != "" {
-		configPath = options.Config
-	} else {
-		configPath = filepath.Join(userConfigDir, options.Project+".yml")
-	}
-
 	var logger *log.Logger
 	if options.Debug {
 		logFile, err := os.Create(filepath.Join(userConfigDir, "smug.log"))
@@ -89,6 +82,20 @@ func main() {
 	tmux := Tmux{commander}
 	smug := Smug{tmux, commander}
 	context := CreateContext()
+
+	var configPath string
+	if options.Config != "" {
+		configPath = options.Config
+	} else if options.Project != "" {
+		configPath = filepath.Join(userConfigDir, options.Project+".yml")
+	} else {
+		s, err := tmux.SessionName()
+		if err != nil {
+			fmt.Fprintln(os.Stderr, err.Error())
+			os.Exit(1)
+		}
+		configPath = filepath.Join(userConfigDir, s+".yml")
+	}
 
 	switch options.Command {
 	case CommandStart:
