@@ -181,9 +181,25 @@ var usageTestTable = []struct {
 	},
 	{
 		[]string{"test"},
-		Options{},
-		ErrHelp,
-		1,
+		Options{
+			Command:  "start",
+			Project:  "test",
+			Windows:  []string{},
+			Settings: map[string]string{},
+		},
+		nil,
+		0,
+	},
+	{
+		[]string{"test", "-w", "win1", "-w", "win2", "a=b", "x=y"},
+		Options{
+			Command:  "start",
+			Project:  "test",
+			Windows:  []string{"win1", "win2"},
+			Settings: map[string]string{"a": "b", "x": "y"},
+		},
+		nil,
+		0,
 	},
 	{
 		[]string{},

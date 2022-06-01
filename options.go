@@ -16,7 +16,59 @@ const (
 	CommandPrint = "print"
 )
 
-var validCommands = []string{CommandStart, CommandStop, CommandNew, CommandEdit, CommandList, CommandPrint}
+type command struct {
+	Name    string
+	Aliases []string
+}
+
+type commands []command
+
+var Commands = commands{
+	{
+		Name:    CommandStart,
+		Aliases: []string{},
+	},
+	{
+		Name:    CommandStop,
+		Aliases: []string{"s", "st"},
+	},
+	{
+		Name:    CommandNew,
+		Aliases: []string{"n"},
+	},
+	{
+		Name:    CommandEdit,
+		Aliases: []string{"e"},
+	},
+	{
+		Name:    CommandList,
+		Aliases: []string{"l"},
+	},
+	{
+		Name:    CommandPrint,
+		Aliases: []string{"p"},
+	},
+}
+
+func (c *commands) Resolve(v string) (*command, error) {
+	for _, cmd := range *c {
+		if cmd.Name == v || Contains(cmd.Aliases, v) {
+			return &cmd, nil
+		}
+	}
+
+	return nil, ErrCommandNotFound
+}
+
+func (c *commands) FindByName(n string) *command {
+	for _, cmd := range *c {
+		if cmd.Name == n {
+			return &cmd
+		}
+	}
+
+	return nil
+}
 
 type Options struct {
 	Command              string
@@ -31,6 +83,7 @@ type Options struct {
 }
 
 var ErrHelp = errors.New("help requested")
+var ErrCommandNotFound = errors.New("command not found")
 
 const (
 	WindowsUsage              = "List of windows to start. If session exists, those windows will be attached to current session"
@@ -59,13 +112,12 @@ func ParseOptions(argv []string, helpRequested func()) (Options, error) {
 		return Options{}, ErrHelp
 	}
 
-	cmd := argv[0]
-	if !Contains(validCommands, cmd) {
-		helpRequested()
-		return Options{}, ErrHelp
+	cmd, cmdErr := Commands.Resolve(argv[0])
+	if errors.Is(cmdErr, ErrCommandNotFound) {
+		cmd = Commands.FindByName(CommandStart)
 	}
 
-	flags := NewFlagSet(cmd)
+	flags := NewFlagSet(cmd.Name)
 
 	config := flags.StringP("file", "f", "", FileUsage)
 	windows := flags.StringArrayP("windows", "w", []string{}, WindowsUsage)
@@ -75,7 +127,6 @@ func ParseOptions(argv []string, helpRequested func()) (Options, error) {
 	insideCurrentSession := flags.BoolP("inside-current-session", "i", false, InsideCurrentSessionUsage)
 
 	err := flags.Parse(argv)
-
 	if err == pflag.ErrHelp {
 		return Options{}, ErrHelp
 	}
@@ -85,8 +136,12 @@ func ParseOptions(argv []string, helpRequested func()) (Options, error) {
 	}
 
 	var project string
-	if *config == "" && len(argv) > 1 {
-		project = argv[1]
+	if *config == "" {
+		if errors.Is(cmdErr, ErrCommandNotFound) {
+			project = argv[0]
+		} else if len(argv) > 1 {
+			project = argv[1]
+		}
 	}
 
 	if strings.Contains(project, ":") {
@@ -111,7 +166,7 @@ func ParseOptions(argv []string, helpRequested func()) (Options, error) {
 	return Options{
 		Project:              project,
 		Config:               *config,
-		Command:              cmd,
+		Command:              cmd.Name,
 		Settings:             settings,
 		Windows:              *windows,
 		Attach:               *attach,
