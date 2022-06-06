@@ -27,8 +27,8 @@ Don't forget to replace `smug_0.1.0_Darwin_x86_64.tar.gz` with the archive that 
 
 #### Prerequisite Tools
 
-* [Git](https://git-scm.com/)
-* [Go (we test it with the last 2 major versions)](https://golang.org/dl/)
+- [Git](https://git-scm.com/)
+- [Go (we test it with the last 2 major versions)](https://golang.org/dl/)
 
 #### Fetch from GitHub
 
@@ -62,7 +62,7 @@ sudo port install smug
 
 #### Arch
 
-There's [AUR](https://aur.archlinux.org/packages/smug) with smug. 
+There's [AUR](https://aur.archlinux.org/packages/smug) with smug.
 
 ```bash
 git clone https://aur.archlinux.org/smug.git
@@ -111,6 +111,16 @@ To start/stop a project and all windows, run:
 xyz@localhost:~$ smug start project
 
 xyz@localhost:~$ smug stop project
+```
+
+Also, smug has aliases to the most of the commands:
+
+```console
+xyz@localhost:~$ smug project # the same as "smug start project"
+
+xyz@localhost:~$ smug st project # the same as "smug stop project"
+
+xyz@localhost:~$ smug p ses # the same as "smug print ses"
 ```
 
 When you already have a running session, and you want only to create some windows from the configuration file, you can do something like this:
