@@ -58,10 +58,10 @@ func GetConfig(path string, settings map[string]string) (Config, error) {
 
 	config := string(f)
 
-	return ParseConfig(config, settings)
+	return ParseConfig(config, settings, path)
 }
 
-func ParseConfig(data string, settings map[string]string) (Config, error) {
+func ParseConfig(data string, settings map[string]string, path string) (Config, error) {
 	data = os.Expand(data, func(v string) string {
 		if val, ok := settings[v]; ok {
 			return val
@@ -81,7 +81,17 @@ func ParseConfig(data string, settings map[string]string) (Config, error) {
 		return Config{}, err
 	}
 
+	AddDefaultEnvs(&c, path)
+
 	return c, nil
+}
+
+func AddDefaultEnvs(c *Config, path string) {
+
+	c.Env["SMUG_SESSION"] = "true"
+	c.Env["SMUG_SESSION_NAME"] = c.Session
+	c.Env["SMUG_SESSION_CONFIG_PATH"] = path
+
 }
 
 func ListConfigs(dir string) ([]string, error) {
