@@ -10,7 +10,7 @@ import (
 
 var testTable = map[string]struct {
 	config           Config
-	options          Options
+	options          *Options
 	context          Context
 	startCommands    []string
 	stopCommands     []string
@@ -28,7 +28,7 @@ var testTable = map[string]struct {
 				},
 			},
 		},
-		Options{},
+		&Options{},
 		Context{},
 		[]string{
 			"tmux has-session -t ses:",
@@ -58,7 +58,7 @@ var testTable = map[string]struct {
 				},
 			},
 		},
-		Options{
+		&Options{
 			Detach: true,
 		},
 		Context{},
@@ -104,7 +104,7 @@ var testTable = map[string]struct {
 				"stop2 -d --foo=bar",
 			},
 		},
-		Options{},
+		&Options{},
 		Context{},
 		[]string{
 			"tmux has-session -t ses:",
@@ -139,7 +139,7 @@ var testTable = map[string]struct {
 				},
 			},
 		},
-		Options{
+		&Options{
 			Windows: []string{"win2"},
 		},
 		Context{},
@@ -164,7 +164,7 @@ var testTable = map[string]struct {
 				{Name: "win1"},
 			},
 		},
-		Options{},
+		&Options{},
 		Context{},
 		[]string{
 			"tmux has-session -t ses:",
@@ -180,7 +180,7 @@ var testTable = map[string]struct {
 			Session: "ses",
 			Root:    "root",
 		},
-		Options{Attach: false},
+		&Options{Attach: false},
 		Context{InsideTmuxSession: true},
 		[]string{
 			"tmux has-session -t ses:",
@@ -201,7 +201,7 @@ var testTable = map[string]struct {
 				{Name: "win1"},
 			},
 		},
-		Options{Attach: true},
+		&Options{Attach: true},
 		Context{InsideTmuxSession: true},
 		[]string{
 			"tmux has-session -t ses:",
@@ -220,7 +220,7 @@ var testTable = map[string]struct {
 				{Name: "win1"},
 			},
 		},
-		Options{
+		&Options{
 			InsideCurrentSession: true,
 		},
 		Context{InsideTmuxSession: true},
@@ -243,7 +243,7 @@ var testTable = map[string]struct {
 				{Name: "win1"},
 			},
 		},
-		Options{
+		&Options{
 			InsideCurrentSession: true,
 		},
 		Context{InsideTmuxSession: true},
@@ -348,7 +348,7 @@ func TestPrintCurrentSession(t *testing.T) {
 
 	smug := Smug{tmux, commander}
 
-	actualConfig, err := smug.GetConfigFromSession(Options{Project: "test"}, Context{})
+	actualConfig, err := smug.GetConfigFromSession(&Options{Project: "test"}, Context{})
 	if err != nil {
 		t.Fatalf("error %v", err)
 	}

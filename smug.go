@@ -77,7 +77,7 @@ func (smug Smug) switchOrAttach(target string, attach bool, insideTmuxSession bo
 	return nil
 }
 
-func (smug Smug) Stop(config Config, options Options, context Context) error {
+func (smug Smug) Stop(config Config, options *Options, context Context) error {
 	windows := options.Windows
 	if len(windows) == 0 {
 		sessionRoot := ExpandPath(config.Root)
@@ -100,7 +100,7 @@ func (smug Smug) Stop(config Config, options Options, context Context) error {
 	return nil
 }
 
-func (smug Smug) Start(config Config, options Options, context Context) error {
+func (smug Smug) Start(config Config, options *Options, context Context) error {
 	var sessionName string
 	var err error
 
@@ -221,7 +221,7 @@ func (smug Smug) Start(config Config, options Options, context Context) error {
 	return nil
 }
 
-func (smug Smug) GetConfigFromSession(options Options, context Context) (Config, error) {
+func (smug Smug) GetConfigFromSession(options *Options, context Context) (Config, error) {
 	config := Config{}
 
 	tmuxSession, err := smug.tmux.SessionName()

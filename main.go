@@ -47,13 +47,19 @@ Examples:
 	$ smug print > ~/.config/smug/blog.yml
 `, version, FileUsage, WindowsUsage, AttachUsage, InsideCurrentSessionUsage, DebugUsage, DetachUsage)
 
-func main() {
-	options, err := ParseOptions(os.Args[1:], func() {
-		fmt.Fprintf(os.Stdout, usage)
-		os.Exit(0)
-	})
+func newLogger(path string) *log.Logger {
+	logFile, err := os.Create(filepath.Join(path, "smug.log"))
+	if err != nil {
+		fmt.Fprintln(os.Stderr, err.Error())
+		os.Exit(1)
+	}
+	return log.New(logFile, "", 0)
+}
 
+func main() {
+	options, err := ParseOptions(os.Args[1:])
 	if err == ErrHelp {
+		fmt.Fprintf(os.Stdout, usage)
 		os.Exit(0)
 	}
 
@@ -70,12 +76,7 @@ func main() {
 
 	var logger *log.Logger
 	if options.Debug {
-		logFile, err := os.Create(filepath.Join(userConfigDir, "smug.log"))
-		if err != nil {
-			fmt.Fprintln(os.Stderr, err.Error())
-			os.Exit(1)
-		}
-		logger = log.New(logFile, "", 0)
+		logger = newLogger(userConfigDir)
 	}
 
 	commander := DefaultCommander{logger}
