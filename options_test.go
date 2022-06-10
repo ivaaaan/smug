@@ -4,15 +4,12 @@ import (
 	"errors"
 	"reflect"
 	"testing"
-
-	"github.com/spf13/pflag"
 )
 
 var usageTestTable = []struct {
-	argv      []string
-	opts      Options
-	err       error
-	helpCalls int
+	argv []string
+	opts Options
+	err  error
 }{
 	{
 		[]string{"start", "smug"},
@@ -27,7 +24,6 @@ var usageTestTable = []struct {
 			Settings: map[string]string{},
 		},
 		nil,
-		0,
 	},
 	{
 		[]string{"start", "smug", "-w", "foo"},
@@ -42,7 +38,6 @@ var usageTestTable = []struct {
 			Settings: map[string]string{},
 		},
 		nil,
-		0,
 	},
 	{
 		[]string{"start", "smug:foo,bar"},
@@ -57,7 +52,6 @@ var usageTestTable = []struct {
 			Settings: map[string]string{},
 		},
 		nil,
-		0,
 	},
 	{
 		[]string{"start", "smug", "--attach", "--debug", "--detach"},
@@ -72,7 +66,6 @@ var usageTestTable = []struct {
 			Settings: map[string]string{},
 		},
 		nil,
-		0,
 	},
 	{
 		[]string{"start", "smug", "-ad"},
@@ -87,7 +80,6 @@ var usageTestTable = []struct {
 			Settings: map[string]string{},
 		},
 		nil,
-		0,
 	},
 	{
 		[]string{"start", "-f", "test.yml"},
@@ -102,7 +94,6 @@ var usageTestTable = []struct {
 			Settings: map[string]string{},
 		},
 		nil,
-		0,
 	},
 	{
 		[]string{"start", "-f", "test.yml", "-w", "win1", "-w", "win2"},
@@ -117,7 +108,6 @@ var usageTestTable = []struct {
 			Settings: map[string]string{},
 		},
 		nil,
-		0,
 	},
 	{
 		[]string{"start", "project", "a=b", "x=y"},
@@ -135,7 +125,6 @@ var usageTestTable = []struct {
 			},
 		},
 		nil,
-		0,
 	},
 	{
 		[]string{"start", "-f", "test.yml", "a=b", "x=y"},
@@ -153,7 +142,6 @@ var usageTestTable = []struct {
 			},
 		},
 		nil,
-		0,
 	},
 	{
 		[]string{"start", "-f", "test.yml", "-w", "win1", "-w", "win2", "a=b", "x=y"},
@@ -171,13 +159,11 @@ var usageTestTable = []struct {
 			},
 		},
 		nil,
-		0,
 	},
 	{
 		[]string{"start", "--help"},
 		Options{},
 		ErrHelp,
-		1,
 	},
 	{
 		[]string{"test"},
@@ -188,7 +174,6 @@ var usageTestTable = []struct {
 			Settings: map[string]string{},
 		},
 		nil,
-		0,
 	},
 	{
 		[]string{"test", "-w", "win1", "-w", "win2", "a=b", "x=y"},
@@ -199,55 +184,33 @@ var usageTestTable = []struct {
 			Settings: map[string]string{"a": "b", "x": "y"},
 		},
 		nil,
-		0,
 	},
 	{
 		[]string{},
 		Options{},
 		ErrHelp,
-		1,
 	},
 	{
 		[]string{"--help"},
 		Options{},
 		ErrHelp,
-		1,
 	},
 	{
 		[]string{"start", "--test"},
 		Options{},
 		errors.New("unknown flag: --test"),
-		0,
 	},
 }
 
 func TestParseOptions(t *testing.T) {
-	helpCalls := 0
-	helpRequested := func() {
-		helpCalls++
-	}
-
-	NewFlagSet = func(cmd string) *pflag.FlagSet {
-		flagSet := pflag.NewFlagSet(cmd, pflag.ContinueOnError)
-		flagSet.Usage = helpRequested
-		return flagSet
-	}
-
 	for _, v := range usageTestTable {
-		opts, err := ParseOptions(v.argv, helpRequested)
+		opts, err := ParseOptions(v.argv)
+		if v.err != nil && err != nil && err.Error() != v.err.Error() {
+			t.Errorf("expected error %v, got %v", v.err, err)
+		}
 
-		if !reflect.DeepEqual(v.opts, opts) {
+		if opts != nil && !reflect.DeepEqual(v.opts, *opts) {
 			t.Errorf("expected struct %v, got %v", v.opts, opts)
 		}
-
-		if helpCalls != v.helpCalls {
-			t.Errorf("expected to get %d help calls, got %d", v.helpCalls, helpCalls)
-		}
-
-		if v.err != nil && err.Error() != v.err.Error() {
-			t.Errorf("expected to get error %v, got %v", v.err, err)
-		}
-
-		helpCalls = 0
 	}
 }

@@ -94,22 +94,22 @@ const (
 	InsideCurrentSessionUsage = "Create all windows inside current session"
 )
 
-// Creates a new FlagSet.
-// Moved it to a variable to be able to override it in the tests.
-var NewFlagSet = func(cmd string) *pflag.FlagSet {
-	f := pflag.NewFlagSet(cmd, pflag.ContinueOnError)
-	return f
-}
-
-func ParseOptions(argv []string, helpRequested func()) (Options, error) {
-	if len(argv) == 0 {
-		helpRequested()
-		return Options{}, ErrHelp
+func parseUserSettings(args []string) map[string]string {
+	settings := make(map[string]string)
+	for _, kv := range args {
+		s := strings.Split(kv, "=")
+		if len(s) < 2 {
+			continue
+		}
+		settings[s[0]] = s[1]
 	}
 
-	if argv[0] == "--help" || argv[0] == "-h" {
-		helpRequested()
-		return Options{}, ErrHelp
+	return settings
+}
+
+func ParseOptions(argv []string) (*Options, error) {
+	if len(argv) == 0 || argv[0] == "--help" || argv[0] == "-h" {
+		return nil, ErrHelp
 	}
 
 	cmd, cmdErr := Commands.Resolve(argv[0])
@@ -117,7 +117,7 @@ func ParseOptions(argv []string, helpRequested func()) (Options, error) {
 		cmd = Commands.FindByName(CommandStart)
 	}
 
-	flags := NewFlagSet(cmd.Name)
+	flags := pflag.NewFlagSet(cmd.Name, pflag.ContinueOnError)
 
 	config := flags.StringP("file", "f", "", FileUsage)
 	windows := flags.StringArrayP("windows", "w", []string{}, WindowsUsage)
@@ -128,11 +128,11 @@ func ParseOptions(argv []string, helpRequested func()) (Options, error) {
 
 	err := flags.Parse(argv)
 	if err == pflag.ErrHelp {
-		return Options{}, ErrHelp
+		return nil, ErrHelp
 	}
 
 	if err != nil {
-		return Options{}, err
+		return nil, err
 	}
 
 	var project string
@@ -151,19 +151,9 @@ func ParseOptions(argv []string, helpRequested func()) (Options, error) {
 		windows = &wl
 	}
 
-	settings := make(map[string]string)
-	userSettings := flags.Args()[1:]
-	if len(userSettings) > 0 {
-		for _, kv := range userSettings {
-			s := strings.Split(kv, "=")
-			if len(s) < 2 {
-				continue
-			}
-			settings[s[0]] = s[1]
-		}
-	}
+	settings := parseUserSettings(flags.Args()[1:])
 
-	return Options{
+	return &Options{
 		Project:              project,
 		Config:               *config,
 		Command:              cmd.Name,
