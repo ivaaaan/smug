@@ -59,7 +59,7 @@ func newLogger(path string) *log.Logger {
 func main() {
 	options, err := ParseOptions(os.Args[1:])
 	if err == ErrHelp {
-		fmt.Fprintf(os.Stdout, usage)
+		fmt.Fprint(os.Stdout, usage)
 		os.Exit(0)
 	}
 
@@ -100,7 +100,7 @@ func main() {
 		}
 		config, err := GetConfig(configPath, options.Settings)
 		if err != nil {
-			fmt.Fprintf(os.Stderr, err.Error())
+			fmt.Fprint(os.Stderr, err.Error())
 			os.Exit(1)
 		}
 
@@ -118,25 +118,25 @@ func main() {
 		}
 		config, err := GetConfig(configPath, options.Settings)
 		if err != nil {
-			fmt.Fprintf(os.Stderr, err.Error())
+			fmt.Fprint(os.Stderr, err.Error())
 			os.Exit(1)
 		}
 
 		err = smug.Stop(config, options, context)
 		if err != nil {
-			fmt.Fprintf(os.Stderr, err.Error())
+			fmt.Fprint(os.Stderr, err.Error())
 			os.Exit(1)
 		}
 	case CommandNew, CommandEdit:
 		err := EditConfig(configPath)
 		if err != nil {
-			fmt.Fprintf(os.Stderr, err.Error())
+			fmt.Fprint(os.Stderr, err.Error())
 			os.Exit(1)
 		}
 	case CommandList:
 		configs, err := ListConfigs(userConfigDir)
 		if err != nil {
-			fmt.Fprintf(os.Stderr, err.Error())
+			fmt.Fprint(os.Stderr, err.Error())
 			os.Exit(1)
 		}
 
@@ -144,13 +144,13 @@ func main() {
 	case CommandPrint:
 		config, err := smug.GetConfigFromSession(options, context)
 		if err != nil {
-			fmt.Fprintf(os.Stderr, err.Error())
+			fmt.Fprint(os.Stderr, err.Error())
 			os.Exit(1)
 		}
 
 		d, err := yaml.Marshal(&config)
 		if err != nil {
-			fmt.Fprintf(os.Stderr, err.Error())
+			fmt.Fprint(os.Stderr, err.Error())
 			os.Exit(1)
 		}
 

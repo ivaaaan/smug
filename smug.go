@@ -77,7 +77,7 @@ func (smug Smug) switchOrAttach(target string, attach bool, insideTmuxSession bo
 	return nil
 }
 
-func (smug Smug) Stop(config Config, options *Options, context Context) error {
+func (smug Smug) Stop(config *Config, options *Options, context Context) error {
 	windows := options.Windows
 	if len(windows) == 0 {
 		sessionRoot := ExpandPath(config.Root)
@@ -100,7 +100,7 @@ func (smug Smug) Stop(config Config, options *Options, context Context) error {
 	return nil
 }
 
-func (smug Smug) Start(config Config, options *Options, context Context) error {
+func (smug Smug) Start(config *Config, options *Options, context Context) error {
 	var sessionName string
 	var err error
 
@@ -210,11 +210,17 @@ func (smug Smug) Start(config Config, options *Options, context Context) error {
 	}
 
 	if !options.InsideCurrentSession {
-		smug.tmux.KillWindow(sessionName + defaultWindowName)
-		smug.tmux.RenumberWindows(sessionName)
+		err := smug.tmux.KillWindow(sessionName + defaultWindowName)
+		if err != nil {
+			return err
+		}
+		err = smug.tmux.RenumberWindows(sessionName)
+		if err != nil {
+			return err
+		}
 	}
 
-	if len(windows) == 0 && len(config.Windows) > 0 && options.Detach == false {
+	if len(windows) == 0 && len(config.Windows) > 0 && !options.Detach {
 		return smug.switchOrAttach(sessionName+config.Windows[0].Name, attach, context.InsideTmuxSession)
 	}
 
@@ -236,7 +242,7 @@ func (smug Smug) GetConfigFromSession(options *Options, context Context) (Config
 	}
 
 	for _, w := range tmuxWindows {
-		tmuxPanes, err := smug.tmux.ListPanes(options.Project + ":" + w.Id)
+		tmuxPanes, err := smug.tmux.ListPanes(options.Project + ":" + w.ID)
 		if err != nil {
 			return Config{}, err
 		}
