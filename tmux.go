@@ -13,9 +13,6 @@ const (
 
 const (
 	EvenHorizontal = "even-horizontal"
-	EvenVertical   = "even-vertical"
-	MainHorizontal = "main-horizontal"
-	MainVertical   = "main-vertical"
 	Tiled          = "tiled"
 )
 
@@ -24,7 +21,7 @@ type Tmux struct {
 }
 
 type TmuxWindow struct {
-	Id     string
+	ID     string
 	Name   string
 	Layout string
 	Root   string
@@ -146,7 +143,7 @@ func (tmux Tmux) ListWindows(target string) ([]TmuxWindow, error) {
 	for _, w := range windowsList {
 		windowInfo := strings.Split(w, ";")
 		window := TmuxWindow{
-			Id:     windowInfo[0],
+			ID:     windowInfo[0],
 			Name:   windowInfo[1],
 			Layout: windowInfo[2],
 			Root:   windowInfo[3],
