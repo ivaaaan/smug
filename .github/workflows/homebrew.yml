@@ -2,7 +2,7 @@ on:
   workflow_dispatch:
   push:
     tags:
-      - '*'
+      - "*"
 
 jobs:
   update-formulae:
@@ -13,5 +13,5 @@ jobs:
         with:
           token: "${{ secrets.TOKEN }}"
           formula: smug
-          force: false
+          force: true
           livecheck: false
