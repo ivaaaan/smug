@@ -10,11 +10,6 @@ import (
 
 const defaultWindowName = "smug_def"
 
-// Very wisely picked default value,
-// after which panes will be rebalanced for each `split-window`
-// Helps with "no space for new pane" error
-const defaultRebalancePanesThreshold = 5
-
 func ExpandPath(path string) string {
 	if strings.HasPrefix(path, "~/") {
 		userHome, err := os.UserHomeDir()
@@ -120,12 +115,6 @@ func (smug Smug) Start(config *Config, options *Options, context Context) error 
 
 	sessionExists := smug.tmux.SessionExists(sessionName)
 	sessionRoot := ExpandPath(config.Root)
-
-	rebalancePanesThreshold := config.RebalanceWindowsThreshold
-	if rebalancePanesThreshold == 0 {
-		rebalancePanesThreshold = defaultRebalancePanesThreshold
-	}
-
 	windows := options.Windows
 	attach := options.Attach
 
@@ -170,7 +159,7 @@ func (smug Smug) Start(config *Config, options *Options, context Context) error 
 			}
 		}
 
-		for pIndex, p := range w.Panes {
+		for i, p := range w.Panes {
 			paneRoot := ExpandPath(p.Root)
 			if paneRoot == "" || !filepath.IsAbs(p.Root) {
 				paneRoot = filepath.Join(windowRoot, p.Root)
@@ -182,19 +171,19 @@ func (smug Smug) Start(config *Config, options *Options, context Context) error 
 				return err
 			}
 
-			for _, c := range p.Commands {
-				err = smug.tmux.SendKeys(window+"."+newPane, c)
-				if err != nil {
-					return err
-				}
-			}
-
-			if pIndex+1 >= rebalancePanesThreshold {
+			if i%2 == 0 {
 				_, err = smug.tmux.SelectLayout(window, Tiled)
 				if err != nil {
 					return err
 				}
 
+			}
+
+			for _, c := range p.Commands {
+				err = smug.tmux.SendKeys(window+"."+newPane, c)
+				if err != nil {
+					return err
+				}
 			}
 		}
 
