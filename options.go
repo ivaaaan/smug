@@ -2,6 +2,7 @@ package main
 
 import (
 	"errors"
+	"os"
 	"strings"
 
 	"github.com/spf13/pflag"
@@ -133,6 +134,12 @@ func ParseOptions(argv []string) (*Options, error) {
 
 	if err != nil {
 		return nil, err
+	}
+
+	// If config file flag is not set, and env is, use the env
+	val, ok := os.LookupEnv("SMUG_SESSION_CONFIG_PATH")
+	if *config == "" && ok {
+		*config = val
 	}
 
 	var project string

@@ -36,6 +36,11 @@ type Config struct {
 	RebalanceWindowsThreshold int               `yaml:"rebalance_panes_after"`
 }
 
+func addDefaultEnvs(c *Config, path string) {
+	c.Env["SMUG_SESSION"] = c.Session
+	c.Env["SMUG_SESSION_NAME"] = c.Session
+}
+
 func EditConfig(path string) error {
 	editor := os.Getenv("EDITOR")
 	if editor == "" {
@@ -58,7 +63,15 @@ func GetConfig(path string, settings map[string]string) (Config, error) {
 
 	config := string(f)
 
-	return ParseConfig(config, settings)
+	c, err := ParseConfig(config, settings)
+	if err != nil {
+		return Config{}, err
+	}
+
+	addDefaultEnvs(&c, path)
+
+	return c, err
+
 }
 
 func ParseConfig(data string, settings map[string]string) (Config, error) {
@@ -74,7 +87,9 @@ func ParseConfig(data string, settings map[string]string) (Config, error) {
 		return v
 	})
 
-	c := Config{}
+	c := Config{
+		Env: make(map[string]string),
+	}
 
 	err := yaml.Unmarshal([]byte(data), &c)
 	if err != nil {
