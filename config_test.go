@@ -28,6 +28,7 @@ windows:
 
 	expected := Config{
 		Session: "test",
+		Env:     make(map[string]string),
 		Windows: []Window{
 			{
 				Layout:   "tiled",
