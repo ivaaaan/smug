@@ -111,6 +111,7 @@ var testTable = map[string]struct {
 			"tmux new -Pd -s ses -n smug_def -c root",
 			"tmux neww -Pd -t ses: -c root -F #{window_id} -n win1",
 			"tmux split-window -Pd -h -t win1 -c root -F #{pane_id}",
+			"tmux select-layout -t win1 tiled",
 			"tmux send-keys -t win1.1 command1 Enter",
 			"tmux select-layout -t win1 main-horizontal",
 			"tmux kill-window -t ses:smug_def",
