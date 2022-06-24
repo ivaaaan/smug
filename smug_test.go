@@ -9,7 +9,7 @@ import (
 )
 
 var testTable = map[string]struct {
-	config           Config
+	config           *Config
 	options          *Options
 	context          Context
 	startCommands    []string
@@ -17,7 +17,7 @@ var testTable = map[string]struct {
 	commanderOutputs []string
 }{
 	"test with 1 window": {
-		Config{
+		&Config{
 			Session:     "ses",
 			Root:        "~/root",
 			BeforeStart: []string{"command1", "command2"},
@@ -48,7 +48,7 @@ var testTable = map[string]struct {
 		[]string{"ses", "win1"},
 	},
 	"test with 1 window and Detach: true": {
-		Config{
+		&Config{
 			Session:     "ses",
 			Root:        "root",
 			BeforeStart: []string{"command1", "command2"},
@@ -78,7 +78,7 @@ var testTable = map[string]struct {
 		[]string{"xyz"},
 	},
 	"test with multiple windows and panes": {
-		Config{
+		&Config{
 			Session: "ses",
 			Root:    "root",
 			Windows: []Window{
@@ -125,7 +125,7 @@ var testTable = map[string]struct {
 		[]string{"ses", "ses", "win1", "1"},
 	},
 	"test start windows from option's Windows parameter": {
-		Config{
+		&Config{
 			Session: "ses",
 			Root:    "root",
 			Windows: []Window{
@@ -157,7 +157,7 @@ var testTable = map[string]struct {
 		[]string{"xyz"},
 	},
 	"test attach to the existing session": {
-		Config{
+		&Config{
 			Session: "ses",
 			Root:    "root",
 			Windows: []Window{
@@ -176,7 +176,7 @@ var testTable = map[string]struct {
 		[]string{""},
 	},
 	"test start a new session from another tmux session": {
-		Config{
+		&Config{
 			Session: "ses",
 			Root:    "root",
 		},
@@ -194,7 +194,7 @@ var testTable = map[string]struct {
 		[]string{"xyz"},
 	},
 	"test switch a client from another tmux session": {
-		Config{
+		&Config{
 			Session: "ses",
 			Root:    "root",
 			Windows: []Window{
@@ -213,7 +213,7 @@ var testTable = map[string]struct {
 		[]string{""},
 	},
 	"test create new windows in current session with same name": {
-		Config{
+		&Config{
 			Session: "ses",
 			Root:    "root",
 			Windows: []Window{
@@ -236,7 +236,7 @@ var testTable = map[string]struct {
 		[]string{"ses", ""},
 	},
 	"test create new windows in current session with different name": {
-		Config{
+		&Config{
 			Session: "ses",
 			Root:    "root",
 			Windows: []Window{

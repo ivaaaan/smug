@@ -55,22 +55,22 @@ func EditConfig(path string) error {
 	return cmd.Run()
 }
 
-func GetConfig(path string, settings map[string]string) (Config, error) {
+func GetConfig(path string, settings map[string]string) (*Config, error) {
 	f, err := ioutil.ReadFile(path)
 	if err != nil {
-		return Config{}, err
+		return nil, err
 	}
 
 	config := string(f)
 
 	c, err := ParseConfig(config, settings)
 	if err != nil {
-		return Config{}, err
+		return nil, err
 	}
 
 	addDefaultEnvs(&c, path)
 
-	return c, err
+	return &c, err
 
 }
 
