@@ -87,15 +87,8 @@ func main() {
 	var configPath string
 	if options.Config != "" {
 		configPath = options.Config
-	} else if options.Project != "" {
-		configPath = filepath.Join(userConfigDir, options.Project+".yml")
 	} else {
-		s, err := tmux.SessionName()
-		if err != nil {
-			fmt.Fprintln(os.Stderr, err.Error())
-			os.Exit(1)
-		}
-		configPath = filepath.Join(userConfigDir, s+".yml")
+		configPath = filepath.Join(userConfigDir, options.Project+".yml")
 	}
 
 	switch options.Command {
