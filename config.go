@@ -38,7 +38,7 @@ type Config struct {
 
 func addDefaultEnvs(c *Config, path string) {
 	c.Env["SMUG_SESSION"] = c.Session
-	c.Env["SMUG_SESSION_NAME"] = c.Session
+	c.Env["SMUG_SESSION_CONFIG_PATH"] = path
 }
 
 func EditConfig(path string) error {
