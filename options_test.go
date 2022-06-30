@@ -2,6 +2,7 @@ package main
 
 import (
 	"errors"
+	"os"
 	"reflect"
 	"testing"
 )
@@ -10,6 +11,7 @@ var usageTestTable = []struct {
 	argv []string
 	opts Options
 	err  error
+	env  map[string]string
 }{
 	{
 		[]string{"start", "smug"},
@@ -23,6 +25,7 @@ var usageTestTable = []struct {
 			Debug:    false,
 			Settings: map[string]string{},
 		},
+		nil,
 		nil,
 	},
 	{
@@ -38,6 +41,7 @@ var usageTestTable = []struct {
 			Settings: map[string]string{},
 		},
 		nil,
+		nil,
 	},
 	{
 		[]string{"start", "smug:foo,bar"},
@@ -51,6 +55,7 @@ var usageTestTable = []struct {
 			Debug:    false,
 			Settings: map[string]string{},
 		},
+		nil,
 		nil,
 	},
 	{
@@ -66,6 +71,7 @@ var usageTestTable = []struct {
 			Settings: map[string]string{},
 		},
 		nil,
+		nil,
 	},
 	{
 		[]string{"start", "smug", "-ad"},
@@ -79,6 +85,7 @@ var usageTestTable = []struct {
 			Debug:    true,
 			Settings: map[string]string{},
 		},
+		nil,
 		nil,
 	},
 	{
@@ -94,6 +101,7 @@ var usageTestTable = []struct {
 			Settings: map[string]string{},
 		},
 		nil,
+		nil,
 	},
 	{
 		[]string{"start", "-f", "test.yml", "-w", "win1", "-w", "win2"},
@@ -107,6 +115,7 @@ var usageTestTable = []struct {
 			Debug:    false,
 			Settings: map[string]string{},
 		},
+		nil,
 		nil,
 	},
 	{
@@ -125,6 +134,7 @@ var usageTestTable = []struct {
 			},
 		},
 		nil,
+		nil,
 	},
 	{
 		[]string{"start", "-f", "test.yml", "a=b", "x=y"},
@@ -141,6 +151,7 @@ var usageTestTable = []struct {
 				"x": "y",
 			},
 		},
+		nil,
 		nil,
 	},
 	{
@@ -159,11 +170,13 @@ var usageTestTable = []struct {
 			},
 		},
 		nil,
+		nil,
 	},
 	{
 		[]string{"start", "--help"},
 		Options{},
 		ErrHelp,
+		nil,
 	},
 	{
 		[]string{"test"},
@@ -173,6 +186,7 @@ var usageTestTable = []struct {
 			Windows:  []string{},
 			Settings: map[string]string{},
 		},
+		nil,
 		nil,
 	},
 	{
@@ -184,26 +198,47 @@ var usageTestTable = []struct {
 			Settings: map[string]string{"a": "b", "x": "y"},
 		},
 		nil,
+		nil,
+	},
+	{
+		[]string{"test"},
+		Options{
+			Command:  "start",
+			Project:  "test",
+			Config:   "",
+			Windows:  []string{},
+			Settings: map[string]string{},
+		},
+		nil,
+		map[string]string{
+			"SMUG_SESSION_CONFIG_PATH": "test",
+		},
 	},
 	{
 		[]string{},
 		Options{},
 		ErrHelp,
+		nil,
 	},
 	{
 		[]string{"--help"},
 		Options{},
 		ErrHelp,
+		nil,
 	},
 	{
 		[]string{"start", "--test"},
 		Options{},
 		errors.New("unknown flag: --test"),
+		nil,
 	},
 }
 
 func TestParseOptions(t *testing.T) {
 	for _, v := range usageTestTable {
+		for k, v := range v.env {
+			os.Setenv(k, v)
+		}
 		opts, err := ParseOptions(v.argv)
 		if v.err != nil && err != nil && err.Error() != v.err.Error() {
 			t.Errorf("expected error %v, got %v", v.err, err)

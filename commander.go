@@ -33,7 +33,7 @@ func (c DefaultCommander) Exec(cmd *exec.Cmd) (string, error) {
 	output, err := cmd.CombinedOutput()
 	if err != nil {
 		if c.logger != nil {
-			c.logger.Println(err)
+			c.logger.Println(err, string(output))
 		}
 		return "", &ShellError{strings.Join(cmd.Args, " "), err}
 	}
