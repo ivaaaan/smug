@@ -81,7 +81,7 @@ func main() {
 
 	commander := DefaultCommander{logger}
 	tmux := Tmux{commander}
-	smug := Smug{tmux, commander}
+	smug := Smug{&tmux, &commander}
 	context := CreateContext()
 
 	var configPath string

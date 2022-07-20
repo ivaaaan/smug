@@ -5,40 +5,16 @@ import (
 	"os"
 	"os/exec"
 	"path/filepath"
-	"strings"
 )
 
 const defaultWindowName = "smug_def"
 
-func ExpandPath(path string) string {
-	if strings.HasPrefix(path, "~/") {
-		userHome, err := os.UserHomeDir()
-		if err != nil {
-			return path
-		}
-
-		return strings.Replace(path, "~", userHome, 1)
-	}
-
-	return path
-}
-
-func Contains(slice []string, s string) bool {
-	for _, e := range slice {
-		if e == s {
-			return true
-		}
-	}
-
-	return false
-}
-
 type Smug struct {
-	tmux      Tmux
+	tmux      *Tmux
 	commander Commander
 }
 
-func (smug Smug) execShellCommands(commands []string, path string) error {
+func (smug *Smug) execShellCommands(commands []string, path string) error {
 	for _, c := range commands {
 		cmd := exec.Command("/bin/sh", "-c", c)
 		cmd.Dir = path
@@ -51,7 +27,7 @@ func (smug Smug) execShellCommands(commands []string, path string) error {
 	return nil
 }
 
-func (smug Smug) setEnvVariables(target string, env map[string]string) error {
+func (smug *Smug) setEnvVariables(target string, env map[string]string) error {
 	for key, value := range env {
 		_, err := smug.tmux.SetEnv(target, key, value)
 		if err != nil {
@@ -62,7 +38,7 @@ func (smug Smug) setEnvVariables(target string, env map[string]string) error {
 	return nil
 }
 
-func (smug Smug) switchOrAttach(target string, attach bool, insideTmuxSession bool) error {
+func (smug *Smug) switchOrAttach(target string, attach bool, insideTmuxSession bool) error {
 	if insideTmuxSession && attach {
 		return smug.tmux.SwitchClient(target)
 	} else if !insideTmuxSession {
@@ -72,7 +48,7 @@ func (smug Smug) switchOrAttach(target string, attach bool, insideTmuxSession bo
 	return nil
 }
 
-func (smug Smug) Stop(config *Config, options *Options, context Context) error {
+func (smug *Smug) Stop(config *Config, options *Options, context Context) error {
 	windows := options.Windows
 	if len(windows) == 0 {
 		sessionRoot := ExpandPath(config.Root)
@@ -95,7 +71,7 @@ func (smug Smug) Stop(config *Config, options *Options, context Context) error {
 	return nil
 }
 
-func (smug Smug) Start(config *Config, options *Options, context Context) error {
+func (smug *Smug) Start(config *Config, options *Options, context Context) error {
 	var sessionName string
 	var err error
 
@@ -111,6 +87,7 @@ func (smug Smug) Start(config *Config, options *Options, context Context) error 
 			return err
 		}
 	}
+
 	sessionName = sessionName + ":"
 
 	sessionExists := smug.tmux.SessionExists(sessionName)
@@ -221,7 +198,7 @@ func (smug Smug) Start(config *Config, options *Options, context Context) error 
 	return nil
 }
 
-func (smug Smug) GetConfigFromSession(options *Options, context Context) (Config, error) {
+func (smug *Smug) GetConfigFromSession(options *Options, context Context) (Config, error) {
 	config := Config{}
 
 	tmuxSession, err := smug.tmux.SessionName()
