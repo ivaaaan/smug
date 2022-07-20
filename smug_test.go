@@ -151,6 +151,7 @@ var testTable = map[string]struct {
 			"tmux select-layout -t xyz even-horizontal",
 			"tmux kill-window -t ses:smug_def",
 			"tmux move-window -r -s ses: -t ses:",
+			"tmux attach -d -t ses:win2",
 		},
 		[]string{
 			"tmux kill-window -t ses:win2",
