@@ -11,8 +11,6 @@ Smug automates your [tmux](https://github.com/tmux/tmux) workflow. You can creat
 
 The configuration used in this GIF can be found [here](#example-2).
 
-## [Support Ukraine 🇺🇦](https://github.com/ivaaaan/smug/issues/101)
-
 ## Installation
 
 ### Download from the releases page
