@@ -1,0 +1,8 @@
+session: smug
+
+root: .
+
+windows:
+  - name: code
+    commands:
+      - go test ./...

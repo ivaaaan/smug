@@ -151,7 +151,8 @@ xyz@localhost:~$ smug start -f ./project.yml -w window1 -w window2
 
 ## Configuration
 
-Configuration files stored in the `~/.config/smug` directory in the `YAML` format, e.g `~/.config/smug/your_project.yml`.
+Configuration files can stored in the `~/.config/smug` directory in the `YAML` format, e.g `~/.config/smug/your_project.yml`.
+You may also create a file named `.smug.yml` in the current working directory, which will be used by default.
 
 ### Examples
 

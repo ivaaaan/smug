@@ -47,6 +47,8 @@ Examples:
 	$ smug print > ~/.config/smug/blog.yml
 `, version, FileUsage, WindowsUsage, AttachUsage, InsideCurrentSessionUsage, DebugUsage, DetachUsage)
 
+const defaultConfigFile = ".smug.yml"
+
 func newLogger(path string) *log.Logger {
 	logFile, err := os.Create(filepath.Join(path, "smug.log"))
 	if err != nil {
@@ -87,8 +89,15 @@ func main() {
 	var configPath string
 	if options.Config != "" {
 		configPath = options.Config
-	} else {
+	} else if options.Project != "" {
 		configPath = filepath.Join(userConfigDir, options.Project+".yml")
+	} else {
+		path, err := os.Getwd()
+		if err != nil {
+			fmt.Fprintln(os.Stderr, err.Error())
+			os.Exit(1)
+		}
+		configPath = filepath.Join(path, defaultConfigFile)
 	}
 
 	switch options.Command {
