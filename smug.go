@@ -6,6 +6,7 @@ import (
 	"os/exec"
 	"path/filepath"
 	"strings"
+	"time"
 )
 
 const defaultWindowName = "smug_def"
@@ -153,6 +154,7 @@ func (smug Smug) Start(config *Config, options *Options, context Context) error 
 		}
 
 		for _, c := range w.Commands {
+			time.Sleep(time.Millisecond * time.Duration(config.SendKeysTimeout))
 			err := smug.tmux.SendKeys(window, c)
 			if err != nil {
 				return err
@@ -180,6 +182,7 @@ func (smug Smug) Start(config *Config, options *Options, context Context) error 
 			}
 
 			for _, c := range p.Commands {
+				time.Sleep(time.Millisecond * time.Duration(config.SendKeysTimeout))
 				err = smug.tmux.SendKeys(window+"."+newPane, c)
 				if err != nil {
 					return err
