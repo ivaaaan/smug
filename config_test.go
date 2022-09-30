@@ -9,6 +9,7 @@ import (
 func TestParseConfig(t *testing.T) {
 	yaml := `
 session: ${session}
+sendkeys_timeout: 200
 windows:
   - layout: tiled
     commands:
@@ -28,6 +29,7 @@ windows:
 
 	expected := Config{
 		Session: "test",
+        SendKeysTimeout: 200,
 		Env:     make(map[string]string),
 		Windows: []Window{
 			{

@@ -27,12 +27,13 @@ type Window struct {
 }
 
 type Config struct {
-	Session     string            `yaml:"session"`
-	Env         map[string]string `yaml:"env"`
-	Root        string            `yaml:"root"`
-	BeforeStart []string          `yaml:"before_start"`
-	Stop        []string          `yaml:"stop"`
-	Windows     []Window          `yaml:"windows"`
+	SendKeysTimeout int            `yaml:"sendkeys_timeout"`
+	Session         string            `yaml:"session"`
+	Env             map[string]string `yaml:"env"`
+	Root            string            `yaml:"root"`
+	BeforeStart     []string          `yaml:"before_start"`
+	Stop            []string          `yaml:"stop"`
+	Windows         []Window          `yaml:"windows"`
 }
 
 func addDefaultEnvs(c *Config, path string) {
