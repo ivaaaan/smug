@@ -27,8 +27,9 @@ type Window struct {
 }
 
 type Config struct {
-	SendKeysTimeout int            `yaml:"sendkeys_timeout"`
 	Session         string            `yaml:"session"`
+	SendKeysTimeout int               `yaml:"sendkeys_timeout"`
+	Silent          bool              `yaml:"silent"`
 	Env             map[string]string `yaml:"env"`
 	Root            string            `yaml:"root"`
 	BeforeStart     []string          `yaml:"before_start"`

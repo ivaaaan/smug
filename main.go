@@ -102,15 +102,18 @@ func main() {
 
 	switch options.Command {
 	case CommandStart:
-		if len(options.Windows) == 0 {
-			fmt.Println("Starting a new session...")
-		} else {
-			fmt.Println("Starting new windows...")
-		}
 		config, err := GetConfig(configPath, options.Settings)
 		if err != nil {
 			fmt.Fprint(os.Stderr, err.Error())
 			os.Exit(1)
+		}
+
+		if !config.Silent {
+			if len(options.Windows) == 0 {
+				fmt.Println("Starting a new session...")
+			} else {
+				fmt.Println("Starting new windows...")
+			}
 		}
 
 		err = smug.Start(config, options, context)
