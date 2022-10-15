@@ -1,6 +1,7 @@
 package main
 
 import (
+	"fmt"
 	"io/ioutil"
 	"os"
 	"os/exec"
@@ -9,6 +10,14 @@ import (
 
 	"gopkg.in/yaml.v2"
 )
+
+type ConfigNotFoundError struct {
+	Project string
+}
+
+func (e ConfigNotFoundError) Error() string {
+	return fmt.Sprintf("config not found for project %s", e.Project)
+}
 
 type Pane struct {
 	Root     string   `yaml:"root,omitempty"`
@@ -109,11 +118,27 @@ func ListConfigs(dir string) ([]string, error) {
 
 	for _, file := range files {
 		fileExt := path.Ext(file.Name())
-		if fileExt != ".yml" {
+		if fileExt != ".yml" && fileExt != ".yaml" {
 			continue
 		}
-		result = append(result, strings.TrimSuffix(file.Name(), fileExt))
+		result = append(result, file.Name())
 	}
 
 	return result, nil
+}
+
+func FindConfig(dir, project string) (string, error) {
+	configs, err := ListConfigs(dir)
+	if err != nil {
+		return "", err
+	}
+
+	for _, config := range configs {
+		fileExt := path.Ext(config)
+		if strings.TrimSuffix(config, fileExt) == project {
+			return config, nil
+		}
+	}
+
+	return "", ConfigNotFoundError{Project: project}
 }

@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"log"
 	"os"
+	"path"
 	"path/filepath"
 	"strings"
 
@@ -90,7 +91,12 @@ func main() {
 	if options.Config != "" {
 		configPath = options.Config
 	} else if options.Project != "" {
-		configPath = filepath.Join(userConfigDir, options.Project+".yml")
+		config, err := FindConfig(userConfigDir, options.Project)
+		if err != nil {
+			fmt.Fprintln(os.Stderr, err.Error())
+			os.Exit(1)
+		}
+		configPath = filepath.Join(userConfigDir, config)
 	} else {
 		path, err := os.Getwd()
 		if err != nil {
@@ -149,7 +155,11 @@ func main() {
 			os.Exit(1)
 		}
 
-		fmt.Println(strings.Join(configs, "\n"))
+		for _, config := range configs {
+			fileExt := path.Ext(config)
+			fmt.Println(strings.TrimSuffix(config, fileExt))
+		}
+
 	case CommandPrint:
 		config, err := smug.GetConfigFromSession(options, context)
 		if err != nil {
