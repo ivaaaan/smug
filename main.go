@@ -1,6 +1,7 @@
 package main
 
 import (
+	"errors"
 	"fmt"
 	"log"
 	"os"
@@ -61,7 +62,7 @@ func newLogger(path string) *log.Logger {
 
 func main() {
 	options, err := ParseOptions(os.Args[1:])
-	if err == ErrHelp {
+	if errors.Is(err, ErrHelp) {
 		fmt.Fprint(os.Stdout, usage)
 		os.Exit(0)
 	}
