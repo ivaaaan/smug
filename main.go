@@ -93,9 +93,12 @@ func main() {
 		configPath = options.Config
 	} else if options.Project != "" {
 		config, err := FindConfig(userConfigDir, options.Project)
-		if err != nil {
+		if err != nil && options.Command != CommandNew {
 			fmt.Fprintln(os.Stderr, err.Error())
 			os.Exit(1)
+		}
+		if options.Command == CommandNew {
+			config = fmt.Sprintf("%s.yml", options.Project)
 		}
 		configPath = filepath.Join(userConfigDir, config)
 	} else {
