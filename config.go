@@ -35,8 +35,9 @@ type Window struct {
 }
 
 type Config struct {
-	SendKeysTimeout int               `yaml:"sendkeys_timeout"`
-	Session         string            `yaml:"session"`
+	SendKeysTimeout int    `yaml:"sendkeys_timeout"`
+	Session         string `yaml:"session"`
+	TmuxOptions     `yaml:"tmux_options"`
 	Env             map[string]string `yaml:"env"`
 	Root            string            `yaml:"root"`
 	BeforeStart     []string          `yaml:"before_start"`
@@ -63,7 +64,12 @@ func EditConfig(path string) error {
 	return cmd.Run()
 }
 
-func GetConfig(path string, settings map[string]string) (*Config, error) {
+func setTmuxOptions(tmuxOpts *TmuxOptions, c Config) {
+	tmuxOpts.SocketName = c.SocketName
+	tmuxOpts.SocketPath = c.SocketPath
+}
+
+func GetConfig(path string, settings map[string]string, tmuxOpts *TmuxOptions) (*Config, error) {
 	f, err := os.ReadFile(path)
 	if err != nil {
 		return nil, err
@@ -77,6 +83,7 @@ func GetConfig(path string, settings map[string]string) (*Config, error) {
 	}
 
 	addDefaultEnvs(&c, path)
+	setTmuxOptions(tmuxOpts, c)
 
 	return &c, err
 

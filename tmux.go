@@ -16,8 +16,18 @@ const (
 	Tiled          = "tiled"
 )
 
+type TmuxOptions struct {
+
+	// Default socket name
+	SocketName string `yaml:"socket_name"`
+
+	// Default socket path, overrides SocketName
+	SocketPath string `yaml:"socket_path"`
+}
+
 type Tmux struct {
 	commander Commander
+	*TmuxOptions
 }
 
 type TmuxWindow struct {
@@ -31,36 +41,48 @@ type TmuxPane struct {
 	Root string
 }
 
+func (tmux Tmux) cmd(args ...string) *exec.Cmd {
+	tmuxCmd := []string{"tmux"}
+	if tmux.SocketPath != "" {
+		tmuxCmd = append(tmuxCmd, "-S", tmux.SocketPath)
+	} else if tmux.SocketName != "" {
+		tmuxCmd = append(tmuxCmd, "-L", tmux.SocketName)
+	} 
+	tmuxCmd = append(tmuxCmd, args...)
+
+	return exec.Command(tmuxCmd[0], tmuxCmd[1:]...)
+}
+
 func (tmux Tmux) NewSession(name string, root string, windowName string) (string, error) {
-	cmd := exec.Command("tmux", "new", "-Pd", "-s", name, "-n", windowName, "-c", root)
+	cmd := tmux.cmd("new", "-Pd", "-s", name, "-n", windowName, "-c", root)
 	return tmux.commander.Exec(cmd)
 }
 
 func (tmux Tmux) SessionExists(name string) bool {
-	cmd := exec.Command("tmux", "has-session", "-t", name)
+	cmd := tmux.cmd("has-session", "-t", name)
 	res, err := tmux.commander.Exec(cmd)
 	return res == "" && err == nil
 }
 
 func (tmux Tmux) KillWindow(target string) error {
-	cmd := exec.Command("tmux", "kill-window", "-t", target)
+	cmd := tmux.cmd("kill-window", "-t", target)
 	_, err := tmux.commander.Exec(cmd)
 	return err
 }
 
 func (tmux Tmux) NewWindow(target string, name string, root string) (string, error) {
-	cmd := exec.Command("tmux", "neww", "-Pd", "-t", target, "-c", root, "-F", "#{window_id}", "-n", name)
+	cmd := tmux.cmd("neww", "-Pd", "-t", target, "-c", root, "-F", "#{window_id}", "-n", name)
 
 	return tmux.commander.Exec(cmd)
 }
 
 func (tmux Tmux) SendKeys(target string, command string) error {
-	cmd := exec.Command("tmux", "send-keys", "-t", target, command, "Enter")
+	cmd := tmux.cmd("send-keys", "-t", target, command, "Enter")
 	return tmux.commander.ExecSilently(cmd)
 }
 
 func (tmux Tmux) Attach(target string, stdin *os.File, stdout *os.File, stderr *os.File) error {
-	cmd := exec.Command("tmux", "attach", "-d", "-t", target)
+	cmd := tmux.cmd("attach", "-d", "-t", target)
 
 	cmd.Stdin = stdin
 	cmd.Stdout = stdout
@@ -70,7 +92,7 @@ func (tmux Tmux) Attach(target string, stdin *os.File, stdout *os.File, stderr *
 }
 
 func (tmux Tmux) RenumberWindows(target string) error {
-	cmd := exec.Command("tmux", "move-window", "-r", "-s", target, "-t", target)
+	cmd := tmux.cmd("move-window", "-r", "-s", target, "-t", target)
 	_, err := tmux.commander.Exec(cmd)
 	return err
 }
@@ -87,7 +109,7 @@ func (tmux Tmux) SplitWindow(target string, splitType string, root string) (stri
 
 	args = append(args, []string{"-t", target, "-c", root, "-F", "#{pane_id}"}...)
 
-	cmd := exec.Command("tmux", args...)
+	cmd := tmux.cmd(args...)
 
 	pane, err := tmux.commander.Exec(cmd)
 	if err != nil {
@@ -98,28 +120,28 @@ func (tmux Tmux) SplitWindow(target string, splitType string, root string) (stri
 }
 
 func (tmux Tmux) SelectLayout(target string, layoutType string) (string, error) {
-	cmd := exec.Command("tmux", "select-layout", "-t", target, layoutType)
+	cmd := tmux.cmd("select-layout", "-t", target, layoutType)
 	return tmux.commander.Exec(cmd)
 }
 
 func (tmux Tmux) SetEnv(target string, key string, value string) (string, error) {
-	cmd := exec.Command("tmux", "setenv", "-t", target, key, value)
+	cmd := tmux.cmd("setenv", "-t", target, key, value)
 	return tmux.commander.Exec(cmd)
 }
 
 func (tmux Tmux) StopSession(target string) (string, error) {
-	cmd := exec.Command("tmux", "kill-session", "-t", target)
+	cmd := tmux.cmd("kill-session", "-t", target)
 	return tmux.commander.Exec(cmd)
 }
 
 func (tmux Tmux) SwitchClient(target string) error {
-	cmd := exec.Command("tmux", "switch-client", "-t", target)
+	cmd := tmux.cmd("switch-client", "-t", target)
 	return tmux.commander.ExecSilently(cmd)
 }
 
 func (tmux Tmux) SessionName() (string, error) {
 
-	cmd := exec.Command("tmux", "display-message", "-p", "#S")
+	cmd := tmux.cmd("display-message", "-p", "#S")
 	sessionName, err := tmux.commander.Exec(cmd)
 
 	if err != nil {
@@ -132,7 +154,7 @@ func (tmux Tmux) SessionName() (string, error) {
 func (tmux Tmux) ListWindows(target string) ([]TmuxWindow, error) {
 	var windows []TmuxWindow
 
-	cmd := exec.Command("tmux", "list-windows", "-F", "#{window_id};#{window_name};#{window_layout};#{pane_current_path}", "-t", target)
+	cmd := tmux.cmd("list-windows", "-F", "#{window_id};#{window_name};#{window_layout};#{pane_current_path}", "-t", target)
 	out, err := tmux.commander.Exec(cmd)
 	if err != nil {
 		return windows, err
@@ -158,7 +180,7 @@ func (tmux Tmux) ListWindows(target string) ([]TmuxWindow, error) {
 func (tmux Tmux) ListPanes(target string) ([]TmuxPane, error) {
 	var panes []TmuxPane
 
-	cmd := exec.Command("tmux", "list-panes", "-F", "#{pane_current_path}", "-t", target)
+	cmd := tmux.cmd("list-panes", "-F", "#{pane_current_path}", "-t", target)
 
 	out, err := tmux.commander.Exec(cmd)
 	if err != nil {

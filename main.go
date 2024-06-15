@@ -85,7 +85,7 @@ func main() {
 	}
 
 	commander := DefaultCommander{logger}
-	tmux := Tmux{commander}
+	tmux := Tmux{commander, &TmuxOptions{}}
 	smug := Smug{tmux, commander}
 	context := CreateContext()
 
@@ -119,7 +119,7 @@ func main() {
 		} else {
 			fmt.Println("Starting new windows...")
 		}
-		config, err := GetConfig(configPath, options.Settings)
+		config, err := GetConfig(configPath, options.Settings, smug.tmux.TmuxOptions)
 		if err != nil {
 			fmt.Fprint(os.Stderr, err.Error())
 			os.Exit(1)
@@ -140,7 +140,7 @@ func main() {
 		} else {
 			fmt.Println("Killing windows...")
 		}
-		config, err := GetConfig(configPath, options.Settings)
+		config, err := GetConfig(configPath, options.Settings, smug.tmux.TmuxOptions)
 		if err != nil {
 			fmt.Fprint(os.Stderr, err.Error())
 			os.Exit(1)
