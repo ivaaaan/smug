@@ -2,7 +2,6 @@ package main
 
 import (
 	"fmt"
-	"io/ioutil"
 	"os"
 	"os/exec"
 	"path"
@@ -65,7 +64,7 @@ func EditConfig(path string) error {
 }
 
 func GetConfig(path string, settings map[string]string) (*Config, error) {
-	f, err := ioutil.ReadFile(path)
+	f, err := os.ReadFile(path)
 	if err != nil {
 		return nil, err
 	}
@@ -110,7 +109,7 @@ func ParseConfig(data string, settings map[string]string) (Config, error) {
 
 func ListConfigs(dir string) ([]string, error) {
 	var result []string
-	files, err := ioutil.ReadDir(dir)
+	files, err := os.ReadDir(dir)
 
 	if err != nil {
 		return result, err
