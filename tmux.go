@@ -23,6 +23,9 @@ type TmuxOptions struct {
 
 	// Default socket path, overrides SocketName
 	SocketPath string `yaml:"socket_path"`
+
+	// tmux config file
+	ConfigFile string `yaml:"config_file"`
 }
 
 type Tmux struct {
@@ -48,6 +51,11 @@ func (tmux Tmux) cmd(args ...string) *exec.Cmd {
 	} else if tmux.SocketName != "" {
 		tmuxCmd = append(tmuxCmd, "-L", tmux.SocketName)
 	} 
+
+	if tmux.ConfigFile != "" {
+		tmuxCmd = append(tmuxCmd, "-f", tmux.ConfigFile)
+	}
+
 	tmuxCmd = append(tmuxCmd, args...)
 
 	return exec.Command(tmuxCmd[0], tmuxCmd[1:]...)

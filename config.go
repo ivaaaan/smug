@@ -2,9 +2,12 @@ package main
 
 import (
 	"fmt"
+	"log"
 	"os"
 	"os/exec"
+	"os/user"
 	"path"
+	"path/filepath"
 	"strings"
 
 	"gopkg.in/yaml.v2"
@@ -67,6 +70,19 @@ func EditConfig(path string) error {
 func setTmuxOptions(tmuxOpts *TmuxOptions, c Config) {
 	tmuxOpts.SocketName = c.SocketName
 	tmuxOpts.SocketPath = c.SocketPath
+
+	if c.ConfigFile != "" {
+		usr, err := user.Current()
+		if err != nil {
+			log.Fatalf("cannot expand user home dir: %s",  err)
+		}
+		path := c.ConfigFile
+		if strings.HasPrefix(path,"~") {
+			path = filepath.Join(usr.HomeDir, path[1:])
+		}
+
+		tmuxOpts.ConfigFile = path
+	}
 }
 
 func GetConfig(path string, settings map[string]string, tmuxOpts *TmuxOptions) (*Config, error) {

@@ -12,7 +12,8 @@ session: ${session}
 sendkeys_timeout: 200
 tmux_options:
     socket_name: foo
-    socket_path: /foo/bar
+    socket_path: /path/to/socket
+    config_file: /path/to/tmux_config
 windows:
   - layout: tiled
     commands:
@@ -36,7 +37,8 @@ windows:
 		Env:             make(map[string]string),
 		TmuxOptions: TmuxOptions{
 			SocketName: "foo",
-			SocketPath: "/foo/bar",
+			SocketPath: "/path/to/socket",
+			ConfigFile: "/path/to/tmux_config",
 		},
 		Windows: []Window{
 			{
