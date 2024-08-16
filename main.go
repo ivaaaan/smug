@@ -84,7 +84,7 @@ func main() {
 	}
 
 	commander := DefaultCommander{logger}
-	tmux := Tmux{commander}
+	tmux := Tmux{commander, &TmuxOptions{}}
 	smug := Smug{tmux, commander}
 	context := CreateContext()
 
@@ -93,9 +93,12 @@ func main() {
 		configPath = options.Config
 	} else if options.Project != "" {
 		config, err := FindConfig(userConfigDir, options.Project)
-		if err != nil {
+		if err != nil && options.Command != CommandNew {
 			fmt.Fprintln(os.Stderr, err.Error())
 			os.Exit(1)
+		}
+		if options.Command == CommandNew {
+			config = fmt.Sprintf("%s.yml", options.Project)
 		}
 		configPath = filepath.Join(userConfigDir, config)
 	} else {
@@ -114,7 +117,8 @@ func main() {
 		} else {
 			fmt.Println("Starting new windows...")
 		}
-		config, err := GetConfig(configPath, options.Settings)
+
+		config, err := GetConfig(configPath, options.Settings, smug.tmux.TmuxOptions)
 		if err != nil {
 			fmt.Fprint(os.Stderr, err.Error())
 			os.Exit(1)
@@ -132,7 +136,7 @@ func main() {
 		} else {
 			fmt.Println("Killing windows...")
 		}
-		config, err := GetConfig(configPath, options.Settings)
+		config, err := GetConfig(configPath, options.Settings, smug.tmux.TmuxOptions)
 		if err != nil {
 			fmt.Fprint(os.Stderr, err.Error())
 			os.Exit(1)

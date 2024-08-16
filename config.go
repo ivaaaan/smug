@@ -2,10 +2,12 @@ package main
 
 import (
 	"fmt"
-	"io/ioutil"
+	"log"
 	"os"
 	"os/exec"
+	"os/user"
 	"path"
+	"path/filepath"
 	"strings"
 
 	"gopkg.in/yaml.v2"
@@ -36,8 +38,9 @@ type Window struct {
 }
 
 type Config struct {
-	SendKeysTimeout int               `yaml:"sendkeys_timeout"`
-	Session         string            `yaml:"session"`
+	SendKeysTimeout int    `yaml:"sendkeys_timeout"`
+	Session         string `yaml:"session"`
+	TmuxOptions     `yaml:"tmux_options"`
 	Env             map[string]string `yaml:"env"`
 	Root            string            `yaml:"root"`
 	BeforeStart     []string          `yaml:"before_start"`
@@ -64,8 +67,26 @@ func EditConfig(path string) error {
 	return cmd.Run()
 }
 
-func GetConfig(path string, settings map[string]string) (*Config, error) {
-	f, err := ioutil.ReadFile(path)
+func setTmuxOptions(tmuxOpts *TmuxOptions, c Config) {
+	tmuxOpts.SocketName = c.SocketName
+	tmuxOpts.SocketPath = c.SocketPath
+
+	if c.ConfigFile != "" {
+		usr, err := user.Current()
+		if err != nil {
+			log.Fatalf("cannot expand user home dir: %s",  err)
+		}
+		path := c.ConfigFile
+		if strings.HasPrefix(path,"~") {
+			path = filepath.Join(usr.HomeDir, path[1:])
+		}
+
+		tmuxOpts.ConfigFile = path
+	}
+}
+
+func GetConfig(path string, settings map[string]string, tmuxOpts *TmuxOptions) (*Config, error) {
+	f, err := os.ReadFile(path)
 	if err != nil {
 		return nil, err
 	}
@@ -78,6 +99,7 @@ func GetConfig(path string, settings map[string]string) (*Config, error) {
 	}
 
 	addDefaultEnvs(&c, path)
+	setTmuxOptions(tmuxOpts, c)
 
 	return &c, err
 
@@ -110,7 +132,7 @@ func ParseConfig(data string, settings map[string]string) (Config, error) {
 
 func ListConfigs(dir string) ([]string, error) {
 	var result []string
-	files, err := ioutil.ReadDir(dir)
+	files, err := os.ReadDir(dir)
 
 	if err != nil {
 		return result, err

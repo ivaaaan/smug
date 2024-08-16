@@ -292,7 +292,7 @@ func TestStartStopSession(t *testing.T) {
 
 		t.Run("start session: "+testDescription, func(t *testing.T) {
 			commander := &MockCommander{[]string{}, params.commanderOutputs}
-			tmux := Tmux{commander}
+			tmux := Tmux{commander, &TmuxOptions{}}
 			smug := Smug{tmux, commander}
 
 			err := smug.Start(params.config, params.options, params.context)
@@ -307,7 +307,7 @@ func TestStartStopSession(t *testing.T) {
 
 		t.Run("stop session: "+testDescription, func(t *testing.T) {
 			commander := &MockCommander{[]string{}, params.commanderOutputs}
-			tmux := Tmux{commander}
+			tmux := Tmux{commander, &TmuxOptions{}}
 			smug := Smug{tmux, commander}
 
 			err := smug.Stop(params.config, params.options, params.context)
@@ -346,7 +346,7 @@ func TestPrintCurrentSession(t *testing.T) {
 		"id1;win1;layout;root",
 		"root\n/tmp",
 	}}
-	tmux := Tmux{commander}
+	tmux := Tmux{commander, &TmuxOptions{}}
 
 	smug := Smug{tmux, commander}
 

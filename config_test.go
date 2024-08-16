@@ -10,6 +10,10 @@ func TestParseConfig(t *testing.T) {
 	yaml := `
 session: ${session}
 sendkeys_timeout: 200
+tmux_options:
+    socket_name: foo
+    socket_path: /path/to/socket
+    config_file: /path/to/tmux_config
 windows:
   - layout: tiled
     commands:
@@ -31,6 +35,11 @@ windows:
 		Session:         "test",
 		SendKeysTimeout: 200,
 		Env:             make(map[string]string),
+		TmuxOptions: TmuxOptions{
+			SocketName: "foo",
+			SocketPath: "/path/to/socket",
+			ConfigFile: "/path/to/tmux_config",
+		},
 		Windows: []Window{
 			{
 				Layout:   "tiled",
