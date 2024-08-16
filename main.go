@@ -9,7 +9,6 @@ import (
 	"path/filepath"
 	"strings"
 
-	"github.com/kr/pretty"
 	"gopkg.in/yaml.v2"
 )
 
@@ -111,7 +110,6 @@ func main() {
 		configPath = filepath.Join(path, defaultConfigFile)
 	}
 
-
 	switch options.Command {
 	case CommandStart:
 		if len(options.Windows) == 0 {
@@ -119,13 +117,11 @@ func main() {
 		} else {
 			fmt.Println("Starting new windows...")
 		}
+
 		config, err := GetConfig(configPath, options.Settings, smug.tmux.TmuxOptions)
 		if err != nil {
 			fmt.Fprint(os.Stderr, err.Error())
 			os.Exit(1)
-		}
-		if options.Debug {
-			pretty.Println(config)
 		}
 
 		err = smug.Start(config, options, context)
