@@ -1,3 +1,4 @@
+version: 2
 project_name: smug
 
 before:
@@ -6,26 +7,53 @@ before:
 builds:
   - env:
       - CGO_ENABLED=0
-    ldflags:
-     - "-X=main.version={{.Env.VERSION}}"
     goos:
       - linux
       - windows
       - darwin
 archives:
-  - replacements:
-      darwin: Darwin
-      linux: Linux
-      windows: Windows
-      386: i386
-      amd64: x86_64
+  - format: tar.gz
+    # this name template makes the OS and Arch compatible with the results of `uname`.
+    name_template: >-
+      "Bitbucket CLI {{  .Version }}"_
+      {{- title .Os }}_
+      {{- if eq .Arch "amd64" }}x86_64
+      {{- else if eq .Arch "386" }}i386
+      {{- else }}{{ .Arch }}{{ end }}
+      {{- if .Arm }}v{{ .Arm }}{{ end }}
+    # use zip for windows archives
+    format_overrides:
+      - goos: windows
+        format: zip
+
 checksum:
   name_template: 'checksums.txt'
 snapshot:
-  name_template: "{{ .Tag }}-next"
+  version_template: "{{ .Tag }}-next"
 changelog:
   sort: asc
   filters:
     exclude:
       - test
       - README
+
+nfpms:
+  - license: MIT
+    maintainer: 'Ivaaaan hello@iillexial.me'
+    homepage: https://github.com/ivaaaan/smug
+    dependencies:
+      - git
+    description: Bitbucket client command line tool.
+    formats:
+      - deb
+      - rpm
+    contents:
+      - src: ./completion/smug.bash
+        dst: /usr/share/bash-completion/completions/smug
+        file_info:
+          mode: 0644
+      - src: ./completion/smug.fish
+        dst: /usr/share/fish/vendor_completions.d/smug.fish
+        file_info:
+          mode: 0644
+
