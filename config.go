@@ -74,10 +74,10 @@ func setTmuxOptions(tmuxOpts *TmuxOptions, c Config) {
 	if c.ConfigFile != "" {
 		usr, err := user.Current()
 		if err != nil {
-			log.Fatalf("cannot expand user home dir: %s",  err)
+			log.Fatalf("cannot expand user home dir: %s", err)
 		}
 		path := c.ConfigFile
-		if strings.HasPrefix(path,"~") {
+		if strings.HasPrefix(path, "~") {
 			path = filepath.Join(usr.HomeDir, path[1:])
 		}
 
@@ -163,4 +163,38 @@ func FindConfig(dir, project string) (string, error) {
 	}
 
 	return "", ConfigNotFoundError{Project: project}
+}
+func FindConfigs(dir, project string) ([]string, error) {
+	isDir, _ := isDirectory(dir + "/" + project)
+
+	if isDir {
+		return ListConfigs(dir + "/" + project)
+	}
+
+	configs, err := ListConfigs(dir)
+	if err != nil {
+		return configs, err
+	}
+	
+	if len(configs) == 0 {
+		return configs, ConfigNotFoundError{Project: project}
+	}
+
+	for _, config := range configs {
+		fileExt := path.Ext(config)
+		if strings.TrimSuffix(config, fileExt) == project {
+			return []string{dir+"/"+config}, nil
+		}
+	}
+
+	return configs, ConfigNotFoundError{Project: project}
+}
+
+func isDirectory(path string) (bool, error) {
+
+	fileInfo, err := os.Stat(path)
+	if os.IsNotExist(err) {
+		return false, err
+	}
+	return fileInfo.IsDir(), err
 }
