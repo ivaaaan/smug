@@ -168,14 +168,21 @@ func FindConfigs(dir, project string) ([]string, error) {
 	isDir, _ := isDirectory(dir + "/" + project)
 
 	if isDir {
-		return ListConfigs(dir + "/" + project)
+		configs, err := ListConfigs(dir + "/" + project)
+		if err != nil {
+			return configs, err
+		}
+		for configIndex, configName := range configs {
+			configs[configIndex] = dir + "/" + project + "/" + configName
+		}
+		return configs, err
 	}
 
 	configs, err := ListConfigs(dir)
 	if err != nil {
 		return configs, err
 	}
-	
+
 	if len(configs) == 0 {
 		return configs, ConfigNotFoundError{Project: project}
 	}
@@ -183,7 +190,7 @@ func FindConfigs(dir, project string) ([]string, error) {
 	for _, config := range configs {
 		fileExt := path.Ext(config)
 		if strings.TrimSuffix(config, fileExt) == project {
-			return []string{dir+"/"+config}, nil
+			return []string{dir + "/" + config}, nil
 		}
 	}
 
