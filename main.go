@@ -169,7 +169,7 @@ func main() {
 			os.Exit(1)
 		}
 	case CommandList:
-		configs, err := ListConfigs(userConfigDir)
+		configs, err := ListConfigs(userConfigDir, true)
 		if err != nil {
 			fmt.Fprint(os.Stderr, err.Error())
 			os.Exit(1)
@@ -178,6 +178,24 @@ func main() {
 		for _, config := range configs {
 			fileExt := path.Ext(config)
 			fmt.Println(strings.TrimSuffix(config, fileExt))
+			isDir, err := IsDirectory(userConfigDir+"/"+config)
+			if err != nil {
+				continue
+			}
+			if isDir {
+
+				subConfigs, err := ListConfigs(userConfigDir+"/"+config, false)
+				if err != nil {
+					fmt.Fprint(os.Stderr, err.Error())
+					os.Exit(1)
+				}
+				for _, subConfig := range subConfigs {
+					fileExt := path.Ext(subConfig)
+					fmt.Println("|--"+strings.TrimSuffix(subConfig, fileExt))
+				}
+
+			}
+
 		}
 
 	case CommandPrint:
