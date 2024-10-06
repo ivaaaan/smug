@@ -92,8 +92,10 @@ func main() {
 	if options.Config != "" {
 		configPath = options.Config
 	} else if options.Project != "" {
+
 		config, err := FindConfig(userConfigDir, options.Project)
-		if err != nil && options.Command != CommandNew {
+
+		if err != nil && options.Command != CommandNew && options.Command != CommandStart && options.Command != CommandStop {
 			fmt.Fprintln(os.Stderr, err.Error())
 			os.Exit(1)
 		}
@@ -117,18 +119,24 @@ func main() {
 		} else {
 			fmt.Println("Starting new windows...")
 		}
-
-		config, err := GetConfig(configPath, options.Settings, smug.tmux.TmuxOptions)
+		configs, err := FindConfigs(userConfigDir, options.Project)
 		if err != nil {
 			fmt.Fprint(os.Stderr, err.Error())
 			os.Exit(1)
 		}
-
-		err = smug.Start(config, options, context)
-		if err != nil {
-			fmt.Println("Oops, an error occurred! Rolling back...")
-			smug.Stop(config, options, context)
-			os.Exit(1)
+		for configIndex, configPath := range configs {
+			config, err := GetConfig(configPath, options.Settings, smug.tmux.TmuxOptions)
+			if err != nil {
+				fmt.Fprint(os.Stderr, err.Error())
+				os.Exit(1)
+			}
+			options.Detach = configIndex != len(configs)-1
+			err = smug.Start(config, options, context)
+			if err != nil {
+				fmt.Println("Oops, an error occurred! Rolling back...")
+				smug.Stop(config, options, context)
+				os.Exit(1)
+			}
 		}
 	case CommandStop:
 		if len(options.Windows) == 0 {
@@ -136,16 +144,23 @@ func main() {
 		} else {
 			fmt.Println("Killing windows...")
 		}
-		config, err := GetConfig(configPath, options.Settings, smug.tmux.TmuxOptions)
+		configs, err := FindConfigs(userConfigDir, options.Project)
 		if err != nil {
 			fmt.Fprint(os.Stderr, err.Error())
 			os.Exit(1)
 		}
+		for _, configPath := range configs {
+			config, err := GetConfig(configPath, options.Settings, smug.tmux.TmuxOptions)
+			if err != nil {
+				fmt.Fprint(os.Stderr, err.Error())
+				os.Exit(1)
+			}
 
-		err = smug.Stop(config, options, context)
-		if err != nil {
-			fmt.Fprint(os.Stderr, err.Error())
-			os.Exit(1)
+			err = smug.Stop(config, options, context)
+			if err != nil {
+				fmt.Fprint(os.Stderr, err.Error())
+				os.Exit(1)
+			}
 		}
 	case CommandNew, CommandEdit:
 		err := EditConfig(configPath)
@@ -154,7 +169,7 @@ func main() {
 			os.Exit(1)
 		}
 	case CommandList:
-		configs, err := ListConfigs(userConfigDir)
+		configs, err := ListConfigs(userConfigDir, true)
 		if err != nil {
 			fmt.Fprint(os.Stderr, err.Error())
 			os.Exit(1)
@@ -163,6 +178,24 @@ func main() {
 		for _, config := range configs {
 			fileExt := path.Ext(config)
 			fmt.Println(strings.TrimSuffix(config, fileExt))
+			isDir, err := IsDirectory(userConfigDir+"/"+config)
+			if err != nil {
+				continue
+			}
+			if isDir {
+
+				subConfigs, err := ListConfigs(userConfigDir+"/"+config, false)
+				if err != nil {
+					fmt.Fprint(os.Stderr, err.Error())
+					os.Exit(1)
+				}
+				for _, subConfig := range subConfigs {
+					fileExt := path.Ext(subConfig)
+					fmt.Println("|--"+strings.TrimSuffix(subConfig, fileExt))
+				}
+
+			}
+
 		}
 
 	case CommandPrint:
