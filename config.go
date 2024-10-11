@@ -74,10 +74,10 @@ func setTmuxOptions(tmuxOpts *TmuxOptions, c Config) {
 	if c.ConfigFile != "" {
 		usr, err := user.Current()
 		if err != nil {
-			log.Fatalf("cannot expand user home dir: %s",  err)
+			log.Fatalf("cannot expand user home dir: %s", err)
 		}
 		path := c.ConfigFile
-		if strings.HasPrefix(path,"~") {
+		if strings.HasPrefix(path, "~") {
 			path = filepath.Join(usr.HomeDir, path[1:])
 		}
 
@@ -130,7 +130,7 @@ func ParseConfig(data string, settings map[string]string) (Config, error) {
 	return c, nil
 }
 
-func ListConfigs(dir string) ([]string, error) {
+func ListConfigs(dir string, includeDirs bool) ([]string, error) {
 	var result []string
 	files, err := os.ReadDir(dir)
 
@@ -140,7 +140,12 @@ func ListConfigs(dir string) ([]string, error) {
 
 	for _, file := range files {
 		fileExt := path.Ext(file.Name())
-		if fileExt != ".yml" && fileExt != ".yaml" {
+		dirCheck := true
+		if includeDirs {
+			dirCheck = !file.IsDir()
+		}
+		if fileExt != ".yml" && fileExt != ".yaml" && dirCheck {
+
 			continue
 		}
 		result = append(result, file.Name())
@@ -150,7 +155,7 @@ func ListConfigs(dir string) ([]string, error) {
 }
 
 func FindConfig(dir, project string) (string, error) {
-	configs, err := ListConfigs(dir)
+	configs, err := ListConfigs(dir, false)
 	if err != nil {
 		return "", err
 	}
@@ -163,4 +168,45 @@ func FindConfig(dir, project string) (string, error) {
 	}
 
 	return "", ConfigNotFoundError{Project: project}
+}
+func FindConfigs(dir, project string) ([]string, error) {
+	isDir, _ := IsDirectory(dir + "/" + project)
+
+	if isDir {
+		configs, err := ListConfigs(dir+"/"+project, false)
+		if err != nil {
+			return configs, err
+		}
+		for configIndex, configName := range configs {
+			configs[configIndex] = dir + "/" + project + "/" + configName
+		}
+		return configs, err
+	}
+
+	configs, err := ListConfigs(dir, false)
+	if err != nil {
+		return configs, err
+	}
+
+	if len(configs) == 0 {
+		return configs, ConfigNotFoundError{Project: project}
+	}
+
+	for _, config := range configs {
+		fileExt := path.Ext(config)
+		if strings.TrimSuffix(config, fileExt) == project {
+			return []string{dir + "/" + config}, nil
+		}
+	}
+
+	return configs, ConfigNotFoundError{Project: project}
+}
+
+func IsDirectory(path string) (bool, error) {
+
+	fileInfo, err := os.Stat(path)
+	if os.IsNotExist(err) {
+		return false, err
+	}
+	return fileInfo.IsDir(), err
 }
