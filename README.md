@@ -23,7 +23,7 @@ mkdir smug && tar -xzf smug_0.1.0_Darwin_x86_64.tar.gz -C ./smug && sudo mv smug
 
 Don't forget to replace `smug_0.1.0_Darwin_x86_64.tar.gz` with the archive that you've downloaded.
 
-### Git
+### Go (recommended)
 
 #### Prerequisite Tools
 
@@ -35,10 +35,7 @@ Don't forget to replace `smug_0.1.0_Darwin_x86_64.tar.gz` with the archive that 
 The easiest way is to clone Smug from GitHub and install it using `go-cli`:
 
 ```bash
-cd /tmp
-git clone https://github.com/ivaaaan/smug.git
-cd smug
-go install
+go install github.com/ivaaaan/smug@latest
 ```
 
 ### macOS
