@@ -83,8 +83,10 @@ type Options struct {
 	InsideCurrentSession bool
 }
 
-var ErrHelp = errors.New("help requested")
-var ErrCommandNotFound = errors.New("command not found")
+var (
+	ErrHelp            = errors.New("help requested")
+	ErrCommandNotFound = errors.New("command not found")
+)
 
 const (
 	WindowsUsage              = "List of windows to start. If session exists, those windows will be attached to current session"

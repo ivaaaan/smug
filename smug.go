@@ -168,7 +168,6 @@ func (smug Smug) Start(config *Config, options *Options, context Context) error 
 			}
 
 			newPane, err := smug.tmux.SplitWindow(window, p.Type, paneRoot)
-
 			if err != nil {
 				return err
 			}
