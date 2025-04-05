@@ -102,7 +102,6 @@ func GetConfig(path string, settings map[string]string, tmuxOpts *TmuxOptions) (
 	setTmuxOptions(tmuxOpts, c)
 
 	return &c, err
-
 }
 
 func ParseConfig(data string, settings map[string]string) (Config, error) {
@@ -133,7 +132,6 @@ func ParseConfig(data string, settings map[string]string) (Config, error) {
 func ListConfigs(dir string, includeDirs bool) ([]string, error) {
 	var result []string
 	files, err := os.ReadDir(dir)
-
 	if err != nil {
 		return result, err
 	}
@@ -145,7 +143,6 @@ func ListConfigs(dir string, includeDirs bool) ([]string, error) {
 			dirCheck = !file.IsDir()
 		}
 		if fileExt != ".yml" && fileExt != ".yaml" && dirCheck {
-
 			continue
 		}
 		result = append(result, file.Name())
@@ -169,6 +166,7 @@ func FindConfig(dir, project string) (string, error) {
 
 	return "", ConfigNotFoundError{Project: project}
 }
+
 func FindConfigs(dir, project string) ([]string, error) {
 	isDir, _ := IsDirectory(dir + "/" + project)
 
@@ -177,19 +175,21 @@ func FindConfigs(dir, project string) ([]string, error) {
 		if err != nil {
 			return configs, err
 		}
+
 		for configIndex, configName := range configs {
 			configs[configIndex] = dir + "/" + project + "/" + configName
 		}
-		return configs, err
+
+		return nil, err
 	}
 
 	configs, err := ListConfigs(dir, false)
 	if err != nil {
-		return configs, err
+		return nil, fmt.Errorf("list configs %w", err)
 	}
 
 	if len(configs) == 0 {
-		return configs, ConfigNotFoundError{Project: project}
+		return nil, ConfigNotFoundError{Project: project}
 	}
 
 	for _, config := range configs {
@@ -199,11 +199,10 @@ func FindConfigs(dir, project string) ([]string, error) {
 		}
 	}
 
-	return configs, ConfigNotFoundError{Project: project}
+	return nil, ConfigNotFoundError{Project: project}
 }
 
 func IsDirectory(path string) (bool, error) {
-
 	fileInfo, err := os.Stat(path)
 	if os.IsNotExist(err) {
 		return false, err
