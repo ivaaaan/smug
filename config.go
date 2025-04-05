@@ -28,6 +28,7 @@ type Pane struct {
 }
 
 type Window struct {
+	Selected    bool     `yaml:"selected"`
 	Name        string   `yaml:"name"`
 	Root        string   `yaml:"root,omitempty"`
 	BeforeStart []string `yaml:"before_start"`
