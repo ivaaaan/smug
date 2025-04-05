@@ -17,7 +17,6 @@ const (
 )
 
 type TmuxOptions struct {
-
 	// Default socket name
 	SocketName string `yaml:"socket_name"`
 
@@ -50,7 +49,7 @@ func (tmux Tmux) cmd(args ...string) *exec.Cmd {
 		tmuxCmd = append(tmuxCmd, "-S", tmux.SocketPath)
 	} else if tmux.SocketName != "" {
 		tmuxCmd = append(tmuxCmd, "-L", tmux.SocketName)
-	} 
+	}
 
 	if tmux.ConfigFile != "" {
 		tmuxCmd = append(tmuxCmd, "-f", tmux.ConfigFile)
@@ -148,10 +147,8 @@ func (tmux Tmux) SwitchClient(target string) error {
 }
 
 func (tmux Tmux) SessionName() (string, error) {
-
 	cmd := tmux.cmd("display-message", "-p", "#S")
 	sessionName, err := tmux.commander.Exec(cmd)
-
 	if err != nil {
 		return sessionName, err
 	}
@@ -182,7 +179,6 @@ func (tmux Tmux) ListWindows(target string) ([]TmuxWindow, error) {
 	}
 
 	return windows, nil
-
 }
 
 func (tmux Tmux) ListPanes(target string) ([]TmuxPane, error) {

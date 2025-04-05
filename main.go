@@ -87,6 +87,7 @@ func main() {
 	tmux := Tmux{commander, &TmuxOptions{}}
 	smug := Smug{tmux, commander}
 	context := CreateContext()
+	configs := []string{}
 
 	var configPath string
 	if options.Config != "" {
@@ -102,14 +103,18 @@ func main() {
 		if options.Command == CommandNew {
 			config = fmt.Sprintf("%s.yml", options.Project)
 		}
+
 		configPath = filepath.Join(userConfigDir, config)
+		configs = append(configs, configPath)
 	} else {
 		path, err := os.Getwd()
 		if err != nil {
 			fmt.Fprintln(os.Stderr, err.Error())
 			os.Exit(1)
 		}
+
 		configPath = filepath.Join(path, defaultConfigFile)
+		configs = append(configs, configPath)
 	}
 
 	switch options.Command {
@@ -119,18 +124,26 @@ func main() {
 		} else {
 			fmt.Println("Starting new windows...")
 		}
-		configs, err := FindConfigs(userConfigDir, options.Project)
-		if err != nil {
-			fmt.Fprint(os.Stderr, err.Error())
-			os.Exit(1)
+    
+		if options.Project != "" {
+			projectConfigs, err := FindConfigs(userConfigDir, options.Project)
+			if err != nil {
+				fmt.Fprint(os.Stderr, err.Error())
+				os.Exit(1)
+			}
+
+			configs = append(configs, projectConfigs...)
 		}
+
 		for configIndex, configPath := range configs {
 			config, err := GetConfig(configPath, options.Settings, smug.tmux.TmuxOptions)
 			if err != nil {
 				fmt.Fprint(os.Stderr, err.Error())
 				os.Exit(1)
 			}
+
 			options.Detach = configIndex != len(configs)-1
+
 			err = smug.Start(config, options, context)
 			if err != nil {
 				fmt.Println("Oops, an error occurred! Rolling back...")
@@ -178,7 +191,7 @@ func main() {
 		for _, config := range configs {
 			fileExt := path.Ext(config)
 			fmt.Println(strings.TrimSuffix(config, fileExt))
-			isDir, err := IsDirectory(userConfigDir+"/"+config)
+			isDir, err := IsDirectory(userConfigDir + "/" + config)
 			if err != nil {
 				continue
 			}
@@ -191,7 +204,7 @@ func main() {
 				}
 				for _, subConfig := range subConfigs {
 					fileExt := path.Ext(subConfig)
-					fmt.Println("|--"+strings.TrimSuffix(subConfig, fileExt))
+					fmt.Println("|--" + strings.TrimSuffix(subConfig, fileExt))
 				}
 
 			}

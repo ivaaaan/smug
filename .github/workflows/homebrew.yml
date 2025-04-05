@@ -11,7 +11,7 @@ jobs:
       - name: Update Homebrew formulae
         uses: dawidd6/action-homebrew-bump-formula@master
         with:
-          token: "${{ secrets.TOKEN }}"
+          token: "${{ secrets.GITHUB_TOKEN }}"
           formula: smug
           force: true
           livecheck: false
