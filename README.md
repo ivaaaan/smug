@@ -210,6 +210,7 @@ stop:
 
 windows:
   - name: code
+    selected: true # Selects this window at the start of the session
     layout: main-horizontal
     commands:
       - $EDITOR app/dependencies.php

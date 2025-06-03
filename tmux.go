@@ -77,6 +77,12 @@ func (tmux Tmux) KillWindow(target string) error {
 	return err
 }
 
+func (tmux Tmux) SelectWindow(target string) error {
+	cmd := tmux.cmd("select-window", "-t", target)
+	_, err := tmux.commander.Exec(cmd)
+	return err
+}
+
 func (tmux Tmux) NewWindow(target string, name string, root string) (string, error) {
 	cmd := tmux.cmd("neww", "-Pd", "-t", target, "-c", root, "-F", "#{window_id}", "-n", name)
 

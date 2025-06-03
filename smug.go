@@ -137,12 +137,15 @@ func (smug Smug) Start(config *Config, options *Options, context Context) error 
 	} else if len(windows) == 0 && !createWindowsInsideCurrSession {
 		return smug.switchOrAttach(sessionName, attach, context.InsideTmuxSession)
 	}
-
+	currentWindowName := ""
 	for _, w := range config.Windows {
 		if (len(windows) == 0 && w.Manual) || (len(windows) > 0 && !Contains(windows, w.Name)) {
 			continue
 		}
 
+		if w.Selected {
+			currentWindowName = w.Name
+		}
 		windowRoot := ExpandPath(w.Root)
 		if windowRoot == "" || !filepath.IsAbs(windowRoot) {
 			windowRoot = filepath.Join(sessionRoot, w.Root)
@@ -217,9 +220,16 @@ func (smug Smug) Start(config *Config, options *Options, context Context) error 
 			w = options.Windows[0]
 		}
 
-		return smug.switchOrAttach(sessionName+w, attach, context.InsideTmuxSession)
+		err := smug.switchOrAttach(sessionName+w, attach, context.InsideTmuxSession)
+		if err != nil && currentWindowName == "" {
+			return err
+		}
 	}
 
+	if currentWindowName != "" {
+		return smug.tmux.SelectWindow(sessionName + currentWindowName)
+
+	}
 	return nil
 }
 
