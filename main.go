@@ -92,6 +92,7 @@ func main() {
 	var configPath string
 	if options.Config != "" {
 		configPath = options.Config
+		configs = append(configs, configPath)
 	} else if options.Project != "" {
 
 		config, err := FindConfig(userConfigDir, options.Project)
