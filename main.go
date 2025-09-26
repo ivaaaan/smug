@@ -143,7 +143,7 @@ func main() {
 				os.Exit(1)
 			}
 
-			options.Detach = configIndex != len(configs)-1
+			options.Detach = options.Detach || (configIndex != len(configs)-1)
 
 			err = smug.Start(config, options, context)
 			if err != nil {
