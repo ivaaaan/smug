@@ -135,8 +135,13 @@ func (smug Smug) Start(config *Config, options *Options, context Context) error 
 			return err
 		}
 	} else if len(windows) == 0 && !createWindowsInsideCurrSession {
+		if options.Detach {
+			return nil
+		}
+
 		return smug.switchOrAttach(sessionName, attach, context.InsideTmuxSession)
 	}
+
 	currentWindowName := ""
 	for _, w := range config.Windows {
 		if (len(windows) == 0 && w.Manual) || (len(windows) > 0 && !Contains(windows, w.Name)) {
@@ -228,7 +233,6 @@ func (smug Smug) Start(config *Config, options *Options, context Context) error 
 
 	if currentWindowName != "" {
 		return smug.tmux.SelectWindow(sessionName + currentWindowName)
-
 	}
 	return nil
 }
