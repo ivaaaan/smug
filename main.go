@@ -7,6 +7,7 @@ import (
 	"os"
 	"path"
 	"path/filepath"
+	"slices"
 	"strings"
 
 	"gopkg.in/yaml.v2"
@@ -133,7 +134,13 @@ func main() {
 				os.Exit(1)
 			}
 
-			configs = append(configs, projectConfigs...)
+			for _, configPath := range projectConfigs {
+				if slices.Contains(configs, configPath) {
+					continue
+				}
+
+				configs = append(configs, configPath)
+			}
 		}
 
 		for configIndex, configPath := range configs {

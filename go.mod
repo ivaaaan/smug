@@ -1,6 +1,6 @@
 module github.com/ivaaaan/smug
 
-go 1.13
+go 1.25
 
 require (
 	github.com/spf13/pflag v1.0.5
