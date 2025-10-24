@@ -3,6 +3,7 @@ package main
 import (
 	"errors"
 	"os"
+	"slices"
 	"strings"
 
 	"github.com/spf13/pflag"
@@ -53,7 +54,7 @@ var Commands = commands{
 
 func (c *commands) Resolve(v string) (*command, error) {
 	for _, cmd := range *c {
-		if cmd.Name == v || Contains(cmd.Aliases, v) {
+		if cmd.Name == v || slices.Contains(cmd.Aliases, v) {
 			return &cmd, nil
 		}
 	}
