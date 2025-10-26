@@ -60,6 +60,31 @@ func newLogger(path string) *log.Logger {
 	return log.New(logFile, "", 0)
 }
 
+func getConfigs(options *Options, userConfigDir string) []string {
+	var configs []string
+	switch {
+	case options.Config != "":
+		configs = append(configs, options.Config)
+
+	case options.Project != "":
+		projectConfigs, err := FindConfigs(userConfigDir, options.Project)
+		if err != nil {
+			fmt.Fprint(os.Stderr, err.Error())
+			os.Exit(1)
+		}
+		configs = append(configs, projectConfigs...)
+	default:
+		cwd, err := os.Getwd()
+		if err != nil {
+			fmt.Fprintln(os.Stderr, err.Error())
+			os.Exit(1)
+		}
+		configs = append(configs, filepath.Join(cwd, defaultConfigFile))
+	}
+
+	return configs
+}
+
 func main() {
 	options, err := ParseOptions(os.Args[1:])
 	if errors.Is(err, ErrHelp) {
@@ -87,36 +112,8 @@ func main() {
 	tmux := Tmux{commander, &TmuxOptions{}}
 	smug := Smug{tmux, commander}
 	context := CreateContext()
-	configs := []string{}
 
-	var configPath string
-	if options.Config != "" {
-		configPath = options.Config
-		configs = append(configs, configPath)
-	} else if options.Project != "" {
-
-		config, err := FindConfig(userConfigDir, options.Project)
-
-		if err != nil && options.Command != CommandNew && options.Command != CommandStart && options.Command != CommandStop {
-			fmt.Fprintln(os.Stderr, err.Error())
-			os.Exit(1)
-		}
-		if options.Command == CommandNew {
-			config = fmt.Sprintf("%s.yml", options.Project)
-		}
-
-		configPath = filepath.Join(userConfigDir, config)
-		configs = append(configs, configPath)
-	} else {
-		path, err := os.Getwd()
-		if err != nil {
-			fmt.Fprintln(os.Stderr, err.Error())
-			os.Exit(1)
-		}
-
-		configPath = filepath.Join(path, defaultConfigFile)
-		configs = append(configs, configPath)
-	}
+	configs := getConfigs(options, userConfigDir)
 
 	switch options.Command {
 	case CommandStart:
@@ -124,16 +121,6 @@ func main() {
 			fmt.Println("Starting a new session...")
 		} else {
 			fmt.Println("Starting new windows...")
-		}
-
-		if options.Project != "" {
-			projectConfigs, err := FindConfigs(userConfigDir, options.Project)
-			if err != nil {
-				fmt.Fprint(os.Stderr, err.Error())
-				os.Exit(1)
-			}
-
-			configs = append(configs, projectConfigs...)
 		}
 
 		for configIndex, configPath := range configs {
@@ -158,11 +145,7 @@ func main() {
 		} else {
 			fmt.Println("Killing windows...")
 		}
-		configs, err := FindConfigs(userConfigDir, options.Project)
-		if err != nil {
-			fmt.Fprint(os.Stderr, err.Error())
-			os.Exit(1)
-		}
+
 		for _, configPath := range configs {
 			config, err := GetConfig(configPath, options.Settings, smug.tmux.TmuxOptions)
 			if err != nil {
@@ -177,7 +160,12 @@ func main() {
 			}
 		}
 	case CommandNew, CommandEdit:
-		err := EditConfig(configPath)
+		if len(configs) == 0 {
+			fmt.Fprint(os.Stderr, "Cannot edit or create multiple configurations at once")
+			os.Exit(1)
+		}
+
+		err := EditConfig(configs[0])
 		if err != nil {
 			fmt.Fprint(os.Stderr, err.Error())
 			os.Exit(1)

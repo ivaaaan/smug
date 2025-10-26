@@ -5,6 +5,7 @@ import (
 	"os"
 	"os/exec"
 	"path/filepath"
+	"slices"
 	"strings"
 	"time"
 )
@@ -22,16 +23,6 @@ func ExpandPath(path string) string {
 	}
 
 	return path
-}
-
-func Contains(slice []string, s string) bool {
-	for _, e := range slice {
-		if e == s {
-			return true
-		}
-	}
-
-	return false
 }
 
 type Smug struct {
@@ -135,11 +126,16 @@ func (smug Smug) Start(config *Config, options *Options, context Context) error 
 			return err
 		}
 	} else if len(windows) == 0 && !createWindowsInsideCurrSession {
+		if options.Detach {
+			return nil
+		}
+
 		return smug.switchOrAttach(sessionName, attach, context.InsideTmuxSession)
 	}
+
 	currentWindowName := ""
 	for _, w := range config.Windows {
-		if (len(windows) == 0 && w.Manual) || (len(windows) > 0 && !Contains(windows, w.Name)) {
+		if (len(windows) == 0 && w.Manual) || (len(windows) > 0 && !slices.Contains(windows, w.Name)) {
 			continue
 		}
 
@@ -228,7 +224,6 @@ func (smug Smug) Start(config *Config, options *Options, context Context) error 
 
 	if currentWindowName != "" {
 		return smug.tmux.SelectWindow(sessionName + currentWindowName)
-
 	}
 	return nil
 }
