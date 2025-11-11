@@ -3,6 +3,7 @@ package main
 import (
 	"errors"
 	"fmt"
+	"io/fs"
 	"log"
 	"os"
 	"path"
@@ -49,10 +50,14 @@ Examples:
 	$ smug print > ~/.config/smug/blog.yml
 `, version, FileUsage, WindowsUsage, AttachUsage, InsideCurrentSessionUsage, DebugUsage, DetachUsage)
 
-const defaultConfigFile = ".smug.yml"
+const (
+	defaultConfigFile = ".smug.yml"
+	defaultSourceDir  = "~/.config/smug"
+	logFile           = "smug.log"
+)
 
 func newLogger(path string) *log.Logger {
-	logFile, err := os.Create(filepath.Join(path, "smug.log"))
+	logFile, err := os.Create(filepath.Join(path, logFile))
 	if err != nil {
 		fmt.Fprintln(os.Stderr, err.Error())
 		os.Exit(1)
@@ -86,6 +91,17 @@ func getConfigs(options *Options, userConfigDir string) []string {
 }
 
 func main() {
+	userConfigDir := filepath.Join(ExpandPath("~/"), ".config/smug")
+
+	if err := initConfigDir(userConfigDir); err != nil {
+		fmt.Fprintf(
+			os.Stderr,
+			"Cannot initialize config dir at ~/.config/smug : %q",
+			err.Error(),
+		)
+		os.Exit(1)
+	}
+
 	options, err := ParseOptions(os.Args[1:])
 	if errors.Is(err, ErrHelp) {
 		fmt.Fprint(os.Stdout, usage)
@@ -100,8 +116,6 @@ func main() {
 		)
 		os.Exit(1)
 	}
-
-	userConfigDir := filepath.Join(ExpandPath("~/"), ".config/smug")
 
 	var logger *log.Logger
 	if options.Debug {
@@ -215,4 +229,40 @@ func main() {
 
 		fmt.Println(string(d))
 	}
+}
+
+func initConfigDir(path string) error {
+	//Create directory if not exist
+	if _, err := os.Stat(path); errors.Is(err, fs.ErrNotExist) {
+		if errMkdir := os.MkdirAll(path, os.ModeDir); errMkdir != nil {
+			return errMkdir
+		}
+	} else if err != nil {
+		return err
+	}
+
+	//Create all files if doesn't exist
+	files := []string{ //Add some config file here
+		logFile,
+	}
+
+	for _, file := range files {
+		filePath := filepath.Join(path, file)
+		if err := createFile(filePath); err != nil {
+			return err
+		}
+	}
+
+	return nil
+}
+
+func createFile(filePath string) error {
+	if _, err := os.Stat(filePath); errors.Is(err, fs.ErrNotExist) {
+		if _, errCreate := os.Create(filePath); errCreate != nil {
+			return errCreate
+		}
+	} else {
+		return err
+	}
+	return nil
 }
