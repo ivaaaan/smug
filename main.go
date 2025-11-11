@@ -3,7 +3,6 @@ package main
 import (
 	"errors"
 	"fmt"
-	"io/fs"
 	"log"
 	"os"
 	"path"
@@ -52,7 +51,6 @@ Examples:
 
 const (
 	defaultConfigFile = ".smug.yml"
-	defaultSourceDir  = "~/.config/smug"
 	logFile           = "smug.log"
 )
 
@@ -93,7 +91,8 @@ func getConfigs(options *Options, userConfigDir string) []string {
 func main() {
 	userConfigDir := filepath.Join(ExpandPath("~/"), ".config/smug")
 
-	if err := initConfigDir(userConfigDir); err != nil {
+	//Create config Directory
+	if err := os.MkdirAll(userConfigDir, 0750); err != nil {
 		fmt.Fprintf(
 			os.Stderr,
 			"Cannot initialize config dir at ~/.config/smug : %q",
@@ -229,40 +228,4 @@ func main() {
 
 		fmt.Println(string(d))
 	}
-}
-
-func initConfigDir(path string) error {
-	//Create directory if not exist
-	if _, err := os.Stat(path); errors.Is(err, fs.ErrNotExist) {
-		if errMkdir := os.MkdirAll(path, os.ModeDir); errMkdir != nil {
-			return errMkdir
-		}
-	} else if err != nil {
-		return err
-	}
-
-	//Create all files if doesn't exist
-	files := []string{ //Add some config file here
-		logFile,
-	}
-
-	for _, file := range files {
-		filePath := filepath.Join(path, file)
-		if err := createFile(filePath); err != nil {
-			return err
-		}
-	}
-
-	return nil
-}
-
-func createFile(filePath string) error {
-	if _, err := os.Stat(filePath); errors.Is(err, fs.ErrNotExist) {
-		if _, errCreate := os.Create(filePath); errCreate != nil {
-			return errCreate
-		}
-	} else {
-		return err
-	}
-	return nil
 }
