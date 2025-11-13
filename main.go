@@ -91,8 +91,8 @@ func getConfigs(options *Options, userConfigDir string) []string {
 func main() {
 	userConfigDir := filepath.Join(ExpandPath("~/"), ".config/smug")
 
-	//Create config Directory
-	if err := os.MkdirAll(userConfigDir, 0750); err != nil {
+	// Create config Directory
+	if err := os.MkdirAll(userConfigDir, 0o750); err != nil {
 		fmt.Fprintf(
 			os.Stderr,
 			"Cannot initialize config dir at ~/.config/smug : %q",
@@ -126,10 +126,10 @@ func main() {
 	smug := Smug{tmux, commander}
 	context := CreateContext()
 
-	configs := getConfigs(options, userConfigDir)
-
 	switch options.Command {
 	case CommandStart:
+		configs := getConfigs(options, userConfigDir)
+
 		if len(options.Windows) == 0 {
 			fmt.Println("Starting a new session...")
 		} else {
@@ -153,6 +153,8 @@ func main() {
 			}
 		}
 	case CommandStop:
+		configs := getConfigs(options, userConfigDir)
+
 		if len(options.Windows) == 0 {
 			fmt.Println("Terminating session...")
 		} else {
@@ -173,12 +175,7 @@ func main() {
 			}
 		}
 	case CommandNew, CommandEdit:
-		if len(configs) == 0 {
-			fmt.Fprint(os.Stderr, "Cannot edit or create multiple configurations at once")
-			os.Exit(1)
-		}
-
-		err := EditConfig(configs[0])
+		err := EditConfig(filepath.Join(userConfigDir, options.Project+".yml"))
 		if err != nil {
 			fmt.Fprint(os.Stderr, err.Error())
 			os.Exit(1)
