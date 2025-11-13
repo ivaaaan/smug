@@ -49,10 +49,13 @@ Examples:
 	$ smug print > ~/.config/smug/blog.yml
 `, version, FileUsage, WindowsUsage, AttachUsage, InsideCurrentSessionUsage, DebugUsage, DetachUsage)
 
-const defaultConfigFile = ".smug.yml"
+const (
+	defaultConfigFile = ".smug.yml"
+	logFile           = "smug.log"
+)
 
 func newLogger(path string) *log.Logger {
-	logFile, err := os.Create(filepath.Join(path, "smug.log"))
+	logFile, err := os.Create(filepath.Join(path, logFile))
 	if err != nil {
 		fmt.Fprintln(os.Stderr, err.Error())
 		os.Exit(1)
@@ -86,6 +89,18 @@ func getConfigs(options *Options, userConfigDir string) []string {
 }
 
 func main() {
+	userConfigDir := filepath.Join(ExpandPath("~/"), ".config/smug")
+
+	//Create config Directory
+	if err := os.MkdirAll(userConfigDir, 0750); err != nil {
+		fmt.Fprintf(
+			os.Stderr,
+			"Cannot initialize config dir at ~/.config/smug : %q",
+			err.Error(),
+		)
+		os.Exit(1)
+	}
+
 	options, err := ParseOptions(os.Args[1:])
 	if errors.Is(err, ErrHelp) {
 		fmt.Fprint(os.Stdout, usage)
@@ -100,8 +115,6 @@ func main() {
 		)
 		os.Exit(1)
 	}
-
-	userConfigDir := filepath.Join(ExpandPath("~/"), ".config/smug")
 
 	var logger *log.Logger
 	if options.Debug {
