@@ -58,3 +58,40 @@ windows:
 		t.Fatalf("expected %v, got %v", expected, config)
 	}
 }
+
+func TestParseConfigWithAttach(t *testing.T) {
+	yaml := `
+session: test
+attach: true
+windows:
+  - name: editor
+    commands:
+      - vim`
+
+	config, err := ParseConfig(yaml, map[string]string{})
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	if !config.Attach {
+		t.Fatal("expected attach to be true, got false")
+	}
+}
+
+func TestParseConfigWithoutAttach(t *testing.T) {
+	yaml := `
+session: test
+windows:
+  - name: editor
+    commands:
+      - vim`
+
+	config, err := ParseConfig(yaml, map[string]string{})
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	if config.Attach {
+		t.Fatal("expected attach to be false by default, got true")
+	}
+}
