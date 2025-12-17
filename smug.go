@@ -108,7 +108,7 @@ func (smug Smug) Start(config *Config, options *Options, context Context) error 
 	sessionExists := smug.tmux.SessionExists(sessionName)
 	sessionRoot := ExpandPath(config.Root)
 	windows := options.Windows
-	attach := options.Attach
+	attach := options.Attach || config.Attach
 
 	if !sessionExists && !createWindowsInsideCurrSession {
 		err := smug.execShellCommands(config.BeforeStart, sessionRoot)

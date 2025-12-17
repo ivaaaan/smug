@@ -39,8 +39,9 @@ type Window struct {
 }
 
 type Config struct {
-	SendKeysTimeout int    `yaml:"sendkeys_timeout"`
-	Session         string `yaml:"session"`
+	SendKeysTimeout int               `yaml:"sendkeys_timeout"`
+	Session         string            `yaml:"session"`
+	Attach          bool              `yaml:"attach,omitempty"`
 	TmuxOptions     `yaml:"tmux_options"`
 	Env             map[string]string `yaml:"env"`
 	Root            string            `yaml:"root"`
