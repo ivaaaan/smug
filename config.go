@@ -41,7 +41,10 @@ type Window struct {
 type Config struct {
 	SendKeysTimeout int    `yaml:"sendkeys_timeout"`
 	Session         string `yaml:"session"`
-	TmuxOptions     `yaml:"tmux_options"`
+	// Attach controls whether the session automatically attaches after creation.
+	// The -a/--attach CLI flag can also enable attachment.
+	Attach      bool              `yaml:"attach,omitempty"`
+	TmuxOptions `yaml:"tmux_options"`
 	Env             map[string]string `yaml:"env"`
 	Root            string            `yaml:"root"`
 	BeforeStart     []string          `yaml:"before_start"`
