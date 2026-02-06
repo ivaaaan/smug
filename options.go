@@ -10,12 +10,13 @@ import (
 )
 
 const (
-	CommandStart = "start"
-	CommandStop  = "stop"
-	CommandNew   = "new"
-	CommandEdit  = "edit"
-	CommandList  = "list"
-	CommandPrint = "print"
+	CommandStart  = "start"
+	CommandStop   = "stop"
+	CommandNew    = "new"
+	CommandEdit   = "edit"
+	CommandList   = "list"
+	CommandPrint  = "print"
+	CommandRemove = "rm"
 )
 
 type command struct {
@@ -49,6 +50,10 @@ var Commands = commands{
 	{
 		Name:    CommandPrint,
 		Aliases: []string{"p"},
+	},
+	{
+		Name:    CommandRemove,
+		Aliases: []string{"r"},
 	},
 }
 

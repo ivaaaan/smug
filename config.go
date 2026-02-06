@@ -57,6 +57,10 @@ func addDefaultEnvs(c *Config, path string) {
 	c.Env["SMUG_SESSION_CONFIG_PATH"] = path
 }
 
+func RemoveConfig(path string) error {
+	return os.Remove(path)
+}
+
 func EditConfig(path string) error {
 	editor := os.Getenv("EDITOR")
 	if editor == "" {
