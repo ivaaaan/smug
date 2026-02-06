@@ -249,7 +249,7 @@ func (smug Smug) GetConfigFromSession(options *Options, context Context) (Config
 		}
 
 		panes := []Pane{}
-		for _, p := range tmuxPanes {
+		for _, p := range tmuxPanes[1:] {
 			root := p.Root
 			if root == w.Root {
 				root = ""

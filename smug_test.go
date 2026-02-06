@@ -332,7 +332,6 @@ func TestPrintCurrentSession(t *testing.T) {
 				Root:   "root",
 				Layout: "layout",
 				Panes: []Pane{
-					{},
 					{
 						Root: "/tmp",
 					},
