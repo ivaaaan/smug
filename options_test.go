@@ -232,6 +232,17 @@ var usageTestTable = []struct {
 		errors.New("unknown flag: --test"),
 		nil,
 	},
+	{
+		[]string{"rm", "blog"},
+		Options{
+			Command:  "rm",
+			Project:  "blog",
+			Windows:  []string{},
+			Settings: map[string]string{},
+		},
+		nil,
+		nil,
+	},
 }
 
 func TestParseOptions(t *testing.T) {

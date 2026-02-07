@@ -9,19 +9,19 @@ _smug() {
     # if command is 'list' or 'print' do not suggest more
     for word in ${COMP_WORDS[@]}; do
         case $word in
-            list|print) return
+            list|print|rm) return
         esac
     done
 
     # commands
     if (( "${#COMP_WORDS[@]}" == 2 )); then
-        reply=($(compgen -W "list print start stop" -- "${cur}"))
+        reply=($(compgen -W "list print rm start stop" -- "${cur}"))
     fi
 
     # projects
     if (( "${#COMP_WORDS[@]}" == 3 )); then
         case ${prev} in
-            start|stop)
+            start|stop|rm)
                 reply=($(compgen -W "$(smug list | grep -F -v smug)" -- "${cur}"))
         esac
     fi

@@ -1,6 +1,7 @@
 package main
 
 import (
+	"bufio"
 	"errors"
 	"fmt"
 	"log"
@@ -35,6 +36,7 @@ Commands:
 	start   start project session
 	stop    stop project session
 	print   session configuration to stdout
+	rm      remove project configuration
 
 Examples:
 	$ smug list
@@ -47,6 +49,7 @@ Examples:
 	$ smug stop blog
 	$ smug start blog --attach
 	$ smug print > ~/.config/smug/blog.yml
+	$ smug rm blog
 `, version, FileUsage, WindowsUsage, AttachUsage, InsideCurrentSessionUsage, DebugUsage, DetachUsage)
 
 const (
@@ -210,6 +213,26 @@ func main() {
 
 		}
 
+	case CommandRemove:
+		config, err := FindConfig(userConfigDir, options.Project)
+		if err != nil {
+			fmt.Fprint(os.Stderr, err.Error())
+			os.Exit(1)
+		}
+
+		fmt.Printf("You are gonna delete %s, are you sure? [y/N]: ", options.Project)
+		scanner := bufio.NewScanner(os.Stdin)
+		scanner.Scan()
+		if strings.ToLower(strings.TrimSpace(scanner.Text())) != "y" {
+			return
+		}
+
+		err = RemoveConfig(filepath.Join(userConfigDir, config))
+		if err != nil {
+			fmt.Fprint(os.Stderr, err.Error())
+			os.Exit(1)
+		}
+		fmt.Println("Removed " + options.Project)
 	case CommandPrint:
 		config, err := smug.GetConfigFromSession(options, context)
 		if err != nil {

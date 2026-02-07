@@ -65,6 +65,10 @@ Force switch client for a session.
 Stop tmux project session
 
 .TP
+.B "rm [<projectname>]"
+Remove a project configuration. Asks for confirmation before deleting.
+
+.TP
 .B "print"
 Print current session configuration as yaml to stdout
 
@@ -84,6 +88,8 @@ $ smug stop blog
 $ smug start blog --attach
 .br
 $ smug print > ~/.config/smug/new_project.yml
+.br
+$ smug rm blog
 
 .SH AUTHOR
 Ivan Klymenchenko
