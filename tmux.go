@@ -66,9 +66,19 @@ func (tmux Tmux) NewSession(name string, root string, windowName string) (string
 }
 
 func (tmux Tmux) SessionExists(name string) bool {
-	cmd := tmux.cmd("has-session", "-t", name)
+	cmd := tmux.cmd("list-sessions", "-F", "#{session_name}")
 	res, err := tmux.commander.Exec(cmd)
-	return res == "" && err == nil
+	if err != nil {
+		return false
+	}
+
+	name = strings.Trim(name, ":")
+	for _, s := range strings.Split(strings.TrimSpace(res), "\n") {
+		if s == name {
+			return true
+		}
+	}
+	return false
 }
 
 func (tmux Tmux) KillWindow(target string) error {

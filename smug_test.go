@@ -31,7 +31,7 @@ var testTable = map[string]struct {
 		&Options{},
 		Context{},
 		[]string{
-			"tmux has-session -t ses:",
+			"tmux list-sessions -F #{session_name}",
 			"/bin/sh -c command1",
 			"/bin/sh -c command2",
 			"tmux new -Pd -s ses -n smug_def -c smug/root",
@@ -45,7 +45,7 @@ var testTable = map[string]struct {
 		[]string{
 			"tmux kill-session -t ses",
 		},
-		[]string{"ses", "win1"},
+		[]string{"", "win1"},
 	},
 	"test with 1 window and Detach: true": {
 		&Config{
@@ -63,7 +63,7 @@ var testTable = map[string]struct {
 		},
 		Context{},
 		[]string{
-			"tmux has-session -t ses:",
+			"tmux list-sessions -F #{session_name}",
 			"/bin/sh -c command1",
 			"/bin/sh -c command2",
 			"tmux new -Pd -s ses -n smug_def -c root",
@@ -107,7 +107,7 @@ var testTable = map[string]struct {
 		&Options{},
 		Context{},
 		[]string{
-			"tmux has-session -t ses:",
+			"tmux list-sessions -F #{session_name}",
 			"tmux new -Pd -s ses -n smug_def -c root",
 			"tmux neww -Pd -t ses: -c root -F #{window_id} -n win1",
 			"tmux split-window -Pd -h -t win1 -c root -F #{pane_id}",
@@ -123,7 +123,7 @@ var testTable = map[string]struct {
 			"/bin/sh -c stop2 -d --foo=bar",
 			"tmux kill-session -t ses",
 		},
-		[]string{"ses", "ses", "win1", "1"},
+		[]string{"", "ses", "win1", "1"},
 	},
 	"test start windows from option's Windows parameter": {
 		&Config{
@@ -145,7 +145,7 @@ var testTable = map[string]struct {
 		},
 		Context{},
 		[]string{
-			"tmux has-session -t ses:",
+			"tmux list-sessions -F #{session_name}",
 			"tmux new -Pd -s ses -n smug_def -c root",
 			"tmux neww -Pd -t ses: -c root -F #{window_id} -n win2",
 			"tmux select-layout -t xyz even-horizontal",
@@ -169,13 +169,13 @@ var testTable = map[string]struct {
 		&Options{},
 		Context{},
 		[]string{
-			"tmux has-session -t ses:",
+			"tmux list-sessions -F #{session_name}",
 			"tmux attach -d -t ses:",
 		},
 		[]string{
 			"tmux kill-session -t ses",
 		},
-		[]string{""},
+		[]string{"ses"},
 	},
 	"test start a new session from another tmux session": {
 		&Config{
@@ -185,7 +185,7 @@ var testTable = map[string]struct {
 		&Options{Attach: false},
 		Context{InsideTmuxSession: true},
 		[]string{
-			"tmux has-session -t ses:",
+			"tmux list-sessions -F #{session_name}",
 			"tmux new -Pd -s ses -n smug_def -c root",
 			"tmux kill-window -t ses:smug_def",
 			"tmux move-window -r -s ses: -t ses:",
@@ -206,13 +206,13 @@ var testTable = map[string]struct {
 		&Options{Attach: true},
 		Context{InsideTmuxSession: true},
 		[]string{
-			"tmux has-session -t ses:",
+			"tmux list-sessions -F #{session_name}",
 			"tmux switch-client -t ses:",
 		},
 		[]string{
 			"tmux kill-session -t ses",
 		},
-		[]string{""},
+		[]string{"ses"},
 	},
 	"test create new windows in current session with same name": {
 		&Config{
@@ -228,7 +228,7 @@ var testTable = map[string]struct {
 		Context{InsideTmuxSession: true},
 		[]string{
 			"tmux display-message -p #S",
-			"tmux has-session -t ses:",
+			"tmux list-sessions -F #{session_name}",
 			"tmux neww -Pd -t ses: -c root -F #{window_id} -n win1",
 			"tmux select-layout -t  even-horizontal",
 		},
@@ -251,7 +251,7 @@ var testTable = map[string]struct {
 		Context{InsideTmuxSession: true},
 		[]string{
 			"tmux display-message -p #S",
-			"tmux has-session -t ses:",
+			"tmux list-sessions -F #{session_name}",
 			"tmux neww -Pd -t ses: -c root -F #{window_id} -n win1",
 			"tmux select-layout -t win1 even-horizontal",
 		},
