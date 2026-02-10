@@ -243,6 +243,30 @@ var usageTestTable = []struct {
 		nil,
 		nil,
 	},
+	{
+		[]string{"switch", "blog"},
+		Options{
+			Command:  "switch",
+			Project:  "blog",
+			Windows:  []string{},
+			Attach:   true,
+			Settings: map[string]string{},
+		},
+		nil,
+		nil,
+	},
+	{
+		[]string{"sw", "blog"},
+		Options{
+			Command:  "switch",
+			Project:  "blog",
+			Windows:  []string{},
+			Attach:   true,
+			Settings: map[string]string{},
+		},
+		nil,
+		nil,
+	},
 }
 
 func TestParseOptions(t *testing.T) {
