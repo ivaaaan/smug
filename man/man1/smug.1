@@ -69,6 +69,10 @@ Stop tmux project session
 Remove a project configuration. Asks for confirmation before deleting.
 
 .TP
+.B "switch [<projectname>]"
+Switch to a tmux project session. Alias for start --attach.
+
+.TP
 .B "print"
 Print current session configuration as yaml to stdout
 
@@ -90,6 +94,8 @@ $ smug start blog --attach
 $ smug print > ~/.config/smug/new_project.yml
 .br
 $ smug rm blog
+.br
+$ smug switch blog
 
 .SH AUTHOR
 Ivan Klymenchenko

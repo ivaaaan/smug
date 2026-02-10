@@ -17,6 +17,7 @@ const (
 	CommandList   = "list"
 	CommandPrint  = "print"
 	CommandRemove = "rm"
+	CommandSwitch = "switch"
 )
 
 type command struct {
@@ -45,7 +46,7 @@ var Commands = commands{
 	},
 	{
 		Name:    CommandList,
-		Aliases: []string{"l"},
+		Aliases: []string{"l", "ls"},
 	},
 	{
 		Name:    CommandPrint,
@@ -54,6 +55,10 @@ var Commands = commands{
 	{
 		Name:    CommandRemove,
 		Aliases: []string{"r"},
+	},
+	{
+		Name:    CommandSwitch,
+		Aliases: []string{"sw"},
 	},
 }
 
@@ -168,7 +173,7 @@ func ParseOptions(argv []string) (*Options, error) {
 
 	settings := parseUserSettings(flags.Args()[1:])
 
-	return &Options{
+	opts := &Options{
 		Project:              project,
 		Config:               *config,
 		Command:              cmd.Name,
@@ -178,5 +183,11 @@ func ParseOptions(argv []string) (*Options, error) {
 		Detach:               *detach,
 		Debug:                *debug,
 		InsideCurrentSession: *insideCurrentSession,
-	}, nil
+	}
+
+	if cmd.Name == CommandSwitch {
+		opts.Attach = true
+	}
+
+	return opts, nil
 }

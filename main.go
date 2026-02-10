@@ -37,6 +37,7 @@ Commands:
 	stop    stop project session
 	print   session configuration to stdout
 	rm      remove project configuration
+	switch  switch to a project session (alias for start -a)
 
 Examples:
 	$ smug list
@@ -50,6 +51,7 @@ Examples:
 	$ smug start blog --attach
 	$ smug print > ~/.config/smug/blog.yml
 	$ smug rm blog
+	$ smug switch blog
 `, version, FileUsage, WindowsUsage, AttachUsage, InsideCurrentSessionUsage, DebugUsage, DetachUsage)
 
 const (
@@ -130,8 +132,13 @@ func main() {
 	context := CreateContext()
 
 	switch options.Command {
-	case CommandStart:
+	case CommandStart, CommandSwitch:
 		configs := getConfigs(options, userConfigDir)
+
+		if options.Command == CommandSwitch && options.Project == "" {
+			fmt.Fprint(os.Stderr, "switch requires a project name")
+			os.Exit(1)
+		}
 
 		if len(options.Windows) == 0 {
 			fmt.Println("Starting a new session...")

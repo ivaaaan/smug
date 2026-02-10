@@ -15,13 +15,13 @@ _smug() {
 
     # commands
     if (( "${#COMP_WORDS[@]}" == 2 )); then
-        reply=($(compgen -W "list print rm start stop" -- "${cur}"))
+        reply=($(compgen -W "list print rm start stop switch" -- "${cur}"))
     fi
 
     # projects
     if (( "${#COMP_WORDS[@]}" == 3 )); then
         case ${prev} in
-            start|stop|rm)
+            start|stop|rm|switch)
                 reply=($(compgen -W "$(smug list | grep -F -v smug)" -- "${cur}"))
         esac
     fi
