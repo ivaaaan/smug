@@ -136,7 +136,7 @@ func main() {
 		configs := getConfigs(options, userConfigDir)
 
 		if options.Command == CommandSwitch && options.Project == "" {
-			fmt.Fprint(os.Stderr, "switch requires a project name")
+			fmt.Fprint(os.Stderr, "switch requires a project session")
 			os.Exit(1)
 		}
 
