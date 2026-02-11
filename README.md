@@ -154,6 +154,11 @@ You may also create a file named `.smug.yml` in the current working directory, w
 ### Session-level options
 
 - `attach` - Automatically attach to the session after creation (defaults to `false`). The `-a` flag can also enable attachment.
+- `before_start` - Runs only before session is created
+- `stop` - Runs only before session killed
+
+- `attach_hook` - Runs every time first client is attached to the session
+- `detach_hook` - Runs every time last client is detached to the session
 
 ### Examples
 
@@ -164,14 +169,19 @@ session: blog
 
 root: ~/Developer/blog
 
-before_start:
-  - docker-compose -f my-microservices/docker-compose.yml up -d # my-microservices/docker-compose.yml is a relative to `root`
-
 env:
   FOO: BAR
 
+before_start:
+  - docker-compose -f my-microservices/docker-compose.yml up -d # my-microservices/docker-compose.yml is a relative to `root`, runs only before session is
+
 stop:
-  - docker stop $(docker ps -q)
+  - docker stop $(docker ps -q) # runs only before session is killed
+
+attach_hook: echo 'test' > /tmp/SMUG-ATTACH-HOOK  # runs every time first client is attached to the session (different than "before_start")
+
+detach_hook: echo 'test' > /tmp/SMUG-DETACH-HOOK  # runs every time last client is detached from the session (different than "stop")
+
 
 windows:
   - name: code
