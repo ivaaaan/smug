@@ -4,6 +4,7 @@ import (
 	"os"
 	"os/exec"
 	"strings"
+	"fmt"
 )
 
 const (
@@ -219,4 +220,26 @@ func (tmux Tmux) ListPanes(target string) ([]TmuxPane, error) {
 	}
 
 	return panes, nil
+}
+
+func (tmux Tmux) SetHook(target string, hookEvent string, command string) error {
+	// for client-detached 0 means last detached client
+	// for client-attached 1 means first attached client
+	var lastOrFirst string
+
+	// only these two hooks for now
+	if hookEvent == "client-detached" {
+		lastOrFirst = "0"
+	} else if hookEvent == "client-attached" {
+		lastOrFirst = "1"
+	} else {
+		return fmt.Errorf("unsupported hook event: %s", hookEvent)
+	}
+
+	hookCondition:= fmt.Sprintf(
+		`if -F "#{==:#{session_attached},%s}" "run-shell \"%s\""`,
+		lastOrFirst, command)
+
+	cmd := tmux.cmd("set-hook", "-t", target, hookEvent, hookCondition)
+	return tmux.commander.ExecSilently(cmd)
 }

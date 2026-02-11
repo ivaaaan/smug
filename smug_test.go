@@ -237,6 +237,36 @@ var testTable = map[string]struct {
 		},
 		[]string{"ses", ""},
 	},
+	"test with attach and detach hooks": {
+		&Config{
+			Session:    "ses",
+			Root:       "root",
+			DetachHook: "echo detached",
+			AttachHook: "echo attached",
+			Windows: []Window{
+				{
+					Name: "win1",
+				},
+			},
+		},
+		&Options{},
+		Context{},
+		[]string{
+			"tmux list-sessions -F #{session_name}",
+			"tmux new -Pd -s ses -n smug_def -c root",
+			`tmux set-hook -t ses client-detached if -F "#{==:#{session_attached},0}" "run-shell \"echo detached\""`,
+			`tmux set-hook -t ses client-attached if -F "#{==:#{session_attached},1}" "run-shell \"echo attached\""`,
+			"tmux neww -Pd -t ses: -c root -F #{window_id} -n win1",
+			"tmux select-layout -t xyz even-horizontal",
+			"tmux kill-window -t ses:smug_def",
+			"tmux move-window -r -s ses: -t ses:",
+			"tmux attach -d -t ses:win1",
+		},
+		[]string{
+			"tmux kill-session -t ses",
+		},
+		[]string{"xyz"},
+	},
 	"test create new windows in current session with different name": {
 		&Config{
 			Session: "ses",
