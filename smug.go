@@ -125,6 +125,20 @@ func (smug Smug) Start(config *Config, options *Options, context Context) error 
 		if err != nil {
 			return err
 		}
+
+		if config.DetachHook != "" {
+			err = smug.tmux.SetHook(config.Session, "client-detached", config.DetachHook)
+			if err != nil {
+				return err
+			}
+		}
+		if config.AttachHook != "" {
+			err = smug.tmux.SetHook(config.Session, "client-attached", config.AttachHook)
+			if err != nil {
+				return err
+			}
+		}
+
 	} else if len(windows) == 0 && !createWindowsInsideCurrSession {
 		if options.Detach {
 			return nil
