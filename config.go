@@ -10,7 +10,7 @@ import (
 	"path/filepath"
 	"strings"
 
-	"gopkg.in/yaml.v2"
+	"gopkg.in/yaml.v3"
 )
 
 type ConfigNotFoundError struct {
@@ -41,18 +41,18 @@ type Window struct {
 type Config struct {
 	SendKeysTimeout int    `yaml:"sendkeys_timeout"`
 	Session         string `yaml:"session"`
-	DetachHook	 	string `yaml:"detach_hook"`
-	AttachHook		string `yaml:"attach_hook"`
+	DetachHook      string `yaml:"detach_hook"`
+	AttachHook      string `yaml:"attach_hook"`
 
 	// Attach controls whether the session automatically attaches after creation.
 	// The -a/--attach CLI flag can also enable attachment.
-	Attach      bool              `yaml:"attach,omitempty"`
+	Attach      bool `yaml:"attach,omitempty"`
 	TmuxOptions `yaml:"tmux_options"`
-	Env             map[string]string `yaml:"env"`
-	Root            string            `yaml:"root"`
-	BeforeStart     []string          `yaml:"before_start"`
-	Stop            []string          `yaml:"stop"`
-	Windows         []Window          `yaml:"windows"`
+	Env         map[string]string `yaml:"env"`
+	Root        string            `yaml:"root"`
+	BeforeStart []string          `yaml:"before_start"`
+	Stop        []string          `yaml:"stop"`
+	Windows     []Window          `yaml:"windows"`
 }
 
 func addDefaultEnvs(c *Config, path string) {
