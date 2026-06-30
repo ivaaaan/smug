@@ -237,3 +237,22 @@ windows:
     commands:
       - ssh -i ~/keys/blog.pem ubuntu@127.0.0.1
 ```
+
+## Scaffolding configs with Claude Code
+
+This repo ships a [Claude Code](https://github.com/anthropics/claude-code) skill that builds a new smug configuration for you interactively, so you don't have to write the YAML by hand.
+
+If you've opened the project in Claude Code, the skill is picked up automatically from `.claude/skills/new-config/`. To use it, run:
+
+```
+/new-config
+```
+
+The skill interviews you about the session and then writes a valid config file:
+
+- **Session name** and where to save it (`.smug.yml` in the current directory, `~/.config/smug/<session>.yml`, or a custom path)
+- **Root directory** for the session
+- **Windows** — names and the commands they run
+- Optional **panes**, **layouts**, **env** variables, **before_start**/**stop** commands, and **attach_hook**/**detach_hook**
+
+Once the file is written, start the session as usual, e.g. `smug start <session>` or `smug start -f <path>`.
