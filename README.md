@@ -70,18 +70,27 @@ makepkg -si
 ## Usage
 
 ```
-smug <command> [<project>] [-f, --file <file>] [-w, --windows <window>]... [-a, --attach] [-d, --debug]
+smug <command> [<project>] [-f, --file <file>] [--worktree <worktree>] [-w, --windows <window>]... [-a, --attach] [-d, --debug]
 ```
 
 ### Options:
 
 ```
 -f, --file A custom path to a config file
+--worktree Use the git worktree (by branch or directory name) as the session root
 -w, --windows List of windows to start. If session exists, those windows will be attached to current session.
 -a, --attach Force switch client for a session
 -i, --inside-current-session Create all windows inside current session
 -d, --debug Print all commands to ~/.config/smug/smug.log
 --detach Detach session. The same as `-d` flag in the tmux
+```
+
+### Git worktrees
+
+If your project `root` is a git repository, `--worktree` starts the session in one of its worktrees instead. The worktree is matched by its branch name or its directory name, and it overrides the `root` for the session:
+
+```console
+xyz@localhost:~$ smug start project --worktree feature-x
 ```
 
 ### Custom settings

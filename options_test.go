@@ -173,6 +173,22 @@ var usageTestTable = []struct {
 		nil,
 	},
 	{
+		[]string{"start", "blog", "--worktree", "feature-x"},
+		Options{
+			Command:  "start",
+			Project:  "blog",
+			Config:   "",
+			Worktree: "feature-x",
+			Windows:  []string{},
+			Attach:   false,
+			Detach:   false,
+			Debug:    false,
+			Settings: map[string]string{},
+		},
+		nil,
+		nil,
+	},
+	{
 		[]string{"start", "--help"},
 		Options{},
 		ErrHelp,
