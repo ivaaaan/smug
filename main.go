@@ -19,10 +19,11 @@ var usage = fmt.Sprintf(`Smug - tmux session manager. Version %s
 
 
 Usage:
-	smug <command> [<project>] [-f, --file <file>] [-w, --windows <window>]... [-a, --attach] [-d, --debug] [--detach] [-i, --inside-current-session] [<key>=<value>]...
+	smug <command> [<project>] [-f, --file <file>] [--worktree <worktree>] [-w, --windows <window>]... [-a, --attach] [-d, --debug] [--detach] [-i, --inside-current-session] [<key>=<value>]...
 
 Options:
 	-f, --file %s
+	--worktree %s
 	-w, --windows %s
 	-a, --attach %s
 	-i, --inside-current-session %s
@@ -44,6 +45,7 @@ Examples:
 	$ smug edit blog
 	$ smug new blog
 	$ smug start blog
+	$ smug start blog --worktree feature-x
 	$ smug start blog:win1
 	$ smug start blog -w win1
 	$ smug start blog:win1,win2
@@ -52,7 +54,7 @@ Examples:
 	$ smug print > ~/.config/smug/blog.yml
 	$ smug rm blog
 	$ smug switch blog
-`, version, FileUsage, WindowsUsage, AttachUsage, InsideCurrentSessionUsage, DebugUsage, DetachUsage)
+`, version, FileUsage, WorktreeUsage, WindowsUsage, AttachUsage, InsideCurrentSessionUsage, DebugUsage, DetachUsage)
 
 const (
 	defaultConfigFile = ".smug.yml"
@@ -66,6 +68,32 @@ func newLogger(path string) *log.Logger {
 		os.Exit(1)
 	}
 	return log.New(logFile, "", 0)
+}
+
+// applyWorktree overrides the config root with the path of the git worktree
+// selected via --worktree.
+func applyWorktree(config *Config, worktree string, commander Commander) error {
+	root := ExpandPath(config.Root)
+	if root == "" {
+		cwd, err := os.Getwd()
+		if err != nil {
+			return err
+		}
+		root = cwd
+	}
+
+	worktrees, err := GitWorktrees(commander, root)
+	if err != nil {
+		return err
+	}
+
+	path, err := FindWorktree(worktrees, worktree)
+	if err != nil {
+		return err
+	}
+
+	config.Root = path
+	return nil
 }
 
 func getConfigs(options *Options, userConfigDir string) []string {
@@ -153,6 +181,13 @@ func main() {
 				os.Exit(1)
 			}
 
+			if options.Worktree != "" {
+				if err := applyWorktree(config, options.Worktree, smug.commander); err != nil {
+					fmt.Fprint(os.Stderr, err.Error())
+					os.Exit(1)
+				}
+			}
+
 			options.Detach = options.Detach || (configIndex != len(configs)-1)
 
 			err = smug.Start(config, options, context)
@@ -176,6 +211,13 @@ func main() {
 			if err != nil {
 				fmt.Fprint(os.Stderr, err.Error())
 				os.Exit(1)
+			}
+
+			if options.Worktree != "" {
+				if err := applyWorktree(config, options.Worktree, smug.commander); err != nil {
+					fmt.Fprint(os.Stderr, err.Error())
+					os.Exit(1)
+				}
 			}
 
 			err = smug.Stop(config, options, context)

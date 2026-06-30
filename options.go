@@ -86,6 +86,7 @@ type Options struct {
 	Command              string
 	Project              string
 	Config               string
+	Worktree             string
 	Windows              []string
 	Settings             map[string]string
 	Attach               bool
@@ -106,6 +107,7 @@ const (
 	DebugUsage                = "Print all commands to ~/.config/smug/smug.log"
 	FileUsage                 = "A custom path to a config file"
 	InsideCurrentSessionUsage = "Create all windows inside current session"
+	WorktreeUsage             = "Use the git worktree (by branch or directory name) as the session root"
 )
 
 func parseUserSettings(args []string) map[string]string {
@@ -134,6 +136,7 @@ func ParseOptions(argv []string) (*Options, error) {
 	flags := pflag.NewFlagSet(cmd.Name, pflag.ContinueOnError)
 
 	config := flags.StringP("file", "f", "", FileUsage)
+	worktree := flags.String("worktree", "", WorktreeUsage)
 	windows := flags.StringArrayP("windows", "w", []string{}, WindowsUsage)
 	attach := flags.BoolP("attach", "a", false, AttachUsage)
 	detach := flags.Bool("detach", false, DetachUsage)
@@ -176,6 +179,7 @@ func ParseOptions(argv []string) (*Options, error) {
 	opts := &Options{
 		Project:              project,
 		Config:               *config,
+		Worktree:             *worktree,
 		Command:              cmd.Name,
 		Settings:             settings,
 		Windows:              *windows,
